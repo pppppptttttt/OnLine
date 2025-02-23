@@ -1,0 +1,23 @@
+services:
+  app:
+    image: 'auth-service:latest'
+    build:
+      context: .
+    container_name: auth_service
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/online_users_db
+      - SPRING_DATASOURCE_USERNAME=online_users_db
+      - SPRING_DATASOURCE_PASSWORD=online_users_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - "8080:8080"
+
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=online_users_db
+      - POSTGRES_PASSWORD=online_users_db
