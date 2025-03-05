@@ -1,6 +1,7 @@
 package ru.hse.online.AuthService.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +16,13 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final Logger logger;
 
     public AuthResponse register(RegisterRequest request) {
+        if (repository.findByEmail(request.getEmail()).orElse(null) != null) {
+            logger.info("User {} already exists", request.getEmail());
+            return null;
+        }
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -38,7 +44,11 @@ public class AuthService {
                         request.getPassword()
                 )
         );
-        var user = repository.findByEmail(request.getEmail()).orElseThrow(); // handle
+        var user = repository.findByEmail(request.getEmail()).orElse(null);
+        if (user == null) {
+            logger.info("User {} not found", request.getEmail());
+            return null;
+        }
         var jwt = jwtService.generateToken(user);
         return AuthResponse.builder()
                 .token(jwt)
