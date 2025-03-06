@@ -27,14 +27,13 @@ class MainActivity : ComponentActivity() {
     private val mapView: BaseMapView = ActualMapView()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val currentActivity = this
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-
         setContent {
-            val currentActivity = this@MainActivity
-
-            ClientTheme {
+            ClientTheme(darkTheme = true) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     mapView.DrawMap()
 
@@ -46,11 +45,11 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             NavButton("St") {
-                                Log.i("online client ui", "stats click!")
+                                Log.i(ui_tag, "stats click!")
                             }
 
                             NavButton("Se") {
-                                Log.i("online client ui", "settings click!")
+                                Log.i(ui_tag, "settings click!")
                                 startActivity(Intent(currentActivity, SettingsActivity::class.java))
                             }
                         }
@@ -69,7 +68,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavButton(text = "Fr") {
                                 Log.i(
-                                    "online client ui",
+                                    ui_tag,
                                     "friends click!"
                                 )
                             }
@@ -78,14 +77,14 @@ class MainActivity : ComponentActivity() {
                                 .scale(1.3f)
                                 .padding(bottom = 40.dp)) {
                                 Log.i(
-                                    "online client ui",
+                                    ui_tag,
                                     "routes click!"
                                 )
                             }
 
                             NavButton(text = "Ra") {
                                 Log.i(
-                                    "online client ui",
+                                    ui_tag,
                                     "ratings click!"
                                 )
                             }
