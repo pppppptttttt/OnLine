@@ -9,7 +9,7 @@ paths:
     get:
       summary: Get user data
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -27,7 +27,7 @@ paths:
     get:
       summary: Get leaderboard
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -45,7 +45,7 @@ paths:
     get:
       summary: Get friends list
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -62,7 +62,7 @@ paths:
     patch:
       summary: Add friend
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -88,12 +88,12 @@ paths:
     delete:
       summary: Remove friend
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
             $ref: '#/components/schemas/UserRequest'
-        - in : query
+        - in: query
           name: friendId
           schema:
             type: object
@@ -110,7 +110,7 @@ paths:
     get:
       summary: Get stats list
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -127,7 +127,7 @@ paths:
     patch:
       summary: Upload stats
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -148,7 +148,7 @@ paths:
     get:
       summary: Get paths list
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -165,7 +165,7 @@ paths:
     patch:
       summary: Upload path
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
@@ -184,12 +184,12 @@ paths:
     delete:
       summary: Remove path
       parameters:
-        - in : header
+        - in: header
           name: user
           required: true
           schema:
             $ref: '#/components/schemas/UserRequest'
-        - in : query
+        - in: query
           name: pathId
           schema:
             type: object
