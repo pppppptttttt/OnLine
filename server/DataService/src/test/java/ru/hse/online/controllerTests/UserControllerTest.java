@@ -35,21 +35,21 @@ class UserControllerTest {
     private UserService userService;
 
     @Test
-    @DisplayName("GET /api/v1/get/user/ - By Username")
-    void getUserByUsernameSuccess() throws Exception {
+    @DisplayName("GET /api/v1/get/user/ - By Email")
+    void getUserByEmailSuccess() throws Exception {
         User user = User.builder().userId(UUID.randomUUID()).username("andrey").build();
-        when(userService.getUserByName("alice")).thenReturn(user);
+        when(userService.getUserByEmail("java.enjoyer@gmail.com")).thenReturn(user);
 
         mockMvc.perform(get("/api/v1/get/user/")
-                        .param("username", "alice"))
+                        .param("email", "java.enjoyer@gmail.com"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("andrey"));
     }
 
     @Test
     @DisplayName("POST /api/v1/create/user - Success")
-    void createUserDuplicateUsername() throws Exception {
-        User user = User.builder().userId(UUID.randomUUID()).username("anton").build();
+    void createUserOnlyWithEmail() throws Exception {
+        User user = User.builder().userId(UUID.randomUUID()).email("java.enjoyer@gmail.com").build();
 
         mockMvc.perform(post("/api/v1/create/user")
                 .contentType(MediaType.APPLICATION_JSON)

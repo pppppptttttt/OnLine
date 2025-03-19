@@ -7,10 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hse.online.exceptions.EntityNotFoundException;
+import ru.hse.online.model.EmailToUserId;
 import ru.hse.online.model.User;
-import ru.hse.online.model.UsernameToUserId;
+import ru.hse.online.repository.EmailToUserIdRepository;
 import ru.hse.online.repository.UserRepository;
-import ru.hse.online.repository.UsernameToUserIdRepository;
 import ru.hse.online.service.core.UserCoreService;
 
 import java.util.Optional;
@@ -27,7 +27,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private UsernameToUserIdRepository usernameToUserIdRepository;
+    private EmailToUserIdRepository usernameToUserIdRepository;
 
     @InjectMocks
     private UserCoreService userCoreService;
@@ -35,28 +35,31 @@ class UserServiceTest {
     private User testUser;
     private UUID testUserId;
     private String testUsername;
+    private String testEmail;
 
     @BeforeEach
     void setUp() {
         testUserId = UUID.randomUUID();
         testUsername = "andrey";
+        testEmail = "java.enjoyer@gmail.com";
         testUser = User.builder()
                 .userId(testUserId)
                 .username(testUsername)
+                .email(testEmail)
                 .build();
     }
 
     @Test
     void getExistingUserByNameReturnsUser() {
-        UsernameToUserId usernameToUserId = UsernameToUserId.builder()
-                .username(testUsername)
+        EmailToUserId usernameToUserId = EmailToUserId.builder()
+                .email(testEmail)
                 .userId(testUserId)
                 .build();
 
         when(usernameToUserIdRepository.findById(testUsername)).thenReturn(Optional.of(usernameToUserId));
         when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
 
-        User result = userCoreService.getUserByName(testUsername);
+        User result = userCoreService.getUserByEmail(testUsername);
 
         assertEquals(testUser, result);
         verify(usernameToUserIdRepository).findById(testUsername);
@@ -64,10 +67,10 @@ class UserServiceTest {
     }
 
     @Test
-    void getNonExistingUserByNameThrowsEntityNotFoundException() {
+    void getNonExistingUserByEmailThrowsEntityNotFoundException() {
         when(usernameToUserIdRepository.findById(testUsername)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> userCoreService.getUserByName(testUsername));
+        assertThrows(EntityNotFoundException.class, () -> userCoreService.getUserByEmail(testUsername));
         verify(usernameToUserIdRepository).findById(testUsername);
         verify(userRepository, never()).findById(any());
     }
@@ -95,6 +98,6 @@ class UserServiceTest {
         userCoreService.saveUser(testUser);
 
         verify(userRepository).save(testUser);
-        verify(usernameToUserIdRepository).save(any(UsernameToUserId.class));
+        verify(usernameToUserIdRepository).save(any(EmailToUserId.class));
     }
 }

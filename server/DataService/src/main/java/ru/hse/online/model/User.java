@@ -1,6 +1,7 @@
 package ru.hse.online.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +25,12 @@ public class User {
     @Column("username")
     @Schema(description = "Username", example = "anton")
     private final String username;
+
+    @NotNull
+    @Email
+    @Column("email")
+    @Schema(description = "Email", example = "java.enjoyer@gmail.com")
+    private final String email;
 
     @Column("friends")
     @Schema(description = "List of friend IDs")

@@ -22,21 +22,21 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "Get user by ID or username")
+    @Operation(summary = "Get user by ID or email")
     @GetMapping("/get/user/")
     @ApiResponses({
             @ApiResponse(responseCode = "200",
                     content = @Content(schema = @Schema(implementation = User.class))),
     })
-    public ResponseEntity<User> getUserByUsername(
-            @Parameter(description = "Username filter")
-            @RequestParam(name = "username", required = false) String username,
+    public ResponseEntity<User> getUserByIdOrEmail(
+            @Parameter(description = "Email filter")
+            @RequestParam(name = "email", required = false) String email,
             @Parameter(description = "User ID filter")
             @RequestParam(name = "userId", required = false) UUID userId) {
         if (userId != null) {
             return ResponseEntity.ok(userService.getUserById(userId));
-        } else if (username != null) {
-            return ResponseEntity.ok(userService.getUserByName(username));
+        } else if (email != null) {
+            return ResponseEntity.ok(userService.getUserByEmail(email));
         }
         return ResponseEntity.notFound().build();
     }
@@ -52,6 +52,7 @@ public class UserController {
                     {
                         "userId": "770e8400-e29b-41d4-a716-446655440000",
                         "username": "anton",
+                        "email": "java.enjoyer@gmail.com",
                         "friends": []
                     }""")
             User user) {

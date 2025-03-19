@@ -41,12 +41,13 @@ class FriendshipServiceTest {
         friendId1 = UUID.randomUUID();
         friendId2 = UUID.randomUUID();
 
-        friend1 = User.builder().userId(friendId1).username("friend1").build();
-        friend2 = User.builder().userId(friendId2).username("friend2").build();
+        friend1 = User.builder().userId(friendId1).email("friend1@gmail.com").username("friend1").build();
+        friend2 = User.builder().userId(friendId2).email("friend2@gmail.com").username("friend1").build();
 
         user = User.builder()
                 .userId(userId)
                 .username("andrey")
+                .email("java.enjoyer@gmail.com")
                 .friends(Arrays.asList(friendId1, friendId2))
                 .build();
     }

@@ -5,7 +5,7 @@ import ru.hse.online.model.User;
 import java.util.UUID;
 
 public interface UserService {
-    User getUserByName(String name);
+    User getUserByEmail(String email);
 
     User getUserById(UUID id);
 

@@ -2,13 +2,14 @@ CREATE TABLE IF NOT EXISTS OnLine.users
 (
     user_id  uuid PRIMARY KEY,
     username text,
-    friends  list<uuid>,
+    email    text,
+    friends  list<uuid>
 );
 
-CREATE TABLE IF NOT EXISTS OnLine.username_to_user_id
+CREATE TABLE IF NOT EXISTS OnLine.email_to_user_id
 (
-    username text PRIMARY KEY,
-    user_id  uuid
+    email   text PRIMARY KEY,
+    user_id uuid
 );
 
 CREATE TABLE IF NOT EXISTS OnLine.user_statistics

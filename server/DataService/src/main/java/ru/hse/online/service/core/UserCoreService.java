@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.hse.online.exceptions.EntityNotFoundException;
+import ru.hse.online.model.EmailToUserId;
 import ru.hse.online.model.User;
-import ru.hse.online.model.UsernameToUserId;
+import ru.hse.online.repository.EmailToUserIdRepository;
 import ru.hse.online.repository.UserRepository;
-import ru.hse.online.repository.UsernameToUserIdRepository;
 import ru.hse.online.service.UserService;
 
 import java.util.UUID;
@@ -16,13 +16,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserCoreService implements UserService {
     private final UserRepository userRepository;
-    private final UsernameToUserIdRepository usernameToUserIdRepository;
+    private final EmailToUserIdRepository emailToUserIdRepository;
 
-    public User getUserByName(String name) {
-        return usernameToUserIdRepository.findById(name)
-                .map(UsernameToUserId::getUserId)
+    public User getUserByEmail(String email) {
+        return emailToUserIdRepository.findById(email)
+                .map(EmailToUserId::getUserId)
                 .flatMap(userRepository::findById)
-                .orElseThrow(() -> new EntityNotFoundException("User with name \"" + name + "\" - not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with email \"" + email + "\" - not found"));
     }
 
     public User getUserById(UUID id) {
@@ -33,9 +33,9 @@ public class UserCoreService implements UserService {
     @Transactional
     public void saveUser(User user) {
         userRepository.save(user);
-        usernameToUserIdRepository.save(
-                UsernameToUserId.builder()
-                        .username(user.getUsername())
+        emailToUserIdRepository.save(
+                EmailToUserId.builder()
+                        .email(user.getEmail())
                         .userId(user.getUserId())
                         .build()
         );

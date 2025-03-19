@@ -11,11 +11,11 @@ import java.util.UUID;
 
 @Data
 @Builder
-@Table("username_to_user_id")
-public class UsernameToUserId {
+@Table("email_to_user_id")
+public class EmailToUserId {
     @NotNull
-    @PrimaryKey("username")
-    private final String username;
+    @PrimaryKey("email")
+    private final String email;
 
     @NotNull
     @Column("user_id")
