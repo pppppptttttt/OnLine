@@ -46,12 +46,10 @@ class StatisticsControllerTest {
 
         UserStatistics expectedStat = UserStatistics.builder()
                 .value(100.0)
-                .key(UserStatistics.UserStatisticsKey.builder()
-                        .userId(userId)
-                        .name("steps")
-                        .timestamp(start)
-                        .build()
-                ).build();
+                .userId(userId)
+                .name("steps")
+                .timestamp(start)
+                .build();
 
         when(statisticsService.getStatisticsForPeriod(
                 eq(userId), eq("steps"), eq(start), eq(end)))

@@ -6,14 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.hse.online.mapper.UserMapper;
 import ru.hse.online.model.User;
 import ru.hse.online.repository.UserRepository;
 import ru.hse.online.service.core.FriendshipCoreService;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -31,7 +29,6 @@ class FriendshipServiceTest {
     private UUID userId;
     private UUID friendId1;
     private UUID friendId2;
-    private User user;
     private User friend1;
     private User friend2;
 
@@ -41,22 +38,22 @@ class FriendshipServiceTest {
         friendId1 = UUID.randomUUID();
         friendId2 = UUID.randomUUID();
 
-        friend1 = User.builder().userId(friendId1).email("friend1@gmail.com").username("friend1").build();
-        friend2 = User.builder().userId(friendId2).email("friend2@gmail.com").username("friend1").build();
+        friend1 = User.builder().userId(friendId1).email("friend1@gmail.com").username("friend1").friends(Collections.emptyList()).build();
+        friend2 = User.builder().userId(friendId2).email("friend2@gmail.com").username("friend2").friends(Collections.emptyList()).build();
+    }
 
-        user = User.builder()
+    @Test
+    void getFriendsListReturnsListOfFriends() {
+        User user = User.builder()
                 .userId(userId)
                 .username("andrey")
                 .email("java.enjoyer@gmail.com")
                 .friends(Arrays.asList(friendId1, friendId2))
                 .build();
-    }
 
-    @Test
-    void getFriendsListReturnsListOfFriends() {
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(userRepository.findById(friendId1)).thenReturn(Optional.of(friend1));
-        when(userRepository.findById(friendId2)).thenReturn(Optional.of(friend2));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(UserMapper.toData(user)));
+        when(userRepository.findById(friendId1)).thenReturn(Optional.of(UserMapper.toData(friend1)));
+        when(userRepository.findById(friendId2)).thenReturn(Optional.of(UserMapper.toData(friend2)));
 
         List<User> expectedFriends = Arrays.asList(friend1, friend2);
         List<User> actualFriends = friendshipCoreService.getFriendsList(userId);

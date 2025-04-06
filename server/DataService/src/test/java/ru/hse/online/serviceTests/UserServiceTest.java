@@ -7,12 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hse.online.exceptions.EntityNotFoundException;
-import ru.hse.online.model.EmailToUserId;
+import ru.hse.online.mapper.UserMapper;
 import ru.hse.online.model.User;
 import ru.hse.online.repository.EmailToUserIdRepository;
 import ru.hse.online.repository.UserRepository;
 import ru.hse.online.service.core.UserCoreService;
+import ru.hse.online.storage.EmailToUserIdData;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,7 +29,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private EmailToUserIdRepository usernameToUserIdRepository;
+    private EmailToUserIdRepository emailToUserIdRepository;
 
     @InjectMocks
     private UserCoreService userCoreService;
@@ -46,38 +48,39 @@ class UserServiceTest {
                 .userId(testUserId)
                 .username(testUsername)
                 .email(testEmail)
+                .friends(Collections.emptyList())
                 .build();
     }
 
     @Test
-    void getExistingUserByNameReturnsUser() {
-        EmailToUserId usernameToUserId = EmailToUserId.builder()
+    void getExistingUserByEmailReturnsUser() {
+        EmailToUserIdData emailToUserId = EmailToUserIdData.builder()
                 .email(testEmail)
                 .userId(testUserId)
                 .build();
 
-        when(usernameToUserIdRepository.findById(testUsername)).thenReturn(Optional.of(usernameToUserId));
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        when(emailToUserIdRepository.findById(testEmail)).thenReturn(Optional.ofNullable(emailToUserId));
+        when(userRepository.findById(testUserId)).thenReturn(Optional.of(UserMapper.toData(testUser)));
 
-        User result = userCoreService.getUserByEmail(testUsername);
+        User result = userCoreService.getUserByEmail(testEmail);
 
         assertEquals(testUser, result);
-        verify(usernameToUserIdRepository).findById(testUsername);
+        verify(emailToUserIdRepository).findById(testEmail);
         verify(userRepository).findById(testUserId);
     }
 
     @Test
     void getNonExistingUserByEmailThrowsEntityNotFoundException() {
-        when(usernameToUserIdRepository.findById(testUsername)).thenReturn(Optional.empty());
+        when(emailToUserIdRepository.findById(testEmail)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> userCoreService.getUserByEmail(testUsername));
-        verify(usernameToUserIdRepository).findById(testUsername);
+        assertThrows(EntityNotFoundException.class, () -> userCoreService.getUserByEmail(testEmail));
+        verify(emailToUserIdRepository).findById(testEmail);
         verify(userRepository, never()).findById(any());
     }
 
     @Test
     void getExistingUserByIdReturnsUser() {
-        when(userRepository.findById(testUserId)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(testUserId)).thenReturn(Optional.of(UserMapper.toData(testUser)));
 
         User result = userCoreService.getUserById(testUserId);
 
@@ -97,7 +100,7 @@ class UserServiceTest {
     void saveValidUserSavesUser() {
         userCoreService.saveUser(testUser);
 
-        verify(userRepository).save(testUser);
-        verify(usernameToUserIdRepository).save(any(EmailToUserId.class));
+        verify(userRepository).save(UserMapper.toData(testUser));
+        verify(emailToUserIdRepository).save(any(EmailToUserIdData.class));
     }
 }

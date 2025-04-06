@@ -5,14 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.hse.online.mapper.UserMapper;
 import ru.hse.online.model.User;
 import ru.hse.online.repository.UserRepository;
 import ru.hse.online.service.FriendshipService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,13 +26,14 @@ public class FriendshipCoreService implements FriendshipService {
 
     public List<User> getFriendsList(UUID userId) {
         return userRepository.findById(userId)
-                .map(User::getFriends)
+                .map(userData -> UserMapper.toModel(userData).getFriends())
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(userRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+                .map(friendId -> userRepository.findById(friendId)
+                        .map(UserMapper::toModel)
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -45,4 +48,3 @@ public class FriendshipCoreService implements FriendshipService {
         cassandraTemplate.getCqlOperations().execute(query);
     }
 }
-

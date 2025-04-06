@@ -5,9 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.hse.online.mapper.UserStatisticsMapper;
 import ru.hse.online.model.UserStatistics;
 import ru.hse.online.repository.UserStatisticsRepository;
 import ru.hse.online.service.core.StatisticsCoreService;
+import ru.hse.online.storage.UserStatisticsData;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -36,24 +38,23 @@ class StatisticsServiceTest {
         LocalDate end = LocalDate.of(2025, 2, 1);
 
         UserStatistics stat1 = UserStatistics.builder()
-                .key(UserStatistics.UserStatisticsKey.builder()
-                        .userId(userId)
-                        .name(name)
-                        .timestamp(start)
-                        .build())
+                .userId(userId)
+                .name(name)
+                .timestamp(start)
                 .value(100.0)
                 .build();
 
         UserStatistics stat2 = UserStatistics.builder()
-                .key(UserStatistics.UserStatisticsKey.builder()
-                        .userId(userId)
-                        .name(name)
-                        .timestamp(end)
-                        .build())
+                .userId(userId)
+                .name(name)
+                .timestamp(end)
                 .value(150.0)
                 .build();
 
-        List<UserStatistics> expectedStats = Arrays.asList(stat1, stat2);
+        UserStatisticsData statData1 = UserStatisticsMapper.toData(stat1);
+        UserStatisticsData statData2 = UserStatisticsMapper.toData(stat2);
+
+        List<UserStatisticsData> expectedStats = Arrays.asList(statData1, statData2);
 
         when(statisticsRepository.findByUserIdAndNameAndTimestampBetween(userId, name, start, end))
                 .thenReturn(expectedStats);
@@ -61,8 +62,8 @@ class StatisticsServiceTest {
         List<UserStatistics> actualStats = statisticsCoreService.getStatisticsForPeriod(userId, name, start, end);
 
         assertEquals(expectedStats.size(), actualStats.size());
-        assertEquals(expectedStats.get(0), actualStats.get(0));
-        assertEquals(expectedStats.get(1), actualStats.get(1));
+        assertEquals(UserStatisticsMapper.toModel(expectedStats.get(0)), actualStats.get(0));
+        assertEquals(UserStatisticsMapper.toModel(expectedStats.get(1)), actualStats.get(1));
 
         verify(statisticsRepository).findByUserIdAndNameAndTimestampBetween(userId, name, start, end);
     }
@@ -75,20 +76,16 @@ class StatisticsServiceTest {
         LocalDate date = LocalDate.of(2025, 1, 2);
 
         UserStatistics stat1 = UserStatistics.builder()
-                .key(UserStatistics.UserStatisticsKey.builder()
-                        .userId(userId)
-                        .name(name)
-                        .timestamp(date)
-                        .build())
+                .userId(userId)
+                .name(name)
+                .timestamp(date)
                 .value(100.0)
                 .build();
 
         UserStatistics stat2 = UserStatistics.builder()
-                .key(UserStatistics.UserStatisticsKey.builder()
-                        .userId(userId)
-                        .name(name)
-                        .timestamp(date)
-                        .build())
+                .userId(userId)
+                .name(name)
+                .timestamp(date)
                 .value(150.0)
                 .build();
 
@@ -96,6 +93,6 @@ class StatisticsServiceTest {
 
         statisticsCoreService.saveStatistics(userStats);
 
-        verify(statisticsRepository).saveAll(userStats);
+        verify(statisticsRepository).saveAll(Arrays.asList(UserStatisticsMapper.toData(stat1), UserStatisticsMapper.toData(stat2)));
     }
 }

@@ -1,4 +1,4 @@
-package ru.hse.online.model;
+package ru.hse.online.storage;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Table("email_to_user_id")
-public class EmailToUserId {
+public class EmailToUserIdData {
     @NotNull
     @PrimaryKey("email")
     private final String email;

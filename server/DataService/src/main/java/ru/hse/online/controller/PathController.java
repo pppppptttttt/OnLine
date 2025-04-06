@@ -44,7 +44,7 @@ public class PathController {
             @RequestBody
             @Schema(example = """
                     {
-                        "key": {"userId": "770e8400-e29b-41d4-a716-446655440000"},
+                        "userId": "770e8400-e29b-41d4-a716-446655440000",
                         "polyline": "line"
                     }""")
             Path path) {
