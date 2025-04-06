@@ -1,4 +1,4 @@
-package ru.hse.online.client.map
+package ru.hse.online.client.view.map
 
 import androidx.compose.runtime.Composable
 

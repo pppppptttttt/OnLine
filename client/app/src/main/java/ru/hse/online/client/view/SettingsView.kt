@@ -1,4 +1,4 @@
-package ru.hse.online.client
+package ru.hse.online.client.view
 
 import android.os.Bundle
 import android.util.Log
@@ -14,12 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.unit.dp
 
-class SettingsActivity : ComponentActivity() {
+class SettingsView : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
 
         setContent {
             Log.i("online client ui", "settings created!")
