@@ -1,4 +1,4 @@
-package ru.hse.online.client.model.map
+package ru.hse.online.client.view.map
 
 import androidx.activity.ComponentActivity
 import android.content.Intent
@@ -13,15 +13,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import ru.hse.online.client.activity.SettingsActivity
-import ru.hse.online.client.common.ui_tag
-import ru.hse.online.client.usecase.DrawNavButtonUseCase
+import ru.hse.online.client.view.SettingsView
+import ru.hse.online.client.common.UI_LOGCAT_TAG
+import ru.hse.online.client.view.common.DrawNavButtonUseCase
 
-class MapOverlay {
+class MapOverlayView {
 
     @Composable
     fun Draw(currentActivity: ComponentActivity) {
-        val navButtonDrawer = DrawNavButtonUseCase();
+        val navButtonDrawer = DrawNavButtonUseCase()
 
         Column(
             verticalArrangement = Arrangement.Top,
@@ -31,12 +31,12 @@ class MapOverlay {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 navButtonDrawer.Execute("St") {
-                    Log.i(ui_tag, "stats click!")
+                    Log.i(UI_LOGCAT_TAG, "stats click!")
                 }
 
                 navButtonDrawer.Execute("Se") {
-                    Log.i(ui_tag, "settings click!")
-                    val intent = Intent(currentActivity, SettingsActivity::class.java)
+                    Log.i(UI_LOGCAT_TAG, "settings click!")
+                    val intent = Intent(currentActivity, SettingsView::class.java)
                     currentActivity.startActivity(intent)
                 }
             }
@@ -55,7 +55,7 @@ class MapOverlay {
             ) {
                 navButtonDrawer.Execute(text = "Fr") {
                     Log.i(
-                        ui_tag,
+                        UI_LOGCAT_TAG,
                         "friends click!"
                     )
                 }
@@ -64,14 +64,14 @@ class MapOverlay {
                     .scale(1.3f)
                     .padding(bottom = 40.dp)) {
                     Log.i(
-                        ui_tag,
+                        UI_LOGCAT_TAG,
                         "routes click!"
                     )
                 }
 
                 navButtonDrawer.Execute(text = "Ra") {
                     Log.i(
-                        ui_tag,
+                        UI_LOGCAT_TAG,
                         "ratings click!"
                     )
                 }

@@ -1,6 +1,10 @@
-package ru.hse.online.client.usecase
+package ru.hse.online.client.view
 
 import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,19 +30,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.hse.online.client.R
-import ru.hse.online.client.activity.AuthActivity
-import ru.hse.online.client.activity.MainActivity
+import ru.hse.online.client.interactor.AuthType
 import ru.hse.online.client.interactor.AuthInteractor
+import ru.hse.online.client.ui.theme.ClientTheme
 
-class HandleAuthUseCase {
-    private enum class AuthType {
-        LogIn, SignUp, None
-    }
-
+class AuthView : ComponentActivity() {
     private val authFunctions = AuthInteractor()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        setContent {
+            ClientTheme(darkTheme = true) {
+                Surface(modifier = Modifier.fillMaxSize()) {
+//                    auth.Execute(this)
+                    Draw(this)
+                }
+            }
+        }
+    }
     @Composable
-    fun Execute(currentActivity: AuthActivity) {
+    fun Draw(currentActivity: AuthView) {
         var email: String by rememberSaveable { mutableStateOf("") }
         var password by rememberSaveable { mutableStateOf("") }
         var authType by rememberSaveable { mutableStateOf(AuthType.None) }
@@ -108,12 +122,12 @@ class HandleAuthUseCase {
                             when (authType) {
                                 AuthType.LogIn -> {
                                     authFunctions.handleLogIn()
-                                    context.startActivity(Intent(currentActivity, MainActivity::class.java))
+                                    context.startActivity(Intent(currentActivity, MapView::class.java))
                                 }
 
                                 AuthType.SignUp -> {
                                     authFunctions.handleSignUp()
-                                    context.startActivity(Intent(currentActivity, MainActivity::class.java))
+                                    context.startActivity(Intent(currentActivity, MapView::class.java))
                                 }
 
                                 AuthType.None -> assert(false)
@@ -127,5 +141,4 @@ class HandleAuthUseCase {
             }
         }
     }
-
 }

@@ -1,4 +1,4 @@
-package ru.hse.online.client.usecase
+package ru.hse.online.client.view.common
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text

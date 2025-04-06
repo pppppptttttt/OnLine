@@ -1,3 +1,3 @@
 package ru.hse.online.client.common
 
-const val ui_tag: String = "online client ui"
+const val UI_LOGCAT_TAG: String = "online client ui"

@@ -1,4 +1,4 @@
-package ru.hse.online.client.model.map
+package ru.hse.online.client.view.map
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
