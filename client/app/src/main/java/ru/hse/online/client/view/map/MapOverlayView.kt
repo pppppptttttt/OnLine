@@ -17,10 +17,10 @@ import ru.hse.online.client.view.SettingsView
 import ru.hse.online.client.common.UI_LOGCAT_TAG
 import ru.hse.online.client.view.common.DrawNavButtonUseCase
 
-class MapOverlayView {
+class MapOverlayView(private val currentActivity: ComponentActivity) {
 
     @Composable
-    fun Draw(currentActivity: ComponentActivity) {
+    fun Draw() {
         val navButtonDrawer = DrawNavButtonUseCase()
 
         Column(
@@ -30,11 +30,11 @@ class MapOverlayView {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                navButtonDrawer.Execute("St") {
+                navButtonDrawer.Draw("St") {
                     Log.i(UI_LOGCAT_TAG, "stats click!")
                 }
 
-                navButtonDrawer.Execute("Se") {
+                navButtonDrawer.Draw("Se") {
                     Log.i(UI_LOGCAT_TAG, "settings click!")
                     val intent = Intent(currentActivity, SettingsView::class.java)
                     currentActivity.startActivity(intent)
@@ -53,14 +53,14 @@ class MapOverlayView {
                     .fillMaxWidth()
                     .padding(start = 60.dp, end = 60.dp)
             ) {
-                navButtonDrawer.Execute(text = "Fr") {
+                navButtonDrawer.Draw(text = "Fr") {
                     Log.i(
                         UI_LOGCAT_TAG,
                         "friends click!"
                     )
                 }
 
-                navButtonDrawer.Execute(text = "Ro", modifier = Modifier
+                navButtonDrawer.Draw(text = "Ro", modifier = Modifier
                     .scale(1.3f)
                     .padding(bottom = 40.dp)) {
                     Log.i(
@@ -69,7 +69,7 @@ class MapOverlayView {
                     )
                 }
 
-                navButtonDrawer.Execute(text = "Ra") {
+                navButtonDrawer.Draw(text = "Ra") {
                     Log.i(
                         UI_LOGCAT_TAG,
                         "ratings click!"

@@ -1,6 +1,5 @@
-package ru.hse.online.client.view
+package ru.hse.online.client.view.auth
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,22 +19,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.hse.online.client.R
-import ru.hse.online.client.interactor.AuthType
-import ru.hse.online.client.interactor.AuthInteractor
 import ru.hse.online.client.ui.theme.ClientTheme
+import kotlinx.coroutines.launch
+import ru.hse.online.client.repository.networking.api_data.AuthType
 
 class AuthView : ComponentActivity() {
-    private val authFunctions = AuthInteractor()
+    private val authModel: AuthViewModel = AuthViewModel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,17 +43,19 @@ class AuthView : ComponentActivity() {
         setContent {
             ClientTheme(darkTheme = true) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-//                    auth.Execute(this)
-                    Draw(this)
+                    Draw()
                 }
             }
         }
     }
+
     @Composable
-    fun Draw(currentActivity: AuthView) {
+    fun Draw() {
         var email: String by rememberSaveable { mutableStateOf("") }
         var password by rememberSaveable { mutableStateOf("") }
-        var authType by rememberSaveable { mutableStateOf(AuthType.None) }
+        var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
+
+        val coroutineScope = rememberCoroutineScope()
 
         Box(
             modifier = Modifier
@@ -75,28 +76,27 @@ class AuthView : ComponentActivity() {
                 Text(
                     text = "Greetings!",
                     modifier = Modifier.padding(32.dp),
-                    style = MaterialTheme.typography.headlineMedium,
-
-                    )
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(onClick = {
-                        authType = AuthType.SignUp
+                        authType = AuthType.SIGNUP
                     }) {
                         Text("Sign Up")
                     }
 
                     Button(onClick = {
-                        authType = AuthType.LogIn
+                        authType = AuthType.LOGIN
                     }) {
                         Text("Log In")
                     }
                 }
 
-                if (authType != AuthType.None) {
+                if (authType != AuthType.NONE) {
                     OutlinedTextField(
                         value = email,
                         label = { Text("Email") },
@@ -115,27 +115,15 @@ class AuthView : ComponentActivity() {
                         onValueChange = { password = it }
                     )
 
-                    val context = LocalContext.current
-
                     Button(
                         onClick = {
-                            when (authType) {
-                                AuthType.LogIn -> {
-                                    authFunctions.handleLogIn()
-                                    context.startActivity(Intent(currentActivity, MapView::class.java))
-                                }
-
-                                AuthType.SignUp -> {
-                                    authFunctions.handleSignUp()
-                                    context.startActivity(Intent(currentActivity, MapView::class.java))
-                                }
-
-                                AuthType.None -> assert(false)
+                            coroutineScope.launch {
+                                authModel.handleAuth(authType, email, password)
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(if (authType == AuthType.LogIn) "Log In" else "Sign Up")
+                        Text(if (authType == AuthType.LOGIN) "Log In" else "Sign Up")
                     }
                 }
             }
