@@ -21,6 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Client"
         tools:targetApi="31">
+
         <activity
             android:name=".view.MainActivity"
             android:exported="true"
@@ -43,6 +44,32 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="health" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
+        <activity
+            android:name=".view.MapView"
+            android:exported="true"
+            android:theme="@style/Theme.Client">
+        </activity>
+
+        <activity
+            android:name=".view.SettingsView"
+            android:exported="true"
+            >
+        </activity>
+
+        <activity
+            android:name=".view.AuthView"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
