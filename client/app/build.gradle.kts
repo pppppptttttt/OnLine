@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "ru.hse.online.client"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -37,12 +37,15 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
 
 dependencies {
-
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.maps.compose)
 
     implementation(libs.androidx.core.ktx)

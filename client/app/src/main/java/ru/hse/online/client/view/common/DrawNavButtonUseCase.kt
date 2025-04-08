@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 
 class DrawNavButtonUseCase {
     @Composable
-    fun Execute(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    fun Draw(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
         Button(
             onClick = onClick,
             modifier = modifier
