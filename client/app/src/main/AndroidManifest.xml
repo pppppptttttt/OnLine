@@ -22,7 +22,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".view.MapView"
+            android:name=".view.map.MapView"
             android:exported="true"
             android:theme="@style/Theme.Client">
         </activity>
@@ -34,7 +34,7 @@
         </activity>
 
         <activity
-            android:name=".view.AuthView"
+            android:name=".view.auth.AuthView"
             android:exported="true"
             >
             <intent-filter>

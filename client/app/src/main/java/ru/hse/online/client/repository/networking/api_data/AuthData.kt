@@ -1,4 +1,4 @@
-package ru.hse.online.client.networking.api_data
+package ru.hse.online.client.repository.networking.api_data
 
 data class AuthRequest(
     val name: String,

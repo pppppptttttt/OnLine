@@ -12,7 +12,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
-class ActualMapView : BaseMapView() {
+class GoogleMapView : BaseMapView() {
     @Composable
     override fun DrawMap() {
         val singapore = LatLng(1.35, 103.87)

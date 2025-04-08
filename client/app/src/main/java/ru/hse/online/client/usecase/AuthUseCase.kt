@@ -2,10 +2,10 @@ package ru.hse.online.client.usecase
 
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
-import ru.hse.online.client.networking.api_data.AuthRequest
-import ru.hse.online.client.networking.api_data.AuthResult
-import ru.hse.online.client.networking.api_data.AuthType
-import ru.hse.online.client.networking.api_service.AuthApiService
+import ru.hse.online.client.repository.networking.api_data.AuthRequest
+import ru.hse.online.client.repository.networking.api_data.AuthResult
+import ru.hse.online.client.repository.networking.api_data.AuthType
+import ru.hse.online.client.repository.networking.api_service.AuthApiService
 
 class AuthUseCase(private val authApiService: AuthApiService) {
     suspend fun execute(

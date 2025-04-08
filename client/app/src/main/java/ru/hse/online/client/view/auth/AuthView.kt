@@ -1,8 +1,6 @@
-package ru.hse.online.client.view
+package ru.hse.online.client.view.auth
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,21 +29,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.hse.online.client.R
-import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.ui.theme.ClientTheme
 import kotlinx.coroutines.launch
-import ru.hse.online.client.common.UI_LOGCAT_TAG
-import ru.hse.online.client.networking.ClientApi
-import ru.hse.online.client.networking.api_data.AuthResult
-import ru.hse.online.client.networking.api_data.AuthType
+import ru.hse.online.client.repository.networking.api_data.AuthType
 
 class AuthView : ComponentActivity() {
-    private lateinit var authUseCase: AuthUseCase
+    private val authModel: AuthViewModel = AuthViewModel(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        authUseCase = AuthUseCase(ClientApi.authApiService)
 
         setContent {
             ClientTheme(darkTheme = true) {
@@ -125,10 +118,7 @@ class AuthView : ComponentActivity() {
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                when (val result = authUseCase.execute(authType, email, password)) {
-                                    is AuthResult.Success -> startMapActivity()
-                                    is AuthResult.Failure -> handleError(result.code, result.message)
-                                }
+                                authModel.handleAuth(authType, email, password)
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
@@ -139,14 +129,4 @@ class AuthView : ComponentActivity() {
             }
         }
     }
-
-    private fun startMapActivity() {
-        val intent = Intent(this, MapView::class.java)
-        startActivity(intent)
-    }
-
-    private fun handleError(code: Int, message: String?) {
-        Log.i(UI_LOGCAT_TAG, "Failed to authenticate with code $code. Message: $message")
-    }
-
 }

@@ -17,10 +17,10 @@ import ru.hse.online.client.view.SettingsView
 import ru.hse.online.client.common.UI_LOGCAT_TAG
 import ru.hse.online.client.view.common.DrawNavButtonUseCase
 
-class MapOverlayView {
+class MapOverlayView(private val currentActivity: ComponentActivity) {
 
     @Composable
-    fun Draw(currentActivity: ComponentActivity) {
+    fun Draw() {
         val navButtonDrawer = DrawNavButtonUseCase()
 
         Column(

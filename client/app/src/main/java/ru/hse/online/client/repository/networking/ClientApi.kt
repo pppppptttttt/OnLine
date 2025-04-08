@@ -1,8 +1,8 @@
-package ru.hse.online.client.networking
+package ru.hse.online.client.repository.networking
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.hse.online.client.networking.api_service.AuthApiService
+import ru.hse.online.client.repository.networking.api_service.AuthApiService
 
 object ClientApi {
     private const val BASE_URL: String = "http://10.0.2.2:80"
