@@ -1,4 +1,4 @@
-package ru.hse.online.client
+package ru.hse.online.client.services.pedometer
 
 import android.app.Notification
 import android.app.NotificationChannel

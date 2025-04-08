@@ -1,4 +1,4 @@
-﻿package ru.hse.online.client
+﻿package ru.hse.online.client.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,9 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.ui.theme.ClientTheme
 
