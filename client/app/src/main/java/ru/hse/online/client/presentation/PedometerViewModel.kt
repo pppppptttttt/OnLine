@@ -1,4 +1,4 @@
-package ru.hse.online.client.view
+package ru.hse.online.client.presentation
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow

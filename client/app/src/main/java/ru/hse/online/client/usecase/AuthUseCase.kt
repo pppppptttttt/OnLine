@@ -11,7 +11,7 @@ class AuthUseCase(private val authApiService: AuthApiService) {
     suspend fun execute(
         authType: AuthType,
         email: String,
-        password: String
+        password: String,
     ): AuthResult = withContext(Dispatchers.IO) {
         try {
             val request = AuthRequest(email, email, password)

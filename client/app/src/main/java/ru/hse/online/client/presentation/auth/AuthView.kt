@@ -1,4 +1,4 @@
-package ru.hse.online.client.view.auth
+package ru.hse.online.client.presentation.auth
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,14 +32,20 @@ import androidx.compose.ui.unit.dp
 import ru.hse.online.client.R
 import ru.hse.online.client.ui.theme.ClientTheme
 import kotlinx.coroutines.launch
+import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthType
+import ru.hse.online.client.repository.storage.AppDataStore
 
 class AuthView : ComponentActivity() {
     private val authModel: AuthViewModel = AuthViewModel(this)
+    private lateinit var settingsModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        AppDataStore.initialize(this)
+        settingsModel = SettingsViewModel(AppDataStore.getInstance())
 
         setContent {
             ClientTheme(darkTheme = true) {
@@ -51,8 +58,8 @@ class AuthView : ComponentActivity() {
 
     @Composable
     fun Draw() {
-        var email: String by rememberSaveable { mutableStateOf("") }
-        var password by rememberSaveable { mutableStateOf("") }
+        val email by settingsModel.userEmail.collectAsState(initial = "")
+        val password by settingsModel.userPassword.collectAsState(initial = "")
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
 
         val coroutineScope = rememberCoroutineScope()
@@ -103,7 +110,10 @@ class AuthView : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        onValueChange = { email = it }
+                        onValueChange = {
+                            settingsModel.saveUserName(it)
+                            settingsModel.saveUserEmail(it)
+                        }
                     )
 
                     OutlinedTextField(
@@ -112,13 +122,13 @@ class AuthView : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        onValueChange = { password = it }
+                        onValueChange = { settingsModel.saveUserPassword(password) }
                     )
 
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                authModel.handleAuth(authType, email, password)
+                                authModel.handleAuth(authType, email, password, settingsModel)
                             }
                         },
                         modifier = Modifier.fillMaxWidth()

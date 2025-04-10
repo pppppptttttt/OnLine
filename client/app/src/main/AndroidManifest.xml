@@ -30,7 +30,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".view.MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Client">
         </activity>
@@ -42,19 +42,19 @@
             android:foregroundServiceType="health" />
 
         <activity
-            android:name=".view.map.MapView"
+            android:name=".presentation.map.MapView"
             android:exported="true"
             android:theme="@style/Theme.Client">
         </activity>
 
         <activity
-            android:name=".view.SettingsView"
+            android:name=".presentation.settings.SettingsView"
             android:exported="true"
             >
         </activity>
 
         <activity
-            android:name=".view.auth.AuthView"
+            android:name=".presentation.auth.AuthView"
             android:exported="true"
             >
             <intent-filter>
