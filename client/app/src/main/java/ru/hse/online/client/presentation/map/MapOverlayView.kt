@@ -1,4 +1,4 @@
-package ru.hse.online.client.view.map
+package ru.hse.online.client.presentation.map
 
 import androidx.activity.ComponentActivity
 import android.content.Intent
@@ -13,9 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
-import ru.hse.online.client.view.SettingsView
+import ru.hse.online.client.presentation.settings.SettingsView
 import ru.hse.online.client.common.UI_LOGCAT_TAG
-import ru.hse.online.client.view.common.DrawNavButtonUseCase
+import ru.hse.online.client.presentation.common.DrawNavButtonUseCase
 
 class MapOverlayView(private val currentActivity: ComponentActivity) {
 

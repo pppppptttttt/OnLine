@@ -1,4 +1,4 @@
-﻿package ru.hse.online.client.view
+﻿package ru.hse.online.client.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

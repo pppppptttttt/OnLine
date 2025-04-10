@@ -1,4 +1,4 @@
-package ru.hse.online.client.view.common
+package ru.hse.online.client.presentation.common
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text

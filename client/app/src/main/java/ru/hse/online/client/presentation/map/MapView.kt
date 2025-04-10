@@ -1,4 +1,4 @@
-﻿package ru.hse.online.client.view.map
+﻿package ru.hse.online.client.presentation.map
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
