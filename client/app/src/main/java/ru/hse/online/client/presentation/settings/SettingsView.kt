@@ -19,18 +19,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.common.UI_LOGCAT_TAG
-import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.ui.theme.ClientTheme
 
-class SettingsView : ComponentActivity() {
-    private lateinit var viewModel: SettingsViewModel
+class SettingsView() : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        viewModel = SettingsViewModel(AppDataStore.getInstance())
 
         setContent {
             Log.i(UI_LOGCAT_TAG, "settings created!")
@@ -44,6 +41,7 @@ class SettingsView : ComponentActivity() {
 
     @Composable
     fun Draw() {
+        val viewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
         val userName by viewModel.userName.collectAsState(initial = "")
         val userEmail by viewModel.userEmail.collectAsState(initial = "")
         val userPassword by viewModel.userPassword.collectAsState(initial = "")

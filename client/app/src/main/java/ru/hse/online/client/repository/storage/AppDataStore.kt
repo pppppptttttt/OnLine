@@ -11,28 +11,12 @@ import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
-class AppDataStore private constructor(private val context: Context) {
+class AppDataStore(private val context: Context) {
     companion object {
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PASSWORD = stringPreferencesKey("user_password")
         val USER_TOKEN = stringPreferencesKey("user_uuid")
-
-        @Volatile
-        private var instance: AppDataStore? = null
-        private var appContext: Context? = null
-
-        fun initialize(context: Context) {
-            appContext = context.applicationContext
-        }
-
-        fun getInstance(): AppDataStore {
-            return instance ?: synchronized(this) {
-                instance ?: AppDataStore(
-                    appContext ?: throw IllegalStateException("Call initialize() first!")
-                ).also { instance = it }
-            }
-        }
     }
 
     suspend fun <T> saveValue(key: Preferences.Key<T>, value: T) {

@@ -32,20 +32,16 @@ import androidx.compose.ui.unit.dp
 import ru.hse.online.client.R
 import ru.hse.online.client.ui.theme.ClientTheme
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthType
-import ru.hse.online.client.repository.storage.AppDataStore
 
 class AuthView : ComponentActivity() {
     private val authModel: AuthViewModel = AuthViewModel(this)
-    private lateinit var settingsModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        AppDataStore.initialize(this)
-        settingsModel = SettingsViewModel(AppDataStore.getInstance())
 
         setContent {
             ClientTheme(darkTheme = true) {
@@ -57,7 +53,7 @@ class AuthView : ComponentActivity() {
     }
 
     @Composable
-    fun Draw() {
+    fun Draw(settingsModel: SettingsViewModel = koinViewModel()) {
         val email by settingsModel.userEmail.collectAsState(initial = "")
         val password by settingsModel.userPassword.collectAsState(initial = "")
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
