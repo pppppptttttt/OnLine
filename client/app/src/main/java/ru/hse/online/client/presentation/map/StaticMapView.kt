@@ -11,10 +11,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ru.hse.online.client.R
 
-class StaticMapView : BaseMapView() {
+class StaticMapView : BaseMapView {
     @Composable
     override fun DrawMap() {
-        Column(verticalArrangement = Arrangement.Top, modifier = Modifier.padding(top = 40.dp)) {
+        Column(verticalArrangement = Arrangement.Top, modifier = Modifier.padding(40.dp)) {
             Image(
                 painter = painterResource(id = R.drawable.meme),
                 contentDescription = "Map",
