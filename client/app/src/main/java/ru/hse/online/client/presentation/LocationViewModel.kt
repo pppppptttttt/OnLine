@@ -15,8 +15,8 @@ import ru.hse.online.client.services.location.LocationProvider
 class LocationViewModel(private val locationProvider: LocationProvider) : ViewModel() {
     private val TAG: String = "APP_LOCATION_VIEW_MODEL"
 
-    private val _location = MutableStateFlow<Location?>(null)
-    val location: StateFlow<Location?> = _location.asStateFlow()
+    private val _location = MutableStateFlow<LatLng>(LatLng(0.0, 0.0))
+    val location: StateFlow<LatLng> = _location.asStateFlow()
     private var _routePoints: MutableStateFlow<List<LatLng>> = MutableStateFlow<List<LatLng>>(listOf());
     val routePoints: StateFlow<List<LatLng>> = _routePoints.asStateFlow()
 
@@ -26,10 +26,10 @@ class LocationViewModel(private val locationProvider: LocationProvider) : ViewMo
             .onEach { state ->
                 when (state) {
                     is LocationProvider.LocationState.Available -> {
-                        _location.value = state.location
                         val newPoint = state.location.let {
                             LatLng(it.latitude, it.longitude)
                         }
+                        _location.value = newPoint
                         _routePoints.value += newPoint
                         Log.i(TAG, "New location " + _location.value);
                     }

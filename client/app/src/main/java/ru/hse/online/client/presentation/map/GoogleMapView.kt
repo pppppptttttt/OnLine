@@ -7,16 +7,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
@@ -37,26 +34,18 @@ class GoogleMapView : BaseMapView {
         val cameraPositionState = rememberCameraPositionState()
 
         val markers = remember { mutableStateListOf<LatLng>() }
-        var selectedMarker = remember { mutableStateOf<LatLng?>(null) }
 
-        /*
-        LaunchedEffect(routePoints) {
-            if (routePoints.isNotEmpty()) {
-                val bounds = LatLngBounds.builder().apply {
-                    routePoints.forEach { include(it) }
-                }.build()
-
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngBounds(bounds, 100)
-                )
-            }
-        }*/
+        val currentMarkerState = rememberMarkerState()
 
         LaunchedEffect(currentLocation) {
-            currentLocation?.let { location ->
+            currentMarkerState.position = currentLocation
+        }
+
+        LaunchedEffect(currentLocation) {
+            currentLocation.let { location ->
                 cameraPositionState.animate(
                     CameraUpdateFactory.newLatLngZoom(
-                        LatLng(location.latitude, location.longitude),
+                        location,
                         15f
                     )
                 )
@@ -72,7 +61,6 @@ class GoogleMapView : BaseMapView {
             uiSettings = MapUiSettings(zoomControlsEnabled = false),
             onMapClick = { coord ->
                 markers.add(coord)
-                Log.i("dbg", routePoints.toString())
             },
             onMapLongClick = { coord ->
                 markers.remove(coord)
@@ -84,6 +72,13 @@ class GoogleMapView : BaseMapView {
                 width = 15f
             )
 
+            Marker(
+                state = currentMarkerState,
+                icon = BitmapDescriptorFactory.defaultMarker(
+                    BitmapDescriptorFactory.HUE_AZURE
+                )
+            )
+
             markers.forEach { coord ->
                 Marker(
                     state = rememberMarkerState(position = coord),
@@ -93,7 +88,5 @@ class GoogleMapView : BaseMapView {
                 )
             }
         }
-
-
     }
 }
