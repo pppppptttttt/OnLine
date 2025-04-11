@@ -20,14 +20,15 @@ class AuthViewModel(private val authView: ComponentActivity) {
         password: String,
         settingsModel: SettingsViewModel
     ) {
-        when (val result = authUseCase.execute(authType, email, password)) {
-            is AuthResult.Success -> {
-                settingsModel.saveUserToken(result.token)
-                startMapActivity()
-            }
-
-            is AuthResult.Failure -> handleError(result.code, result.message)
-        }
+//        when (val result = authUseCase.execute(authType, email, password)) {
+//            is AuthResult.Success -> {
+//                settingsModel.saveUserToken(result.token)
+//                startMapActivity()
+//            }
+//
+//            is AuthResult.Failure -> handleError(result.code, result.message)
+//        }
+        startMapActivity()
     }
 
     private fun startMapActivity() {

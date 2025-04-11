@@ -47,11 +47,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.presentation.common.BottomScreenName
+import ru.hse.online.client.presentation.LocationViewModel
 import ru.hse.online.client.ui.theme.ClientTheme
 
 class MainActivity : ComponentActivity() {
