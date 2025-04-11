@@ -14,12 +14,18 @@ import ru.hse.online.client.presentation.settings.SettingsViewModel
 class AuthViewModel(private val authView: ComponentActivity) {
     private var authUseCase: AuthUseCase = AuthUseCase(ClientApi.authApiService)
 
-    suspend fun handleAuth(authType: AuthType, email: String, password: String, settingsModel: SettingsViewModel) {
+    suspend fun handleAuth(
+        authType: AuthType,
+        email: String,
+        password: String,
+        settingsModel: SettingsViewModel
+    ) {
         when (val result = authUseCase.execute(authType, email, password)) {
             is AuthResult.Success -> {
                 settingsModel.saveUserToken(result.token)
                 startMapActivity()
             }
+
             is AuthResult.Failure -> handleError(result.code, result.message)
         }
     }

@@ -36,9 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.presentation.common.BottomScreenName
 import ru.hse.online.client.ui.theme.ClientTheme
 
 class MainActivity : ComponentActivity() {
+    private val bottomScreenName = BottomScreenName("Pedometer")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +48,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ClientTheme {
-                MainScreen()
+                bottomScreenName.DisplayNameAndDraw {
+                    MainScreen()
+                }
             }
         }
     }

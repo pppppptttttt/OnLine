@@ -104,7 +104,7 @@ class StepCounterService : Service(), SensorEventListener {
         testJob = CoroutineScope(Dispatchers.Default).launch {
             while (true) {
                 delay(1000)
-                _steps.value += Random.nextInt(1,5)
+                _steps.value += Random.nextInt(1, 5)
                 updateDerivedMetrics()
             }
 
@@ -167,7 +167,7 @@ class StepCounterService : Service(), SensorEventListener {
             if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
                 _steps.value++
                 if (isOnline) {
-                    _stepsOnline.value++;
+                    _stepsOnline.value++
                 }
                 updateDerivedMetrics()
             }
@@ -196,7 +196,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     private val autoSaveJob = CoroutineScope(Dispatchers.IO).launch {
         while (true) {
-            delay(1000*60*2)
+            delay(1000 * 60 * 2)
             saveData()
         }
     }

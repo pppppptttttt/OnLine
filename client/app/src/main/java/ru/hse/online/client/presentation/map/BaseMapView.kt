@@ -2,7 +2,7 @@ package ru.hse.online.client.presentation.map
 
 import androidx.compose.runtime.Composable
 
-abstract class BaseMapView {
+interface BaseMapView {
     @Composable
-    abstract fun DrawMap()
+    fun DrawMap()
 }
