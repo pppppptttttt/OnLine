@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.Route
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SupervisedUserCircle
+import androidx.compose.material3.Icon
 //import androidx.compose.material.icons.filled.RocketLaunch
 //import androidx.compose.material.icons.filled.Route
 //import androidx.compose.material.icons.filled.Settings
 //import androidx.compose.material.icons.filled.SupervisedUserCircle
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.MainActivity
-import ru.hse.online.client.presentation.PedometerViewModel
+import ru.hse.online.client.presentation.pedometer.PedometerView
+import ru.hse.online.client.presentation.pedometer.PedometerViewModel
 import ru.hse.online.client.presentation.common.NavButtonDrawer
 import ru.hse.online.client.presentation.friendlist.FriendListView
 import ru.hse.online.client.presentation.routelist.RouteListView
@@ -74,7 +78,7 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     from = currentActivity,
                     to = SettingsView::class.java,
                 ) {
-                    //Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                    Icon(Icons.Filled.Settings, contentDescription = "Settings")
                 }
             }
         }
@@ -94,25 +98,25 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     from = currentActivity,
                     to = FriendListView::class.java,
                     function = {
-                        //Icon(Icons.Filled.SupervisedUserCircle, contentDescription = "Settings")
+                        Icon(Icons.Filled.SupervisedUserCircle, contentDescription = "Settings")
                     }
                 )
 
                 navButtonDrawer.Draw(
                     from = currentActivity,
-                    to = MainActivity::class.java,
+                    to = PedometerView::class.java,
                     modifier = Modifier
                         .scale(1.3f)
                         .padding(bottom = 40.dp)
                 ) {
-                    //Icon(Icons.Filled.RocketLaunch, contentDescription = "Settings")
+                    Icon(Icons.Filled.RocketLaunch, contentDescription = "Settings")
                 }
 
                 navButtonDrawer.Draw(
                     currentActivity,
                     RouteListView::class.java
                 ) {
-                    //Icon(Icons.Filled.Route, contentDescription = "Settings")
+                    Icon(Icons.Filled.Route, contentDescription = "Settings")
                 }
             }
         }

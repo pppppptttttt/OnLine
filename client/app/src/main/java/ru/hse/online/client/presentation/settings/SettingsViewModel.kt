@@ -49,4 +49,15 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         AppDataStore.USER_TOKEN,
         defaultValue = ""
     )
+
+    fun saveDailyStepCount(steps: Int) {
+        viewModelScope.launch {
+            dataStore.saveValue(AppDataStore.DAILY_STEP_COUNT, steps)
+        }
+    }
+
+    val dailyStepCount = dataStore.getValueFlow(
+        AppDataStore.DAILY_STEP_COUNT,
+        defaultValue = 6000
+    )
 }

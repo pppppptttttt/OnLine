@@ -1,4 +1,4 @@
-﻿package ru.hse.online.client.presentation
+﻿package ru.hse.online.client.presentation.pedometer
 
 import android.Manifest
 import android.app.Activity
@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
@@ -32,10 +33,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,16 +48,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.presentation.common.BottomScreenName
 import ru.hse.online.client.presentation.LocationViewModel
+import ru.hse.online.client.presentation.settings.SettingsView
+import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.ui.theme.ClientTheme
 
-class MainActivity : ComponentActivity() {
+class PedometerView : ComponentActivity() {
     private val bottomScreenName = BottomScreenName("Pedometer")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +86,9 @@ fun MainScreen(viewModel: PedometerViewModel = koinViewModel()) {
     val calories by viewModel.totalCalories.collectAsStateWithLifecycle(0.0)
     val distance by viewModel.totalDistance.collectAsStateWithLifecycle(0.0)
     val time by viewModel.totalTime.collectAsStateWithLifecycle(0L)
+
+    val settingsViewModel = koinViewModel<SettingsViewModel>()
+    val dailyStepCount by settingsViewModel.dailyStepCount.collectAsState(initial = 6000)
     
     Scaffold(
         topBar = {
@@ -103,13 +113,21 @@ fun MainScreen(viewModel: PedometerViewModel = koinViewModel()) {
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            MetricsGrid(
-                stepCount = stepCount,
-                stepGoal = 6000,
-                calories = calories,
-                distance = distance,
-                time = time
-            )
+            Row {
+                MetricsGrid(
+                    stepCount = stepCount,
+                    stepGoal = dailyStepCount,
+                    calories = calories,
+                    distance = distance,
+                    time = time
+                )
+
+                TextField(
+                    value = "$dailyStepCount",
+                    onValueChange = { if (it.isDigitsOnly()) settingsViewModel.saveDailyStepCount(it.toInt()) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
             LocationScreen()
         }
     }

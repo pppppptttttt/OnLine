@@ -4,7 +4,7 @@ import android.content.Context
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import ru.hse.online.client.presentation.LocationViewModel
-import ru.hse.online.client.presentation.PedometerViewModel
+import ru.hse.online.client.presentation.pedometer.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.services.location.LocationProvider
