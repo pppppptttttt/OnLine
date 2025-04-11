@@ -1,5 +1,7 @@
 package ru.hse.online.client.presentation.map
 
+import android.content.Intent
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,10 +11,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SupervisedUserCircle
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 //import androidx.compose.material.icons.filled.RocketLaunch
 //import androidx.compose.material.icons.filled.Route
@@ -21,6 +26,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -32,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.common.UI_LOGCAT_TAG
 import ru.hse.online.client.presentation.pedometer.PedometerView
 import ru.hse.online.client.presentation.pedometer.PedometerViewModel
 import ru.hse.online.client.presentation.common.NavButtonDrawer
@@ -74,11 +84,26 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     )
                 }
 
-                navButtonDrawer.Draw(
-                    from = currentActivity,
-                    to = SettingsView::class.java,
-                ) {
-                    Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                Column {
+                    navButtonDrawer.Draw(
+                        from = currentActivity,
+                        to = SettingsView::class.java,
+                    ) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                    }
+
+                    var iconPlay by remember { mutableStateOf(false) }
+                    Button(
+                        onClick = {
+                            Log.i(UI_LOGCAT_TAG, "$iconPlay")
+                            iconPlay = !iconPlay
+                          },
+                    ) {
+                        if (iconPlay)
+                            Icon(Icons.Filled.PlayArrow, contentDescription = "Start badtrip")
+                        else
+                            Icon(Icons.Filled.Pause, contentDescription = "Pause badtrip")
+                    }
                 }
             }
         }
