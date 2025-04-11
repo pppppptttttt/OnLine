@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,8 @@ import ru.hse.online.client.repository.storage.AppDataStore
 import kotlin.random.Random
 
 class StepCounterService : Service(), SensorEventListener {
+    private val TAG: String = "APP_STEP_COUNTER_SERVICE"
+
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
     private val dataStore: AppDataStore by inject()
@@ -99,7 +102,7 @@ class StepCounterService : Service(), SensorEventListener {
         loadSavedData()
         startForeground()
         registerSensor()
-        startTesting()
+        //startTesting()
         startAutoSave()
     }
 
@@ -207,6 +210,7 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
             if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
+                Log.e(TAG, "Step detected, ${_steps.value}")
                 _steps.value++
                 if (isOnline) {
                     _stepsOnline.value++
@@ -227,11 +231,11 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     private fun updateDerivedMetrics() {
-        _caloriesBurned.value = _steps.value * _KKAL_PER_STEP
-        _distanceTraveled.value = _steps.value * _KM_PER_STEP
+        _caloriesBurned.value += _KKAL_PER_STEP
+        _distanceTraveled.value += _KM_PER_STEP
         if (isOnline) {
-            _caloriesBurnedOnline.value = _stepsOnline.value * _KKAL_PER_STEP
-            _distanceTraveledOnline.value = _stepsOnline.value * _KM_PER_STEP
+            _caloriesBurnedOnline.value += _KKAL_PER_STEP
+            _distanceTraveledOnline.value += _KM_PER_STEP
         }
     }
 
