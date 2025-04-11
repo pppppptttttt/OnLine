@@ -58,8 +58,6 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
 
     @Composable
     fun Draw(viewModel: PedometerViewModel = koinViewModel()) {
-        val stepCount by viewModel.totalSteps.collectAsStateWithLifecycle(0)
-
         val navButtonDrawer = NavButtonDrawer()
 
         Column(
@@ -77,9 +75,14 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     val onLineTime by viewModel.onlineTime.collectAsStateWithLifecycle(0L)
 
                     Column {
-                        for (stat in arrayOf(onLineStepCount, onLineDistance, onLineTime, onLineCalories)) {
+                        for (stat in arrayOf(
+                            Pair(onLineStepCount, "steps"),
+                            Pair(onLineDistance, "meters"),
+                            Pair(onLineTime, "hm"),
+                            Pair(onLineCalories, "kcal")
+                        )) {
                             Text(
-                                text = "$stat steps on line!",
+                                text = "${stat.first.format(2)} ${stat.second} on line!",
                                 fontSize = 16.sp,
                                 style = TextStyle(
                                     shadow = Shadow(
@@ -106,7 +109,7 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                             iconPlay = !iconPlay
                             if (iconPlay) viewModel.goOnLine()
                             else viewModel.goOffLine()
-                          },
+                        },
                     ) {
                         if (iconPlay)
                             Icon(Icons.Filled.Pause, contentDescription = "Start badtrip")
@@ -156,3 +159,13 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
         }
     }
 }
+
+private fun Number.format(scale: Int): String =
+    if (this is Int) {
+        "%d".format(this)
+    } else if (this is Double) {
+        "%.${scale}f".format(this)
+    } else {
+        toString()
+    }
+
