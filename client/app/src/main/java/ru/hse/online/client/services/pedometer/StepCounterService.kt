@@ -99,7 +99,7 @@ class StepCounterService : Service(), SensorEventListener {
         loadSavedData()
         startForeground()
         registerSensor()
-        //startTesting()
+        startTesting()
         startAutoSave()
     }
 
