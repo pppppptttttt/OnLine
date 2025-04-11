@@ -1,8 +1,7 @@
-package ru.hse.online.client.presentation
+package ru.hse.online.client.presentation.pedometer
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
-import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.services.pedometer.ContextProvider
 import ru.hse.online.client.services.pedometer.StepCounterService
 import ru.hse.online.client.services.pedometer.StepServiceConnector
