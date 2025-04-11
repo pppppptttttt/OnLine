@@ -3,9 +3,11 @@ package ru.hse.online.client.di
 import android.content.Context
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import ru.hse.online.client.presentation.LocationViewModel
 import ru.hse.online.client.presentation.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
+import ru.hse.online.client.services.location.LocationProvider
 import ru.hse.online.client.services.pedometer.ContextProvider
 import ru.hse.online.client.services.pedometer.StepServiceConnector
 
@@ -29,6 +31,16 @@ val appModule = module {
         PedometerViewModel(
             connector = get(),
             contextProvider = get()
+        )
+    }
+
+    single<LocationProvider> {
+        LocationProvider(get<Context>())
+    }
+
+    viewModel<LocationViewModel> {
+        LocationViewModel(
+            get()
         )
     }
 }
