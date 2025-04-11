@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.common.UI_LOGCAT_TAG
 import ru.hse.online.client.presentation.pedometer.PedometerView
 import ru.hse.online.client.presentation.pedometer.PedometerViewModel
 import ru.hse.online.client.presentation.common.NavButtonDrawer
@@ -72,16 +71,25 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(modifier = Modifier.background(color = Color(0x77000000))) {
-                    Text(
-                        text = "$stepCount steps today",
-                        fontSize = 16.sp,
-                        style = TextStyle(
-                            shadow = Shadow(
-                                blurRadius = 2.0f,
-                                offset = Offset(2.0f, 5.0f)
+                    val onLineStepCount by viewModel.onlineSteps.collectAsStateWithLifecycle(0)
+                    val onLineCalories by viewModel.onlineCalories.collectAsStateWithLifecycle(0.0)
+                    val onLineDistance by viewModel.onlineDistance.collectAsStateWithLifecycle(0.0)
+                    val onLineTime by viewModel.onlineTime.collectAsStateWithLifecycle(0L)
+
+                    Column {
+                        for (stat in arrayOf(onLineStepCount, onLineDistance, onLineTime, onLineCalories)) {
+                            Text(
+                                text = "$stat steps on line!",
+                                fontSize = 16.sp,
+                                style = TextStyle(
+                                    shadow = Shadow(
+                                        blurRadius = 2.0f,
+                                        offset = Offset(2.0f, 5.0f)
+                                    )
+                                )
                             )
-                        )
-                    )
+                        }
+                    }
                 }
 
                 Column {
@@ -95,14 +103,15 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     var iconPlay by remember { mutableStateOf(false) }
                     Button(
                         onClick = {
-                            Log.i(UI_LOGCAT_TAG, "$iconPlay")
                             iconPlay = !iconPlay
+                            if (iconPlay) viewModel.goOnLine()
+                            else viewModel.goOffLine()
                           },
                     ) {
                         if (iconPlay)
-                            Icon(Icons.Filled.PlayArrow, contentDescription = "Start badtrip")
+                            Icon(Icons.Filled.Pause, contentDescription = "Start badtrip")
                         else
-                            Icon(Icons.Filled.Pause, contentDescription = "Pause badtrip")
+                            Icon(Icons.Filled.PlayArrow, contentDescription = "Pause badtrip")
                     }
                 }
             }

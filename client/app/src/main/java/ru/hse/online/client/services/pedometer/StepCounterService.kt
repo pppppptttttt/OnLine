@@ -102,7 +102,7 @@ class StepCounterService : Service(), SensorEventListener {
         loadSavedData()
         startForeground()
         registerSensor()
-//        startTesting()
+        startTesting()
         startAutoSave()
     }
 
@@ -150,6 +150,7 @@ class StepCounterService : Service(), SensorEventListener {
             while (true) {
                 delay(1000)
                 _steps.value += Random.nextInt(1, 5)
+                if (isOnline) _stepsOnline.value += Random.nextInt(1, 5)
                 updateDerivedMetrics()
             }
 

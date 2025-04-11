@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -65,7 +66,10 @@ class GoogleMapView : BaseMapView {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            googleMapOptionsFactory = { GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM) },
+            googleMapOptionsFactory = {
+                GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM)
+            },
+            uiSettings = MapUiSettings(zoomControlsEnabled = false),
             onMapClick = { coord ->
                 markers.add(coord)
                 Log.i("dbg", routePoints.toString())
