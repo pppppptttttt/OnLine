@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import ru.hse.online.client.common.UI_LOGCAT_TAG
 import ru.hse.online.client.repository.storage.AppDataStore
 import kotlin.random.Random
 
@@ -102,7 +103,7 @@ class StepCounterService : Service(), SensorEventListener {
         loadSavedData()
         startForeground()
         registerSensor()
-        startTesting()
+//        startTesting()
         startAutoSave()
     }
 
@@ -209,6 +210,9 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onSensorChanged(event: SensorEvent?) {
+        Log.i(
+            UI_LOGCAT_TAG, "bebra"
+        )
         event?.let {
             if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
                 Log.e(TAG, "Step detected, ${_steps.value}")

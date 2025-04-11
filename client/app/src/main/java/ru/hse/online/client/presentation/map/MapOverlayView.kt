@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -18,12 +22,14 @@ import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 //import androidx.compose.material.icons.filled.RocketLaunch
 //import androidx.compose.material.icons.filled.Route
 //import androidx.compose.material.icons.filled.Settings
 //import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,8 +43,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.presentation.pedometer.PedometerView
@@ -104,17 +112,25 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     }
 
                     var iconPlay by remember { mutableStateOf(false) }
+                    var dialogDraw by remember { mutableStateOf(false) }
                     Button(
                         onClick = {
                             iconPlay = !iconPlay
                             if (iconPlay) viewModel.goOnLine()
-                            else viewModel.goOffLine()
+                            else {
+                                viewModel.goOffLine()
+                                dialogDraw = true
+                            }
                         },
                     ) {
                         if (iconPlay)
                             Icon(Icons.Filled.Pause, contentDescription = "Start badtrip")
                         else
                             Icon(Icons.Filled.PlayArrow, contentDescription = "Pause badtrip")
+                    }
+
+                    if (dialogDraw) {
+                        Dialog_({dialogDraw = false}, {dialogDraw = false})
                     }
                 }
             }
@@ -154,6 +170,52 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     RouteListView::class.java
                 ) {
                     Icon(Icons.Filled.Route, contentDescription = "Settings")
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun Dialog_(
+        onDismissRequest: () -> Unit,
+        onConfirmation: () -> Unit,
+    ) {
+        Dialog(onDismissRequest = { onDismissRequest() }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = "Would you like to save path you walked on line?",
+                        modifier = Modifier.padding(16.dp),
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        TextButton(
+                            onClick = { onDismissRequest() },
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            Text("Dismiss")
+                        }
+                        TextButton(
+                            onClick = { onConfirmation() },
+                            modifier = Modifier.padding(8.dp),
+                        ) {
+                            Text("Confirm")
+                        }
+                    }
                 }
             }
         }
