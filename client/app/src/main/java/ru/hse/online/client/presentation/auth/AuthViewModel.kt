@@ -1,4 +1,4 @@
-package ru.hse.online.client.view.auth
+package ru.hse.online.client.presentation.auth
 
 import android.content.Intent
 import android.util.Log
@@ -8,14 +8,24 @@ import ru.hse.online.client.repository.networking.ClientApi
 import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.usecase.AuthUseCase
-import ru.hse.online.client.view.map.MapView
+import ru.hse.online.client.presentation.map.MapView
+import ru.hse.online.client.presentation.settings.SettingsViewModel
 
 class AuthViewModel(private val authView: ComponentActivity) {
     private var authUseCase: AuthUseCase = AuthUseCase(ClientApi.authApiService)
 
-    suspend fun handleAuth(authType: AuthType, email: String, password: String) {
+    suspend fun handleAuth(
+        authType: AuthType,
+        email: String,
+        password: String,
+        settingsModel: SettingsViewModel
+    ) {
         when (val result = authUseCase.execute(authType, email, password)) {
-            is AuthResult.Success -> startMapActivity()
+            is AuthResult.Success -> {
+                settingsModel.saveUserToken(result.token)
+                startMapActivity()
+            }
+
             is AuthResult.Failure -> handleError(result.code, result.message)
         }
     }

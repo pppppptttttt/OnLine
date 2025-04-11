@@ -1,18 +1,17 @@
-package ru.hse.online.client.view.map
+package ru.hse.online.client.presentation.map
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapColorScheme
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
-class GoogleMapView : BaseMapView() {
+class GoogleMapView : BaseMapView {
     @Composable
     override fun DrawMap() {
         val singapore = LatLng(1.35, 103.87)
@@ -22,14 +21,13 @@ class GoogleMapView : BaseMapView() {
         }
 
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            googleMapOptionsFactory = { GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM) }
+            googleMapOptionsFactory = { GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM) },
+            uiSettings = MapUiSettings(zoomControlsEnabled = false)
         ) {
             Marker(
                 state = singaporeMarkerState,
-                title = "Singapore",
-                snippet = "Marker in Singapore"
+                onClick = { true }
             )
         }
     }

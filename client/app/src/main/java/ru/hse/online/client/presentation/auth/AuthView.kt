@@ -1,4 +1,4 @@
-package ru.hse.online.client.view.auth
+package ru.hse.online.client.presentation.auth
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,12 +11,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,11 +34,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import ru.hse.online.client.R
-import ru.hse.online.client.ui.theme.ClientTheme
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.R
+import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthType
+import ru.hse.online.client.ui.theme.ClientTheme
 
 class AuthView : ComponentActivity() {
     private val authModel: AuthViewModel = AuthViewModel(this)
@@ -50,9 +62,10 @@ class AuthView : ComponentActivity() {
     }
 
     @Composable
-    fun Draw() {
-        var email: String by rememberSaveable { mutableStateOf("") }
-        var password by rememberSaveable { mutableStateOf("") }
+    fun Draw(settingsModel: SettingsViewModel = koinViewModel()) {
+        val email by settingsModel.userEmail.collectAsState(initial = "")
+        val password by settingsModel.userPassword.collectAsState(initial = "")
+        var passwordVisible by rememberSaveable { mutableStateOf(false) }
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
 
         val coroutineScope = rememberCoroutineScope()
@@ -103,7 +116,10 @@ class AuthView : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        onValueChange = { email = it }
+                        onValueChange = {
+                            settingsModel.saveUserName(it)
+                            settingsModel.saveUserEmail(it)
+                        }
                     )
 
                     OutlinedTextField(
@@ -112,13 +128,27 @@ class AuthView : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        onValueChange = { password = it }
+                        onValueChange = { settingsModel.saveUserPassword(it) },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            val image = if (passwordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+
+                            val description =
+                                if (passwordVisible) "Hide password" else "Show password"
+
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, description)
+                            }
+                        }
                     )
 
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                authModel.handleAuth(authType, email, password)
+                                authModel.handleAuth(authType, email, password, settingsModel)
                             }
                         },
                         modifier = Modifier.fillMaxWidth()

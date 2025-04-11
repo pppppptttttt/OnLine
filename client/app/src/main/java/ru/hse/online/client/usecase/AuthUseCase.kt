@@ -1,7 +1,7 @@
 package ru.hse.online.client.usecase
 
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.hse.online.client.repository.networking.api_data.AuthRequest
 import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.AuthType
@@ -11,7 +11,7 @@ class AuthUseCase(private val authApiService: AuthApiService) {
     suspend fun execute(
         authType: AuthType,
         email: String,
-        password: String
+        password: String,
     ): AuthResult = withContext(Dispatchers.IO) {
         try {
             val request = AuthRequest(email, email, password)
