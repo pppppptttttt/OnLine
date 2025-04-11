@@ -33,7 +33,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.pedometer.PedometerView"
             android:exported="true"
             android:theme="@style/Theme.Client">
         </activity>

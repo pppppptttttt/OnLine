@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation
+package ru.hse.online.client.presentation.pedometer
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +10,7 @@ class PedometerViewModel(
     private val connector: StepServiceConnector,
     private val contextProvider: ContextProvider
 ) : ViewModel() {
+
     val totalSteps: StateFlow<Int> = connector.steps
     val totalCalories: StateFlow<Double> = connector.caloriesBurned
     val totalDistance: StateFlow<Double> = connector.distanceTraveled

@@ -13,6 +13,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,14 +23,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import ru.hse.online.client.common.UI_LOGCAT_TAG
+import ru.hse.online.client.repository.storage.AppDataStore
 import kotlin.random.Random
 
 class StepCounterService : Service(), SensorEventListener {
+    private val TAG: String = "APP_STEP_COUNTER_SERVICE"
+
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
-    private lateinit var sharedPrefs: SharedPreferences
+    private val dataStore: AppDataStore by inject()
 
     private var testJob: Job? = null
+    private var autoSaveJob: Job? = null
 
     private val _KKAL_PER_STEP = 0.04
     private val _KM_PER_STEP = 0.00762
@@ -89,22 +96,62 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onCreate() {
         super.onCreate()
-        sharedPrefs = getSharedPreferences("pedometer_prefs", Context.MODE_PRIVATE)
-        loadSavedData()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
+        loadSavedData()
         startForeground()
         registerSensor()
-        startTesting()
+//        startTesting()
+        startAutoSave()
     }
+
+    private fun loadSavedData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.getValueFlow(AppDataStore.USER_TOTAL_STEPS, 0).collect { value ->
+                _steps.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_TOTAL_CALORIES, 0.0).collect { value ->
+                _caloriesBurned.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_TOTAL_DISTANCE, 0.0).collect { value ->
+                _distanceTraveled.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_TOTAL_TIME, 0).collect { value ->
+                _timeElapsed.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_ONLINE_STEPS, 0).collect { value ->
+                _stepsOnline.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_ONLINE_CALORIES, 0.0).collect { value ->
+                _caloriesBurnedOnline.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_ONLINE_DISTANCE, 0.0).collect { value ->
+                _distanceTraveledOnline.value = value
+            }
+            dataStore.getValueFlow(AppDataStore.USER_ONLINE_TIME, 0).collect { value ->
+                _timeElapsedOnline.value = value
+            }
+        }
+    }
+
+    private fun startAutoSave() {
+        autoSaveJob = CoroutineScope(Dispatchers.IO).launch {
+            while (true) {
+                delay(1000 * 60 * 2)
+                saveData()
+            }
+        }
+    }
+
 
     private fun startTesting() {
         testJob = CoroutineScope(Dispatchers.Default).launch {
             while (true) {
                 delay(1000)
                 _steps.value += Random.nextInt(1, 5)
+                if (isOnline) _stepsOnline.value += Random.nextInt(1, 5)
                 updateDerivedMetrics()
             }
 
@@ -163,8 +210,12 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onSensorChanged(event: SensorEvent?) {
+        Log.i(
+            UI_LOGCAT_TAG, "bebra"
+        )
         event?.let {
             if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
+                Log.e(TAG, "Step detected, ${_steps.value}")
                 _steps.value++
                 if (isOnline) {
                     _stepsOnline.value++
@@ -185,37 +236,26 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     private fun updateDerivedMetrics() {
-        _caloriesBurned.value = _steps.value * _KKAL_PER_STEP
-        _distanceTraveled.value = _steps.value * _KM_PER_STEP
+        _caloriesBurned.value += _KKAL_PER_STEP
+        _distanceTraveled.value += _KM_PER_STEP
         if (isOnline) {
-            _caloriesBurnedOnline.value = _stepsOnline.value * _KKAL_PER_STEP
-            _distanceTraveledOnline.value = _stepsOnline.value * _KM_PER_STEP
+            _caloriesBurnedOnline.value += _KKAL_PER_STEP
+            _distanceTraveledOnline.value += _KM_PER_STEP
         }
-        //_timeElapsed.value = System.currentTimeMillis() - startTime
-    }
-
-    private val autoSaveJob = CoroutineScope(Dispatchers.IO).launch {
-        while (true) {
-            delay(1000 * 60 * 2)
-            saveData()
-        }
-    }
-
-    private fun loadSavedData() {
-        _steps.value = sharedPrefs.getInt("steps", 0)
-        _caloriesBurned.value = sharedPrefs.getFloat("calories", 0f).toDouble()
-        _distanceTraveled.value = sharedPrefs.getFloat("distance", 0f).toDouble()
     }
 
     private fun saveData() {
-        sharedPrefs.edit().apply {
-            putInt("steps", _steps.value)
-            putFloat("calories", _caloriesBurned.value.toFloat())
-            putFloat("distance", _distanceTraveled.value.toFloat())
-            apply()
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.saveValue(AppDataStore.USER_TOTAL_STEPS, _steps.value)
+            dataStore.saveValue(AppDataStore.USER_TOTAL_CALORIES, _caloriesBurned.value)
+            dataStore.saveValue(AppDataStore.USER_TOTAL_DISTANCE, _distanceTraveled.value)
+            dataStore.saveValue(AppDataStore.USER_TOTAL_TIME, _timeElapsed.value)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_STEPS, _stepsOnline.value)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_CALORIES, _caloriesBurnedOnline.value)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_DISTANCE, _distanceTraveledOnline.value)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_TIME, _timeElapsedOnline.value)
         }
     }
-
 
     companion object {
         private const val CHANNEL_ID = "online_pedometer_channel"
