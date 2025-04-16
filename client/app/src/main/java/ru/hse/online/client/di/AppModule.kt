@@ -34,7 +34,7 @@ val appModule = module {
         )
     }
 
-    single<LocationProvider> {
+    factory<LocationProvider> {// TODO
         LocationProvider(get<Context>())
     }
 
