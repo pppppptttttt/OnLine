@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.material.icons.extended)
 }
 
 secrets {

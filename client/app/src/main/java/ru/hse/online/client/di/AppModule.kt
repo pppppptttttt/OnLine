@@ -7,7 +7,7 @@ import ru.hse.online.client.presentation.LocationViewModel
 import ru.hse.online.client.presentation.pedometer.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
-import ru.hse.online.client.services.location.LocationProvider
+import ru.hse.online.client.services.location.LocationService
 import ru.hse.online.client.services.pedometer.ContextProvider
 import ru.hse.online.client.services.pedometer.StepServiceConnector
 
@@ -34,9 +34,7 @@ val appModule = module {
         )
     }
 
-    factory<LocationProvider> {// TODO
-        LocationProvider(get<Context>())
-    }
+    single<LocationService> { LocationService() }
 
     viewModel<LocationViewModel> {
         LocationViewModel(
