@@ -75,6 +75,12 @@
         </activity>
 
         <activity
+            android:name=".presentation.TestView"
+            android:exported="true"
+            >
+        </activity>
+
+        <activity
             android:name=".presentation.auth.AuthView"
             android:exported="true"
             >

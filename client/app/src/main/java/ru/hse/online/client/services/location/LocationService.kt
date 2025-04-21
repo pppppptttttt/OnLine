@@ -8,21 +8,24 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.*
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import ru.hse.online.client.R
+import ru.hse.online.client.repository.storage.LocationRepository
 
 class LocationService : Service() {
+    private val TAG: String = "APP_LOCATION_SERVICE"
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val scope = CoroutineScope(Dispatchers.IO)
     private var locationJob: Job? = null
 
-    private val _locationState = MutableStateFlow<LocationState>(LocationState.Idle)
-    val locationState: StateFlow<LocationState> = _locationState.asStateFlow()
+    private val repository: LocationRepository by inject()
 
     private val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
         .setMinUpdateIntervalMillis(5000)
@@ -32,7 +35,7 @@ class LocationService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             locationResult.lastLocation?.let { location ->
-                _locationState.value = LocationState.Available(location)
+                repository.updateLocation(location)
                 updateNotification(location)
             }
         }
@@ -40,11 +43,13 @@ class LocationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.i(TAG, "Created")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createNotificationChannel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.i(TAG, "OnStartCommand")
         startForeground(NOTIFICATION_ID, buildNotification("Starting location tracking..."))
         startLocationUpdates()
         return START_STICKY
@@ -53,7 +58,8 @@ class LocationService : Service() {
     @SuppressLint("MissingPermission")
     private fun startLocationUpdates() {
         if (!hasPermissions()) {
-            _locationState.value = LocationState.Error("Location permissions not granted")
+            Log.i(TAG, "No permissions")
+            repository.updateLocation("Location permissions not granted")
             stopSelf()
             return
         }
@@ -66,9 +72,10 @@ class LocationService : Service() {
                     locationCallback,
                     Looper.getMainLooper()
                 )
-                _locationState.value = LocationState.Active
+                Log.i(TAG, "Location update succeed")
+                repository.setActive()
             } catch (e: Exception) {
-                _locationState.value = LocationState.Error("Location updates failed: ${e.message}")
+                repository.updateLocation("Location updates failed: ${e.message}")
                 stopSelf()
             }
         }
@@ -95,6 +102,7 @@ class LocationService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Location Tracking Active")
             .setContentText(text)
+            .setSmallIcon(R.drawable.ic_launcher_background)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }
@@ -116,13 +124,6 @@ class LocationService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-
-    sealed class LocationState {
-        object Idle : LocationState()
-        object Active : LocationState()
-        data class Available(val location: Location) : LocationState()
-        data class Error(val message: String) : LocationState()
-    }
 
     companion object {
         private val NOTIFICATION_ID = 1235

@@ -2,6 +2,8 @@ package ru.hse.online.client.presentation
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,11 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.LatLng
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.presentation.common.BottomScreenName
-import ru.hse.online.client.presentation.pedometer.hasLocationPermissions
 import ru.hse.online.client.ui.theme.ClientTheme
 
 class TestView : ComponentActivity() {
@@ -59,9 +61,26 @@ class TestView : ComponentActivity() {
     }
 }
 
+fun hasLocationPermissions(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACTIVITY_RECOGNITION
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
 @Composable
 fun RouteListScreen(viewModel: LocationViewModel = koinViewModel()) {
     val routePoints by viewModel.routePoints.collectAsStateWithLifecycle()
+    val locationState by viewModel.location.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val activity = context as Activity
     var showRationale by remember { mutableStateOf(false) }
@@ -86,7 +105,8 @@ fun RouteListScreen(viewModel: LocationViewModel = koinViewModel()) {
                 arrayOf(
                     Manifest.permission.ACTIVITY_RECOGNITION,
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 )
             )
         }
@@ -97,8 +117,10 @@ fun RouteListScreen(viewModel: LocationViewModel = koinViewModel()) {
         Button(onClick = {
             permissionLauncher.launch(
                 arrayOf(
+                    Manifest.permission.ACTIVITY_RECOGNITION,
                     Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 )
             )
             showRationale = false
@@ -111,9 +133,15 @@ fun RouteListScreen(viewModel: LocationViewModel = koinViewModel()) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            Button(onClick = {
+                viewModel.startService()
+            }) {
+                Text("History")
+            }
             Text(
-                text = "Route History",
-                modifier = Modifier.padding(bottom = 16.dp)
+                text = "Current Location:\nLat: ${locationState.latitude}\nLon: ${locationState.longitude}",
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
             )
 
             if (routePoints.isEmpty()) {
