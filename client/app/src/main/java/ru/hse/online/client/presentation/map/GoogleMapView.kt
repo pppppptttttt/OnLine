@@ -1,6 +1,5 @@
 package ru.hse.online.client.presentation.map
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,72 +20,67 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.LocationViewModel
+import ru.hse.online.client.viewModels.LocationViewModel
 
-class GoogleMapView : BaseMapView {
+@Composable
+fun GoogleMapView(viewModel: LocationViewModel) {
+    val routePoints by viewModel.routePoints.collectAsState()
+    val currentLocation by viewModel.location.collectAsState()
+    val cameraPositionState = rememberCameraPositionState()
 
-    @Composable
-    override fun DrawMap() {
-        val viewModel: LocationViewModel = koinViewModel()
-        val routePoints by viewModel.routePoints.collectAsState()
-        val currentLocation by viewModel.location.collectAsState()
-        val cameraPositionState = rememberCameraPositionState()
+    val markers = remember { mutableStateListOf<LatLng>() }
 
-        val markers = remember { mutableStateListOf<LatLng>() }
+    val currentMarkerState = rememberMarkerState()
 
-        val currentMarkerState = rememberMarkerState()
+    LaunchedEffect(currentLocation) {
+        currentMarkerState.position = currentLocation
+    }
 
-        LaunchedEffect(currentLocation) {
-            currentMarkerState.position = currentLocation
-        }
-
-        LaunchedEffect(currentLocation) {
-            currentLocation.let { location ->
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(
-                        location,
-                        15f
-                    )
+    LaunchedEffect(currentLocation) {
+        currentLocation.let { location ->
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(
+                    location,
+                    15f
                 )
-            }
-        }
-
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            googleMapOptionsFactory = {
-                GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM)
-            },
-            uiSettings = MapUiSettings(zoomControlsEnabled = false),
-            onMapClick = { coord ->
-                markers.add(coord)
-            },
-            onMapLongClick = { coord ->
-                markers.remove(coord)
-            }
-        ) {
-            Polyline(
-                points = routePoints,
-                color = Color(0x800000FF),
-                width = 15f
             )
+        }
+    }
 
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState,
+        googleMapOptionsFactory = {
+            GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM)
+        },
+        uiSettings = MapUiSettings(zoomControlsEnabled = false),
+        onMapClick = { coord ->
+            markers.add(coord)
+        },
+        onMapLongClick = { coord ->
+            markers.remove(coord)
+        }
+    ) {
+        Polyline(
+            points = routePoints,
+            color = Color(0x800000FF),
+            width = 15f
+        )
+
+        Marker(
+            state = currentMarkerState,
+            icon = BitmapDescriptorFactory.defaultMarker(
+                BitmapDescriptorFactory.HUE_AZURE
+            )
+        )
+
+        markers.forEach { coord ->
             Marker(
-                state = currentMarkerState,
+                state = rememberMarkerState(position = coord),
                 icon = BitmapDescriptorFactory.defaultMarker(
                     BitmapDescriptorFactory.HUE_AZURE
                 )
             )
-
-            markers.forEach { coord ->
-                Marker(
-                    state = rememberMarkerState(position = coord),
-                    icon = BitmapDescriptorFactory.defaultMarker(
-                        BitmapDescriptorFactory.HUE_AZURE
-                    )
-                )
-            }
         }
     }
 }

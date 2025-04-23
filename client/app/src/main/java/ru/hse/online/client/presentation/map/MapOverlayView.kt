@@ -1,6 +1,5 @@
 package ru.hse.online.client.presentation.map
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,10 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.RocketLaunch
-import androidx.compose.material.icons.filled.Route
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -30,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -39,11 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.pedometer.PedometerViewModel
-import ru.hse.online.client.presentation.common.NavButtonDrawer
-import ru.hse.online.client.presentation.friendlist.FriendListView
-import ru.hse.online.client.presentation.routelist.RouteListView
+import ru.hse.online.client.viewModels.PedometerViewModel
 
 class MapOverlayView() {
 
@@ -54,7 +44,7 @@ class MapOverlayView() {
     }
 
     @Composable
-    fun Draw(viewModel: PedometerViewModel = koinViewModel()) {
+    fun Draw(viewModel: PedometerViewModel) {
 
         Column(
             verticalArrangement = Arrangement.Top,

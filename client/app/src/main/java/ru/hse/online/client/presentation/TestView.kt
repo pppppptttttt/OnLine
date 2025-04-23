@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.LatLng
-import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.viewModels.LocationViewModel
 
 fun hasLocationPermissions(context: Context): Boolean {
     return ContextCompat.checkSelfPermission(
@@ -53,7 +53,7 @@ fun hasLocationPermissions(context: Context): Boolean {
 }
 
 @Composable
-fun TestScreen(viewModel: LocationViewModel = koinViewModel()) {
+fun TestScreen(viewModel: LocationViewModel) {
     val routePoints by viewModel.routePoints.collectAsStateWithLifecycle()
     val locationState by viewModel.location.collectAsStateWithLifecycle()
     val context = LocalContext.current

@@ -24,10 +24,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.KoinContext
 import ru.hse.online.client.presentation.map.MapScreen
 import ru.hse.online.client.presentation.pedometer.MainScreen
+import ru.hse.online.client.viewModels.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsScreen
 import ru.hse.online.client.ui.theme.ClientTheme
+import ru.hse.online.client.viewModels.LocationViewModel
 
 sealed class Screen(
     val route: String,
@@ -72,7 +76,8 @@ fun BottomNavigationBar(navController: NavController) {
 @Composable
 fun NavigationComponent() {
     val navController = rememberNavController()
-
+    val locationViewModel: LocationViewModel = koinViewModel()
+    val pedometerViewModel: PedometerViewModel = koinViewModel()
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { padding ->
@@ -81,10 +86,10 @@ fun NavigationComponent() {
             startDestination = Screen.Main.route,
             modifier = Modifier.padding(padding)
         ) {
-            composable(Screen.Main.route) { MainScreen() }
-            composable(Screen.Map.route) { MapScreen() }
+            composable(Screen.Main.route) { MainScreen(pedometerViewModel) }
+            composable(Screen.Map.route) { MapScreen(pedometerViewModel, locationViewModel) }
             composable(Screen.Settings.route) { SettingsScreen() }
-            composable(Screen.Test.route) { TestScreen() }
+            composable(Screen.Test.route) { TestScreen(locationViewModel) }
         }
     }
 }
@@ -95,8 +100,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            ClientTheme {
-                NavigationComponent()
+            KoinContext {
+                ClientTheme {
+                    NavigationComponent()
+                }
             }
         }
     }

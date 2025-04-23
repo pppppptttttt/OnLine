@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation.pedometer
+package ru.hse.online.client.viewModels
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow

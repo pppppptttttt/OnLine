@@ -4,16 +4,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.koin.compose.KoinContext
+import ru.hse.online.client.viewModels.LocationViewModel
+import ru.hse.online.client.viewModels.PedometerViewModel
 
 @Composable
-fun MapScreen() {
-    val mapView: BaseMapView = GoogleMapView()
+fun MapScreen(pedometerViewModel: PedometerViewModel, locationViewModel: LocationViewModel) {
     val mapOverlay: MapOverlayView = MapOverlayView()
-    KoinContext {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            mapView.DrawMap()
-            mapOverlay.Draw()
-        }
+    Surface(modifier = Modifier.fillMaxSize()) {
+        GoogleMapView(locationViewModel)
+        mapOverlay.Draw(pedometerViewModel)
     }
 }

@@ -6,11 +6,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class LocationRepository {
+    private val MIN_DISTANCE_CHANGE_METERS = 2.0
+
     private val _locationState = MutableStateFlow<LocationState>(LocationState.Idle)
     val locationState: StateFlow<LocationState> = _locationState.asStateFlow()
+    private var _location: Location? = null
 
-    fun updateLocation(location: Location) {
-        _locationState.value = LocationState.Available(location)
+    fun updateLocation(newLocation: Location) {
+        if (_location != null && _location?.distanceTo(newLocation)!! <= MIN_DISTANCE_CHANGE_METERS) {
+            return;
+        }
+        _locationState.value = LocationState.Available(newLocation)
+        _location = newLocation
     }
 
     fun updateLocation(error: String) {

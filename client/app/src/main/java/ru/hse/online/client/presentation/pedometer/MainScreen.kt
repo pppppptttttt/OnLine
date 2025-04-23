@@ -38,10 +38,11 @@ import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.viewModels.PedometerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: PedometerViewModel = koinViewModel()) {
+fun MainScreen(viewModel: PedometerViewModel) {
     val stepCount by viewModel.totalSteps.collectAsStateWithLifecycle(0)
     val calories by viewModel.totalCalories.collectAsStateWithLifecycle(0.0)
     val distance by viewModel.totalDistance.collectAsStateWithLifecycle(0.0)
