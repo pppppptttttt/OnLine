@@ -1,7 +1,5 @@
 package ru.hse.online.client.presentation.map
 
-import android.content.Intent
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
@@ -24,17 +21,12 @@ import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-//import androidx.compose.material.icons.filled.RocketLaunch
-//import androidx.compose.material.icons.filled.Route
-//import androidx.compose.material.icons.filled.Settings
-//import androidx.compose.material.icons.filled.SupervisedUserCircle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,20 +35,17 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.pedometer.PedometerView
 import ru.hse.online.client.presentation.pedometer.PedometerViewModel
 import ru.hse.online.client.presentation.common.NavButtonDrawer
 import ru.hse.online.client.presentation.friendlist.FriendListView
 import ru.hse.online.client.presentation.routelist.RouteListView
-import ru.hse.online.client.presentation.settings.SettingsView
 
-class MapOverlayView(private val currentActivity: ComponentActivity) {
+class MapOverlayView() {
 
     companion object {
         private val paddingTop = 30.dp
@@ -66,7 +55,6 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
 
     @Composable
     fun Draw(viewModel: PedometerViewModel = koinViewModel()) {
-        val navButtonDrawer = NavButtonDrawer()
 
         Column(
             verticalArrangement = Arrangement.Top,
@@ -104,13 +92,6 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                 }
 
                 Column {
-                    navButtonDrawer.Draw(
-                        from = currentActivity,
-                        to = SettingsView::class.java,
-                    ) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                    }
-
                     var iconPlay by remember { mutableStateOf(false) }
                     var dialogDraw by remember { mutableStateOf(false) }
                     Button(
@@ -132,44 +113,6 @@ class MapOverlayView(private val currentActivity: ComponentActivity) {
                     if (dialogDraw) {
                         Dialog_({dialogDraw = false}, {dialogDraw = false})
                     }
-                }
-            }
-        }
-
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.padding(bottom = 70.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .fillMaxWidth()
-                    .padding(start = 60.dp, end = 60.dp)
-            ) {
-                navButtonDrawer.Draw(
-                    from = currentActivity,
-                    to = FriendListView::class.java,
-                    function = {
-                        Icon(Icons.Filled.SupervisedUserCircle, contentDescription = "Settings")
-                    }
-                )
-
-                navButtonDrawer.Draw(
-                    from = currentActivity,
-                    to = PedometerView::class.java,
-                    modifier = Modifier
-                        .scale(1.3f)
-                        .padding(bottom = 40.dp)
-                ) {
-                    Icon(Icons.Filled.RocketLaunch, contentDescription = "Settings")
-                }
-
-                navButtonDrawer.Draw(
-                    currentActivity,
-                    RouteListView::class.java
-                ) {
-                    Icon(Icons.Filled.Route, contentDescription = "Settings")
                 }
             }
         }

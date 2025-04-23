@@ -4,20 +4,14 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -41,25 +35,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.maps.model.LatLng
 import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.common.BottomScreenName
-import ru.hse.online.client.ui.theme.ClientTheme
-
-class TestView : ComponentActivity() {
-    private val bottomScreenName = BottomScreenName("Pedometer")
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        setContent {
-            ClientTheme {
-                bottomScreenName.DisplayNameAndDraw {
-                    RouteListScreen()
-                }
-            }
-        }
-    }
-}
 
 fun hasLocationPermissions(context: Context): Boolean {
     return ContextCompat.checkSelfPermission(
@@ -78,7 +53,7 @@ fun hasLocationPermissions(context: Context): Boolean {
 }
 
 @Composable
-fun RouteListScreen(viewModel: LocationViewModel = koinViewModel()) {
+fun TestScreen(viewModel: LocationViewModel = koinViewModel()) {
     val routePoints by viewModel.routePoints.collectAsStateWithLifecycle()
     val locationState by viewModel.location.collectAsStateWithLifecycle()
     val context = LocalContext.current
