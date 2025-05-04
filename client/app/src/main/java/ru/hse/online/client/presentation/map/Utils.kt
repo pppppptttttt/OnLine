@@ -24,7 +24,7 @@ fun List<LatLng>.toGoogleMapsFormat(): String {
 
 fun String.googleMapsFormatToLatLngList(): List<LatLng> {
     val cleaned = this.replace("\\s".toRegex(), "")
-    
+
     val coordPattern = "\\[([-+]?[0-9]*\\.?[0-9]+),([-+]?[0-9]*\\.?[0-9]+)]".toRegex()
     val matches = coordPattern.findAll(cleaned)
 

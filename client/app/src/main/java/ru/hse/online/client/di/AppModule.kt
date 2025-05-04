@@ -19,9 +19,11 @@ val appModule = module {
         )
     }
 
-    single<ContextProvider> { object : ContextProvider {
-        override fun getContext() = get<Context>()
-    }}
+    single<ContextProvider> {
+        object : ContextProvider {
+            override fun getContext() = get<Context>()
+        }
+    }
 
     single<AppDataStore> { AppDataStore(context = get()) }
 

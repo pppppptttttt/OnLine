@@ -1,6 +1,5 @@
 package ru.hse.online.client.presentation
 
-import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,7 +16,8 @@ class LocationViewModel(private val locationProvider: LocationProvider) : ViewMo
 
     private val _location = MutableStateFlow<LatLng>(LatLng(0.0, 0.0))
     val location: StateFlow<LatLng> = _location.asStateFlow()
-    private var _routePoints: MutableStateFlow<List<LatLng>> = MutableStateFlow<List<LatLng>>(listOf());
+    private var _routePoints: MutableStateFlow<List<LatLng>> =
+        MutableStateFlow<List<LatLng>>(listOf())
     val routePoints: StateFlow<List<LatLng>> = _routePoints.asStateFlow()
 
     init {
@@ -31,10 +31,12 @@ class LocationViewModel(private val locationProvider: LocationProvider) : ViewMo
                         }
                         _location.value = newPoint
                         _routePoints.value += newPoint
-                        Log.i(TAG, "New location " + _location.value);
+                        Log.i(TAG, "New location " + _location.value)
                     }
+
                     is LocationProvider.LocationState.Error ->
                         Log.e(TAG, state.message)
+
                     else -> {}
                 }
             }
