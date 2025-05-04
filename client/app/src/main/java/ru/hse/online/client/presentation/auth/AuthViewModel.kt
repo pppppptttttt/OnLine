@@ -29,9 +29,6 @@ class AuthViewModel(private val authView: ComponentActivity) {
         when (val authResult = authUseCase.execute(authType, email, password)) {
             is AuthResult.Success -> {
                 if (authType == AuthType.SIGNUP) {
-                    val token = authResult.token
-                    val id = authResult.userId
-                    Log.i(UI_LOGCAT_TAG, "token: $token; user_id: $id")
                     val createResult = createUserUseCase.execute(
                         token = authResult.token,
                         User(
