@@ -7,6 +7,7 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.hse.online.client.repository.networking.api_service.AuthApiService
+import ru.hse.online.client.repository.networking.api_service.PathApiService
 import ru.hse.online.client.repository.networking.api_service.UserDataApiService
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.usecase.CreateUserUseCase
@@ -20,10 +21,11 @@ val networkModule = module {
 
     single<AuthApiService> { provideAuthService(get()) }
     single<UserDataApiService> { provideUserDataService(get()) }
+    single<PathApiService> { providePathApiService(get()) }
 
     factory<CreateUserUseCase> { CreateUserUseCase(get()) }
     factory<GetUserUseCase> { GetUserUseCase(get()) }
-    single<AuthUseCase> { AuthUseCase(get()) }
+    factory<AuthUseCase> { AuthUseCase(get()) }
 }
 
 private fun provideBaseUrl(): String = "http://51.250.111.207:80"
@@ -32,6 +34,7 @@ private fun provideOkHttpClient(): OkHttpClient {
     val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
+
     return OkHttpClient.Builder()
         .addInterceptor(interceptor)
         .build()
@@ -55,4 +58,8 @@ private fun provideAuthService(retrofit: Retrofit): AuthApiService {
 
 private fun provideUserDataService(retrofit: Retrofit): UserDataApiService {
     return retrofit.create(UserDataApiService::class.java)
+}
+
+private fun providePathApiService(retrofit: Retrofit): PathApiService {
+    return retrofit.create(PathApiService::class.java)
 }
