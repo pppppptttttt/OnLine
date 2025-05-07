@@ -101,7 +101,7 @@ class MapOverlayView() {
                     }
 
                     if (dialogDraw) {
-                        Dialog_({dialogDraw = false}, {dialogDraw = false})
+                        Dialog_({ dialogDraw = false }, { dialogDraw = false })
                     }
                 }
             }

@@ -24,8 +24,6 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-      args:
-        JAR_FILE: dataService.jar
     environment:
       SPRING_CASSANDRA_CONTACTPOINTS: cassandra
       SPRING_CASSANDRA_PORT: 9042

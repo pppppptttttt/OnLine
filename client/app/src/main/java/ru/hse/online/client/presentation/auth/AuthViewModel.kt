@@ -9,9 +9,19 @@ import ru.hse.online.client.repository.networking.ClientApi
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.repository.networking.ClientApi
+import ru.hse.online.client.repository.networking.api_data.AuthResult
+import ru.hse.online.client.repository.networking.api_data.AuthType
+import ru.hse.online.client.repository.networking.api_data.User
+import ru.hse.online.client.repository.networking.api_data.UserResult
+import ru.hse.online.client.usecase.AuthUseCase
+import ru.hse.online.client.usecase.CreateUserUseCase
+import kotlin.random.Random
 
 class AuthViewModel(private val authView: ComponentActivity) {
     private var authUseCase: AuthUseCase = AuthUseCase(ClientApi.authApiService)
+    private var createUserUseCase: CreateUserUseCase =
+        CreateUserUseCase(ClientApi.userDataApiService)
 
     suspend fun handleAuth(
         authType: AuthType,
@@ -19,15 +29,38 @@ class AuthViewModel(private val authView: ComponentActivity) {
         password: String,
         settingsModel: SettingsViewModel
     ) {
-//        when (val result = authUseCase.execute(authType, email, password)) {
-//            is AuthResult.Success -> {
-//                settingsModel.saveUserToken(result.token)
-//                startMapActivity()
-//            }
-//
-//            is AuthResult.Failure -> handleError(result.code, result.message)
-//        }
-        startMapActivity()
+        when (val authResult = authUseCase.execute(authType, email, password)) {
+            is AuthResult.Success -> {
+                if (authType == AuthType.SIGNUP) {
+                    val createResult = createUserUseCase.execute(
+                        token = authResult.token,
+                        User(
+                            email = email,
+                            username = "aboba" + Random.nextInt(1, 100),
+                            userId = authResult.userId
+                        )
+                    )
+                    when (createResult) {
+                        is UserResult.Success -> {
+                            settingsModel.saveUserToken(authResult.token)
+                            settingsModel.saveUserId(authResult.userId)
+                            startMapActivity()
+                        }
+
+                        is UserResult.Failure -> handleError(
+                            createResult.code,
+                            createResult.message
+                        )
+                    }
+                } else {
+                    settingsModel.saveUserToken(authResult.token)
+                    settingsModel.saveUserId(authResult.userId)
+                    startMapActivity()
+                }
+            }
+
+            is AuthResult.Failure -> handleError(authResult.code, authResult.message)
+        }
     }
 
     private fun startMapActivity() {
