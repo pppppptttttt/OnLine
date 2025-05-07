@@ -4,6 +4,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
 import ru.hse.online.client.common.UI_LOGCAT_TAG
+import ru.hse.online.client.presentation.TestView
 import ru.hse.online.client.presentation.map.MapView
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.ClientApi
@@ -61,7 +62,7 @@ class AuthViewModel(private val authView: ComponentActivity) {
     }
 
     private fun startMapActivity() {
-        val intent = Intent(authView, MapView::class.java)
+        val intent = Intent(authView, TestView::class.java)
         authView.startActivity(intent)
     }
 

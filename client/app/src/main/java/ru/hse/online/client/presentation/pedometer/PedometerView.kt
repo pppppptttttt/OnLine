@@ -179,12 +179,14 @@ fun LocationScreen(viewModel: LocationViewModel = koinViewModel()) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(onClick = {
-                viewModel.startUpdates()
+                //viewModel.startUpdates()
             }) {
                 Text("Start Tracking")
             }
 
-            Button(onClick = { viewModel.stopUpdates() }) {
+            Button(onClick = {
+                //viewModel.stopUpdates()
+            }) {
                 Text("Stop Tracking")
             }
         }

@@ -44,11 +44,11 @@
             android:exported="false"
             android:foregroundServiceType="health" />
 
-<!--        <service-->
-<!--            android:name=".services.location.LocationService"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="false"-->
-<!--            android:foregroundServiceType="location" />-->
+        <service
+            android:name=".services.location.LocationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
 
         <activity
             android:name=".presentation.map.MapView"
@@ -70,6 +70,12 @@
 
         <activity
             android:name=".presentation.routelist.RouteListView"
+            android:exported="true"
+            >
+        </activity>
+
+        <activity
+            android:name=".presentation.TestView"
             android:exported="true"
             >
         </activity>

@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "ru.hse.online.client"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.material.icons.extended)
 }
 
 secrets {
