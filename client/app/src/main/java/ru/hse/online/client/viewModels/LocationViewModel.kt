@@ -15,9 +15,6 @@ import ru.hse.online.client.services.pedometer.ContextProvider
 
 class LocationViewModel(private val contextProvider: ContextProvider, private val repository: LocationRepository) : ViewModel() {
     private val TAG: String = "APP_LOCATION_VIEW_MODEL"
-
-    private val _location = MutableStateFlow<LatLng>(LatLng(0.0, 0.0))
-    val location: StateFlow<LatLng> = _location.asStateFlow()
     
     private var _routePoints: MutableStateFlow<List<LatLng>> =
         MutableStateFlow<List<LatLng>>(listOf())
