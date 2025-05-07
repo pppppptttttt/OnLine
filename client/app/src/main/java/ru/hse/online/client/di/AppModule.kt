@@ -3,8 +3,8 @@ package ru.hse.online.client.di
 import android.content.Context
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-import ru.hse.online.client.presentation.LocationViewModel
-import ru.hse.online.client.presentation.pedometer.PedometerViewModel
+import ru.hse.online.client.viewModels.LocationViewModel
+import ru.hse.online.client.viewModels.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.LocationRepository

@@ -1,7 +1,6 @@
-package ru.hse.online.client.presentation
+package ru.hse.online.client.viewModels
 
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -47,6 +46,7 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
                 }
             }
             .launchIn(viewModelScope)
+        startService()
     }
 
     fun startService() {

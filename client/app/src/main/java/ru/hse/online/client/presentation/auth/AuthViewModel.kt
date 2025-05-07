@@ -4,8 +4,10 @@ import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
 import ru.hse.online.client.common.UI_LOGCAT_TAG
-import ru.hse.online.client.presentation.TestView
-import ru.hse.online.client.presentation.map.MapView
+import ru.hse.online.client.presentation.MainActivity
+import ru.hse.online.client.repository.networking.ClientApi
+import ru.hse.online.client.repository.networking.api_data.AuthType
+import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.ClientApi
 import ru.hse.online.client.repository.networking.api_data.AuthResult
@@ -62,7 +64,7 @@ class AuthViewModel(private val authView: ComponentActivity) {
     }
 
     private fun startMapActivity() {
-        val intent = Intent(authView, TestView::class.java)
+        val intent = Intent(authView, MainActivity::class.java)
         authView.startActivity(intent)
     }
 
