@@ -3,12 +3,12 @@ package ru.hse.online.client.repository.storage
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -17,14 +17,15 @@ import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
-class AppDataStore (
+class AppDataStore(
     private val context: Context
 ) {
     companion object {
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PASSWORD = stringPreferencesKey("user_password")
-        val USER_TOKEN = stringPreferencesKey("user_uuid")
+        val USER_TOKEN = stringPreferencesKey("user_token")
+        val USER_ID = stringPreferencesKey("user_id")
 
         val USER_TOTAL_STEPS = intPreferencesKey("user_total_steps")
         val USER_TOTAL_CALORIES = doublePreferencesKey("user_total_calories")
