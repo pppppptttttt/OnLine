@@ -107,6 +107,13 @@ class AuthView : ComponentActivity() {
                     }) {
                         Text("Log In")
                     }
+
+                    Button(onClick = {
+                        authModel.start()
+                    }) {
+                        Text("Bypass")
+                    }
+
                 }
 
                 if (authType != AuthType.NONE) {

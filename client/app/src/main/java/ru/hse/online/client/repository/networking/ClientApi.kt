@@ -2,7 +2,6 @@ package ru.hse.online.client.repository.networking
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-// import retrofit2.converter.scalars.ScalarsConverterFactory
 import ru.hse.online.client.repository.networking.api_service.AuthApiService
 import ru.hse.online.client.repository.networking.api_service.UserDataApiService
 
@@ -11,7 +10,6 @@ object ClientApi {
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
-//        .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
