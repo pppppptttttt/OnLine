@@ -1,51 +1,24 @@
 package ru.hse.online.client.presentation
 
-import android.Manifest
-import android.app.Activity
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Science
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -56,9 +29,9 @@ import org.koin.compose.KoinContext
 import ru.hse.online.client.presentation.map.MapScreen
 import ru.hse.online.client.presentation.pedometer.MainScreen
 import ru.hse.online.client.viewModels.PedometerViewModel
-import ru.hse.online.client.presentation.settings.SettingsScreen
 import ru.hse.online.client.ui.theme.ClientTheme
 import ru.hse.online.client.viewModels.LocationViewModel
+import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class Screen(
     val route: String,
@@ -105,6 +78,8 @@ fun NavigationComponent() {
     val navController = rememberNavController()
     val locationViewModel: LocationViewModel = koinViewModel()
     val pedometerViewModel: PedometerViewModel = koinViewModel()
+    val userViewModel: UserViewModel = koinViewModel()
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { padding ->
@@ -115,7 +90,7 @@ fun NavigationComponent() {
         ) {
             composable(Screen.Main.route) { MainScreen(pedometerViewModel) }
             composable(Screen.Map.route) { MapScreen(pedometerViewModel, locationViewModel) }
-            composable(Screen.Settings.route) { SettingsScreen() }
+            composable(Screen.Settings.route) { MenuScreen(userViewModel) }
             composable(Screen.Test.route) { TestScreen() }
         }
     }

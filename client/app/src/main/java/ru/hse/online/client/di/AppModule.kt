@@ -8,8 +8,10 @@ import ru.hse.online.client.viewModels.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.LocationRepository
+import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.services.pedometer.ContextProvider
 import ru.hse.online.client.services.pedometer.StepServiceConnector
+import ru.hse.online.client.viewModels.UserViewModel
 
 val appModule = module {
 
@@ -41,6 +43,14 @@ val appModule = module {
     viewModel<LocationViewModel> {
         LocationViewModel(
             contextProvider = get(),
+            repository = get()
+        )
+    }
+
+    single { UserRepository() }
+
+    viewModel<UserViewModel> {
+        UserViewModel(
             repository = get()
         )
     }

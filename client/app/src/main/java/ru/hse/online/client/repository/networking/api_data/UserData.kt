@@ -1,5 +1,11 @@
 package ru.hse.online.client.repository.networking.api_data
 
+data class Friend(
+    val userId: String,
+    val username: String,
+    val email: String
+)
+
 data class User(
     val userId: String,
     val username: String,
