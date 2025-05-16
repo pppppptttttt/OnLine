@@ -1,146 +1,53 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Friends WebSocket Test</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
+
 <body>
-<div style="padding: 20px;">
-    <!-- Connection Section -->
-    <div>
-        <button id="connectBtn" onclick="connect()">Connect</button>
-        <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+    <div style="padding: 20px;">
+        <!-- Connection Section -->
+        <div>
+            <button id="connectBtn" onclick="connect()">Connect</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+        </div>
+
+        <!-- User Registration -->
+        <div style="margin-top: 20px;">
+            <input type="text" id="username" placeholder="Your username">
+            <button onclick="registerUser()">Register</button>
+        </div>
+
+        <!-- Invite Section -->
+        <div style="margin-top: 20px;">
+            <input type="text" id="friendName" placeholder="Friend's username">
+            <button onclick="sendInvite()">Invite</button>
+        </div>
+
+        <!-- Location Update -->
+        <div style="margin-top: 20px;">
+            <input type="number" id="lat" step="0.000001" placeholder="Latitude">
+            <input type="number" id="lng" step="0.000001" placeholder="Longitude">
+            <button onclick="updateLocation()">Update Location</button>
+        </div>
+
+        <!-- Group Management -->
+        <div style="margin-top: 20px;">
+            <button onclick="joinGroup()">Join Group</button>
+            <button onclick="quitGroup()">Quit Group</button>
+        </div>
+
+        <!-- Status Messages -->
+        <div style="margin-top: 20px;">
+            <h3>Messages:</h3>
+            <div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto;"></div>
+        </div>
     </div>
 
-    <!-- User Registration -->
-    <div style="margin-top: 20px;">
-        <input type="text" id="username" placeholder="Your username">
-        <button onclick="registerUser()">Register</button>
-    </div>
-
-    <!-- Invite Section -->
-    <div style="margin-top: 20px;">
-        <input type="text" id="friendName" placeholder="Friend's username">
-        <button onclick="sendInvite()">Invite</button>
-    </div>
-
-    <!-- Location Update -->
-    <div style="margin-top: 20px;">
-        <input type="number" id="lat" step="0.000001" placeholder="Latitude">
-        <input type="number" id="lng" step="0.000001" placeholder="Longitude">
-        <button onclick="updateLocation()">Update Location</button>
-    </div>
-
-    <!-- Group Management -->
-    <div style="margin-top: 20px;">
-        <button onclick="joinGroup()">Join Group</button>
-        <button onclick="quitGroup()">Quit Group</button>
-    </div>
-
-    <!-- Status Messages -->
-    <div style="margin-top: 20px;">
-        <h3>Messages:</h3>
-        <div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto;"></div>
-    </div>
-</div>
-
-<script>
-
-let stompClient = null;
-let currentUser = null;
-
-function connect() {
-    const username = document.getElementById('username').value.trim();
-
-    if (!username) {
-        alert('Please enter your username first!');
-        return;
-    }
-
-    const socket = new WebSocket('ws://localhost:8080/ws');
-    stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, () => {
-        document.getElementById('disconnectBtn').disabled = false;
-        document.getElementById('connectBtn').disabled = true;
-
-
-        // Подписки на очереди
-        stompClient.subscribe('/user/queue/startWalk', (message) => {
-            logMessage(`Walk ID assigned: ${JSON.parse(message.body)}`);
-        });
-
-        stompClient.subscribe('/user/queue/endWalk', (message) => {
-            logMessage(`Walk ID assigned: ${JSON.parse(message.body)}`);
-        });
-
-        stompClient.subscribe(`/user/${username}/msg`, (message) => {
-            const content = JSON.parse(message.body);
-            if(content.lat) {
-                logMessage(`Location update: ${content.lat}, ${content.lng}`);
-            } else if (content.from) {
-                logMessage(`Invite from: ${content.from}`);
-            }
-        });
-
-        registerUser();
-    });
-}
-
-function disconnect() {
-    if (stompClient !== null) {
-        stompClient.disconnect();
-    }
-    document.getElementById('disconnectBtn').disabled = true;
-    document.getElementById('connectBtn').disabled = false;
-    logMessage("Disconnected");
-}
-
-function registerUser() {
-    currentUser = document.getElementById('username').value;
-    stompClient.send('/app/start', {}, JSON.stringify(currentUser));
-    logMessage(`Registration sent for: ${currentUser}`);
-}
-
-function sendInvite() {
-    const friend = document.getElementById('friendName').value;
-    stompClient.send('/app/invite', {}, JSON.stringify({
-        fromWho: currentUser,
-        toWho: friend
-    }));
-    logMessage(`Invite sent to: ${friend}`);
-}
-
-function updateLocation() {
-    const lat = parseFloat(document.getElementById('lat').value);
-    const lng = parseFloat(document.getElementById('lng').value);
-    stompClient.send('/app/updateLocation', {}, JSON.stringify({
-        from: currentUser,
-        location: {lat, lng}
-    }));
-    logMessage(`Location updated: ${lat}, ${lng}`);
-}
-
-function joinGroup() {
-    const friend = document.getElementById('friendName').value;
-    stompClient.send('/app/joinGroup', {}, JSON.stringify({
-        fromWho: currentUser,
-        toWho: friend
-    }));
-    logMessage(`Joining group of: ${friend}`);
-}
-
-function quitGroup() {
-    stompClient.send('/app/quitGroup', {}, JSON.stringify(currentUser));
-    logMessage(`Left current group`);
-}
-
-function logMessage(message) {
-    const messagesDiv = document.getElementById('messages');
-    messagesDiv.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-</script>
+    <script src=index.js></script>
 </body>
+
 </html>

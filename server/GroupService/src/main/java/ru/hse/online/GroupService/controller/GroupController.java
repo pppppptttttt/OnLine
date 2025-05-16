@@ -6,44 +6,37 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import ru.hse.online.GroupService.data.GroupManager;
 import ru.hse.online.GroupService.data.Invite;
 import ru.hse.online.GroupService.data.Location;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Objects;
 
-@Controller public class GroupController {
+@Controller
+public class GroupController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final Map<String, Long> userToWalkId;
-    private final Map<Long, Set<String>> walkIdToUserGroup;
-    private long walkId = 0;
+    private final GroupManager groupManager = new GroupManager();
+
+    static private final ObjectMapper mapper = new ObjectMapper();
 
     public GroupController(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
-        this.userToWalkId = new ConcurrentHashMap<>();
-        this.walkIdToUserGroup = new ConcurrentHashMap<>();
     }
 
     @MessageMapping("/start")
     @SendToUser("/queue/startWalk")
     public Long registerNewUser(String username) {
-        if (!userToWalkId.containsKey(username)) {
-            userToWalkId.put(username, walkId);
-            Set<String> newWalk = new HashSet<>();
-            newWalk.add(username);
-            walkIdToUserGroup.put(walkId, newWalk);
-            ++walkId;
-        }
-        return userToWalkId.get(username);
+        username = username.substring(1, username.length() - 1);
+        return groupManager.addUser(username);
     }
 
     @MessageMapping("/stop")
     @SendToUser("/queue/endWalk")
     public String unregisterUser(String username) {
-        userToWalkId.remove(username);
+        username = username.substring(1, username.length() - 1);
+        groupManager.removeUser(username);
         return username;
     }
 
@@ -55,41 +48,33 @@ import java.util.concurrent.ConcurrentHashMap;
 
     @MessageMapping("/joinGroup")
     public void joinGroup(Invite invite) {
-        userToWalkId.put(invite.toWho, userToWalkId.get(invite.fromWho));
+        groupManager.joinUserGroups(invite.toWho, invite.fromWho);
     }
 
     @MessageMapping("/quitGroup")
     public void quitGroup(String username) {
-        userToWalkId.put(username, walkId++);
+        username = username.substring(1, username.length() - 1);
+        groupManager.moveUserToNewGroup(username);
+    }
+
+    public GroupManager getGroupManager() {
+        return groupManager;
     }
 
     private record FromUsernameAndLocation(String from, Location location) {
     }
 
-    // WTF
     @MessageMapping("/updateLocation")
     public void updateLocation(String data) throws JsonProcessingException {
-
-        ObjectMapper mapper = new ObjectMapper();
         FromUsernameAndLocation usernameAndLocation = mapper.readValue(data, FromUsernameAndLocation.class);
         String from = usernameAndLocation.from;
         Location location = usernameAndLocation.location;
 
-        assert userToWalkId.keySet().iterator().next().equals(from);
-        assert userToWalkId.containsKey(from);
-        System.out.println(userToWalkId.values());
-        System.out.println(from);
-        System.out.println(userToWalkId);
-        System.out.println(userToWalkId.get(from));
-        System.out.println(walkIdToUserGroup);
-        System.out.println(walkIdToUserGroup.get(userToWalkId.get(from)));
-
-        for (String to : walkIdToUserGroup.get(userToWalkId.get(from))) {
-            if (!to.equals(from)) {
-                messagingTemplate.convertAndSendToUser(to, "/msg", location);
+        List<String> group = groupManager.getGroup(groupManager.getGroupId(from));
+        for (String to : group) {
+            if (!Objects.equals(from, to)) {
+                messagingTemplate.convertAndSendToUser(to, "/msg", location.toJson());
             }
         }
     }
-
 }
-

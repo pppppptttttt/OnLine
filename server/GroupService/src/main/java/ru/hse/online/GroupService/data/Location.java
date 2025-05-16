@@ -13,5 +13,8 @@ public class Location {
         this.lat = lat;
         this.lng = lng;
     }
-}
 
+    public String toJson() {
+        return "{\"lat\": " + lat + ", \"lng\": " + lng + "}";
+    }
+}
