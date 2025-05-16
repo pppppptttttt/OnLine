@@ -10,9 +10,11 @@ import ru.hse.online.client.presentation.map.MapView
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.AuthType
+import ru.hse.online.client.usecase.AuthUseCase
+import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserResult
-import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.usecase.CreateUserUseCase
 import kotlin.random.Random
 
@@ -63,7 +65,7 @@ class AuthViewModel(
     }
 
     private fun startMapActivity() {
-        val intent = Intent(authView, MapView::class.java)
+        val intent = Intent(authView, MainActivity::class.java)
         authView.startActivity(intent)
     }
 

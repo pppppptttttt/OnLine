@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-<!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"-->
-<!--        tools:ignore="CoarseFineLocation" />-->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -33,7 +31,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".presentation.pedometer.PedometerView"
+            android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Client">
         </activity>
@@ -44,23 +42,11 @@
             android:exported="false"
             android:foregroundServiceType="health" />
 
-<!--        <service-->
-<!--            android:name=".services.location.LocationService"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="false"-->
-<!--            android:foregroundServiceType="location" />-->
-
-        <activity
-            android:name=".presentation.map.MapView"
-            android:exported="true"
-            android:theme="@style/Theme.Client">
-        </activity>
-
-        <activity
-            android:name=".presentation.settings.SettingsView"
-            android:exported="true"
-            >
-        </activity>
+        <service
+            android:name=".services.location.LocationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
 
         <activity
             android:name=".presentation.friendlist.FriendListView"
@@ -88,5 +74,4 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
     </application>
-
 </manifest>
