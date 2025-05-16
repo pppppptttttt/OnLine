@@ -3,9 +3,12 @@ package ru.hse.online.client.presentation.auth
 import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
-import ru.hse.online.client.common.UI_LOGCAT_TAG
-import ru.hse.online.client.presentation.MainActivity
-import ru.hse.online.client.repository.networking.ClientApi
+import androidx.lifecycle.ViewModel
+import org.koin.core.scope.Scope
+import ru.hse.online.client.common.NET_LOGCAT_TAG
+import ru.hse.online.client.presentation.map.MapView
+import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.presentation.settings.SettingsViewModel
@@ -15,10 +18,11 @@ import ru.hse.online.client.repository.networking.api_data.UserResult
 import ru.hse.online.client.usecase.CreateUserUseCase
 import kotlin.random.Random
 
-class AuthViewModel(private val authView: ComponentActivity) {
-    private var authUseCase: AuthUseCase = AuthUseCase(ClientApi.authApiService)
-    private var createUserUseCase: CreateUserUseCase =
-        CreateUserUseCase(ClientApi.userDataApiService)
+class AuthViewModel(
+    private val authUseCase: AuthUseCase,
+    private val createUserUseCase: CreateUserUseCase,
+    private val authView: ComponentActivity
+) : ViewModel() {
 
     suspend fun handleAuth(
         authType: AuthType,
@@ -66,6 +70,6 @@ class AuthViewModel(private val authView: ComponentActivity) {
     }
 
     private fun handleError(code: Int, message: String?) {
-        Log.i(UI_LOGCAT_TAG, "Failed to authenticate with code $code. Message: $message")
+        Log.i(NET_LOGCAT_TAG, "Failed to authenticate with code $code. Message: $message")
     }
 }
