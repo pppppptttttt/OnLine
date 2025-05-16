@@ -9,4 +9,3 @@ public class Invite {
         this.toWho = toWho;
     }
 }
-
