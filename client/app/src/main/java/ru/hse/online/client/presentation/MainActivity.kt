@@ -29,9 +29,9 @@ import org.koin.compose.KoinContext
 import ru.hse.online.client.presentation.map.MapScreen
 import ru.hse.online.client.presentation.pedometer.MainScreen
 import ru.hse.online.client.viewModels.PedometerViewModel
-import ru.hse.online.client.presentation.settings.SettingsScreen
 import ru.hse.online.client.ui.theme.ClientTheme
 import ru.hse.online.client.viewModels.LocationViewModel
+import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class Screen(
     val route: String,
@@ -78,6 +78,8 @@ fun NavigationComponent() {
     val navController = rememberNavController()
     val locationViewModel: LocationViewModel = koinViewModel()
     val pedometerViewModel: PedometerViewModel = koinViewModel()
+    val userViewModel: UserViewModel = koinViewModel()
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { padding ->
@@ -88,8 +90,8 @@ fun NavigationComponent() {
         ) {
             composable(Screen.Main.route) { MainScreen(pedometerViewModel) }
             composable(Screen.Map.route) { MapScreen(pedometerViewModel, locationViewModel) }
-            composable(Screen.Settings.route) { SettingsScreen() }
-            composable(Screen.Test.route) { TestScreen(locationViewModel) }
+            composable(Screen.Settings.route) { MenuScreen(userViewModel) }
+            composable(Screen.Test.route) { TestScreen() }
         }
     }
 }
@@ -102,7 +104,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KoinContext {
                 ClientTheme {
-                    NavigationComponent()
+                    PermissionScreen()
                 }
             }
         }

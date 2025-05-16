@@ -45,7 +45,7 @@ class AuthViewModel(
                         is UserResult.Success -> {
                             settingsModel.saveUserToken(authResult.token)
                             settingsModel.saveUserId(authResult.userId)
-                            startMapActivity()
+                            startMainActivity()
                         }
 
                         is UserResult.Failure -> handleError(
@@ -56,7 +56,7 @@ class AuthViewModel(
                 } else {
                     settingsModel.saveUserToken(authResult.token)
                     settingsModel.saveUserId(authResult.userId)
-                    startMapActivity()
+                    startMainActivity()
                 }
             }
 
@@ -64,7 +64,11 @@ class AuthViewModel(
         }
     }
 
-    private fun startMapActivity() {
+    fun start() {
+        startMainActivity()
+    }
+
+    private fun startMainActivity() {
         val intent = Intent(authView, MainActivity::class.java)
         authView.startActivity(intent)
     }
