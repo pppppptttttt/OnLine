@@ -42,7 +42,7 @@ public class GroupController {
 
     @MessageMapping("/invite")
     public void invite(Invite invite) {
-        System.out.println("Sending invite from " + invite.fromWho + " to " + invite.toWho);
+//        System.out.println("Sending invite from " + invite.fromWho + " to " + invite.toWho);
         messagingTemplate.convertAndSendToUser(invite.toWho, "/msg", "{\"from\": \"" + invite.fromWho + "\"}");
     }
 

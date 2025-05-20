@@ -2,11 +2,12 @@ package ru.hse.online.GroupService.data;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GroupManager {
     private final Map<String, Long> userToGroupId = new ConcurrentHashMap<>();
     private final Map<Long, List<String>> groupIdToUsers = new ConcurrentHashMap<>();
-    private volatile long groupId = 0;
+    private final AtomicLong groupId = new AtomicLong(0);
 
     private void logGroups() {
         System.out.println(userToGroupId);
@@ -14,24 +15,23 @@ public class GroupManager {
     }
     
     public Long addUser(String user) {
-        logGroups();
-        userToGroupId.put(user, groupId);
-        System.out.println("Registered " + user);
+//        logGroups();
+        userToGroupId.put(user, groupId.get());
 
-        List<String> group = groupIdToUsers.get(groupId);
+        List<String> group = groupIdToUsers.get(groupId.get());
         if (group == null) {
             group = new ArrayList<>();
         }
 
         group.add(user);
-        groupIdToUsers.put(groupId, group);
-        logGroups();
-        return groupId++;
+        groupIdToUsers.put(groupId.get(), group);
+//        logGroups();
+        return groupId.getAndIncrement();
     }
 
     public void removeUser(String user) {
-        logGroups();
-        long id = userToGroupId.get(user);
+//        logGroups();
+        var id = userToGroupId.get(user);
 
         groupIdToUsers.get(id).remove(user);
         if (groupIdToUsers.get(id).isEmpty()) {
@@ -39,40 +39,40 @@ public class GroupManager {
         }
 
         userToGroupId.remove(user);
-        logGroups();
+//        logGroups();
     }
 
     public void joinUserGroups(String user1, String user2) {
-        logGroups();
-        System.out.println("Joining " + user1 + " and " + user2);
+//        logGroups();
+//        System.out.println("Joining " + user1 + " and " + user2);
 
-        System.out.println(userToGroupId);
-        System.out.println(groupIdToUsers);
+//        System.out.println(userToGroupId);
+//        System.out.println(groupIdToUsers);
 
-        long id1 = userToGroupId.get(user1);
+        var id1 = userToGroupId.get(user1);
         groupIdToUsers.get(id1).remove(user1);
 
-        long id2 = userToGroupId.get(user2);
+        var id2 = userToGroupId.get(user2);
         userToGroupId.put(user1, id2);
 
         groupIdToUsers.get(id2).add(user1);
 
-        logGroups();
+//        logGroups();
     }
 
     public void moveUserToNewGroup(String user) {
-        logGroups();
-        long id = userToGroupId.get(user);
+//        logGroups();
+        var id = userToGroupId.get(user);
         groupIdToUsers.get(id).remove(user);
 
-        userToGroupId.put(user, groupId);
+        userToGroupId.put(user, groupId.get());
 
         List<String> group = new ArrayList<>();
         group.add(user);
-        groupIdToUsers.put(groupId, group);
-        ++groupId;
+        groupIdToUsers.put(groupId.get(), group);
+        groupId.incrementAndGet();
 
-        logGroups();
+//        logGroups();
     }
 
     public Long getGroupId(String user) {
