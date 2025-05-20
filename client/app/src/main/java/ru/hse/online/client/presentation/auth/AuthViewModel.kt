@@ -4,15 +4,12 @@ import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
-import org.koin.core.scope.Scope
 import ru.hse.online.client.common.NET_LOGCAT_TAG
-import ru.hse.online.client.presentation.map.MapView
+import ru.hse.online.client.presentation.MainActivity
 import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.usecase.AuthUseCase
-import ru.hse.online.client.presentation.settings.SettingsViewModel
-import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserResult
 import ru.hse.online.client.usecase.CreateUserUseCase

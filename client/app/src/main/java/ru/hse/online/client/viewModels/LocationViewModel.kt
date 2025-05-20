@@ -25,6 +25,7 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
 
     private val _isOnline = MutableStateFlow(false)
     private val _isPaused = MutableStateFlow(false)
+    val previewPath: StateFlow<List<LatLng>> = repository.previewPath
 
     init {
         repository.locationState
@@ -79,5 +80,9 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
 
     fun goOffLine() {
         _isOnline.value = false
+    }
+
+    fun clearPreview() {
+        repository.clearPreview()
     }
 }

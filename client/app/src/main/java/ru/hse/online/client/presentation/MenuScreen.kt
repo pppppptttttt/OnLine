@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.navigation.NavController
 import ru.hse.online.client.presentation.friendlist.FriendsScreen
 import ru.hse.online.client.presentation.settings.SettingsScreen
 import ru.hse.online.client.repository.networking.api_data.User
@@ -39,7 +40,7 @@ sealed class AppPage(val title: String) {
 }
 
 @Composable
-fun MenuScreen(viewModel: UserViewModel) {
+fun MenuScreen(viewModel: UserViewModel, navController: NavController) {
     var selectedPage by remember { mutableStateOf<AppPage>(AppPage.Profile) }
 
     Row(modifier = Modifier.fillMaxSize()) {
@@ -78,7 +79,7 @@ fun MenuScreen(viewModel: UserViewModel) {
                 when (selectedPage) {
                     AppPage.Profile -> ProfileScreen()
                     AppPage.Roads -> RoadsScreen()
-                    AppPage.Friends -> FriendsScreen(viewModel)
+                    AppPage.Friends -> FriendsScreen(viewModel, navController)
                     AppPage.Leaderboard -> LeaderboardScreen()
                     AppPage.Settings -> SettingsScreen()
                 }

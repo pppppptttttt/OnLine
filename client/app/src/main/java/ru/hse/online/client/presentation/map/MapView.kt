@@ -6,12 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import ru.hse.online.client.viewModels.LocationViewModel
 import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.UserViewModel
 
 @Composable
-fun MapScreen(pedometerViewModel: PedometerViewModel, locationViewModel: LocationViewModel) {
+fun MapScreen(pedometerViewModel: PedometerViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
     val mapOverlay: MapOverlayView = MapOverlayView()
     Surface(modifier = Modifier.fillMaxSize()) {
         GoogleMapView(locationViewModel)
-        mapOverlay.Draw(pedometerViewModel, locationViewModel)
+        mapOverlay.Draw(pedometerViewModel, locationViewModel, userViewModel)
     }
 }

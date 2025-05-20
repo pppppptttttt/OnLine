@@ -10,20 +10,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AssistWalker
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Snowshoeing
+import androidx.compose.material.icons.filled.SocialDistance
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,14 +52,21 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ru.hse.online.client.presentation.pedometer.AdditionalMetricCard
+import ru.hse.online.client.presentation.pedometer.MetricsGrid
+import ru.hse.online.client.presentation.pedometer.formatTime
 import ru.hse.online.client.viewModels.LocationViewModel
 import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.UserViewModel
 
 class MapOverlayView() {
 
@@ -57,7 +77,7 @@ class MapOverlayView() {
     }
 
     @Composable
-    fun Draw(viewModel: PedometerViewModel, locationViewModel: LocationViewModel) {
+    fun Draw(viewModel: PedometerViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
         var showDialog by remember { mutableStateOf(false) }
         val isOnline by viewModel.isOnline.collectAsStateWithLifecycle(false)
         val isPaused by viewModel.isPaused.collectAsStateWithLifecycle(false)
@@ -65,37 +85,55 @@ class MapOverlayView() {
 
         Column(
             verticalArrangement = Arrangement.Top,
-            modifier = Modifier.padding(top = paddingTop, start = paddingStart, end = paddingEnd)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().background(color = Color(0x77000000))
             ) {
-                Box(modifier = Modifier.background(color = Color(0x77000000))) {
                     val onLineStepCount by viewModel.onlineSteps.collectAsStateWithLifecycle(0)
                     val onLineCalories by viewModel.onlineCalories.collectAsStateWithLifecycle(0.0)
                     val onLineDistance by viewModel.onlineDistance.collectAsStateWithLifecycle(0.0)
                     val onLineTime by viewModel.onlineTime.collectAsStateWithLifecycle(0L)
 
-                    Column {
-                        for (stat in arrayOf(
-                            Pair(onLineStepCount, "steps"),
-                            Pair(onLineDistance, "meters"),
-                            Pair(onLineTime, "hm"),
-                            Pair(onLineCalories, "kcal")
-                        )) {
-                            Text(
-                                text = "${stat.first.format(2)} ${stat.second} on line!",
-                                fontSize = 16.sp,
-                                style = TextStyle(
-                                    shadow = Shadow(
-                                        blurRadius = 2.0f,
-                                        offset = Offset(2.0f, 5.0f)
-                                    )
-                                )
-                            )
-                        }
-                    }
+                    SmallMetricCard(
+                        icon = Icons.Filled.AssistWalker,
+                        title = "steps",
+                        value = "%d".format(onLineStepCount)
+                    )
+
+                    SmallMetricCard(
+                        icon = Icons.Default.SocialDistance,
+                        title = "km",
+                        value = "%.1f".format(onLineDistance)
+                    )
+                    SmallMetricCard(
+                        icon = Icons.Default.LocalFireDepartment,
+                        title = "kcal",
+                        value = "%.1f".format(onLineCalories)
+                    )
+                    SmallMetricCard(
+                        icon = Icons.Default.AccessTime,
+                        title = "time",
+                        value = formatTime(onLineTime)
+                    )
+
+            }
+
+            Row (
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                val previewPath by locationViewModel.previewPath.collectAsStateWithLifecycle()
+                Button(
+                    onClick = {
+                        locationViewModel.clearPreview()
+                    },
+                    modifier = Modifier.widthIn(min = 50.dp).alpha(if (previewPath.isNotEmpty()) 1f else 0f),
+                    enabled = previewPath.isNotEmpty()
+                ) {
+                    Icon(Icons.Filled.Clear, contentDescription = "Remove preview")
                 }
             }
         }
@@ -157,7 +195,8 @@ class MapOverlayView() {
 
         if (showDialog) {
             GroupCreationDialog(
-                onConfirmation = { showDialog = false }
+                onConfirmation = { showDialog = false },
+                userViewModel = userViewModel
             )
         }
     }
@@ -165,6 +204,7 @@ class MapOverlayView() {
     @Composable
     fun GroupCreationDialog(
         onConfirmation: () -> Unit,
+        userViewModel: UserViewModel
     ) {
         var groupId by remember { mutableStateOf("") }
 
@@ -183,6 +223,7 @@ class MapOverlayView() {
                         onClick = {
                             //viewModel.onCreateGroup()
                             onConfirmation()
+                            userViewModel.createGroup()
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -269,14 +310,81 @@ class MapOverlayView() {
             }
         }
     }
-}
 
-private fun Number.format(scale: Int): String =
-    if (this is Int) {
-        "%d".format(this)
-    } else if (this is Double) {
-        "%.${scale}f".format(this)
-    } else {
-        toString()
+    @Preview
+    @Composable
+    fun TopSide() {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().background(color = Color(0x77000000))
+            ) {
+                val onLineStepCount = 6543
+                val onLineCalories = 456.1
+                val onLineDistance = 1.123
+                val onLineTime: Long = 1232133
+
+                SmallMetricCard(
+                    icon = Icons.Filled.AssistWalker,
+                    title = "steps",
+                    value = "%d".format(onLineStepCount)
+                )
+
+                SmallMetricCard(
+                    icon = Icons.Default.SocialDistance,
+                    title = "km",
+                    value = "%.1f".format(onLineDistance)
+                )
+                SmallMetricCard(
+                    icon = Icons.Default.LocalFireDepartment,
+                    title = "kcal",
+                    value = "%.1f".format(onLineCalories)
+                )
+                SmallMetricCard(
+                    icon = Icons.Default.AccessTime,
+                    title = "time",
+                    value = formatTime(onLineTime)
+                )
+
+            }
+        }
     }
 
+
+    @Composable
+    fun SmallMetricCard(
+        icon: ImageVector,
+        title: String,
+        value: String,
+    ) {
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            ),
+            modifier = Modifier
+                .padding(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}

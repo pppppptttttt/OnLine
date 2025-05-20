@@ -5,12 +5,19 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.networking.api_data.Friend
+import ru.hse.online.client.repository.networking.api_data.Path
+import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
+import java.util.UUID
 
 class UserViewModel(
-    private val repository: UserRepository
+    private val repository: UserRepository,
+    private val locationRepository: LocationRepository
 ): ViewModel() {
     val friends: StateFlow<List<Friend>> = repository.friends
+    val isInGroup: StateFlow<Boolean> = repository.isInGroup
+    val friendPublicPaths: StateFlow<List<Path>> = repository.friendPublicPaths
+    val friendProfile: StateFlow<Friend?> = repository.friendProfile
 
     init {
         viewModelScope.launch {
@@ -28,6 +35,19 @@ class UserViewModel(
         viewModelScope.launch {
             repository.deleteFriend(uuid)
         }
+    }
+
+    fun createGroup() {
+        repository.createGroup()
+    }
+
+    fun joinGroup(uuid: String) {}
+    fun inviteToGroup(uuid: UUID) {}
+    fun loadFriendProfile(userId: String) {}
+    fun loadPublicPaths(userId: UUID) {}
+    fun addPathToCollection(path: Path) {}
+    fun previewPath(path: Path) {
+        locationRepository.loadPreviewPath(path.polyline)
     }
 
 }

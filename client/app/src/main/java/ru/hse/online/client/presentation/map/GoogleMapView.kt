@@ -25,6 +25,7 @@ import ru.hse.online.client.viewModels.LocationViewModel
 @Composable
 fun GoogleMapView(viewModel: LocationViewModel) {
     val routePoints by viewModel.routePoints.collectAsState()
+    val previewPath by viewModel.previewPath.collectAsState()
     val currentLocation by viewModel.location.collectAsState()
     val cameraPositionState = rememberCameraPositionState()
 
@@ -64,6 +65,12 @@ fun GoogleMapView(viewModel: LocationViewModel) {
         Polyline(
             points = routePoints,
             color = Color(0x800000FF),
+            width = 15f
+        )
+
+        Polyline(
+            points = previewPath,
+            color = Color(0xffff6347),
             width = 15f
         )
 

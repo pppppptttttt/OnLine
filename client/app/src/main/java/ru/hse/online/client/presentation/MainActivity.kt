@@ -20,12 +20,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinContext
+import ru.hse.online.client.presentation.friendlist.FriendProfileScreen
 import ru.hse.online.client.presentation.map.MapScreen
 import ru.hse.online.client.presentation.pedometer.MainScreen
 import ru.hse.online.client.viewModels.PedometerViewModel
@@ -89,9 +92,20 @@ fun NavigationComponent() {
             modifier = Modifier.padding(padding)
         ) {
             composable(Screen.Main.route) { MainScreen(pedometerViewModel) }
-            composable(Screen.Map.route) { MapScreen(pedometerViewModel, locationViewModel) }
-            composable(Screen.Settings.route) { MenuScreen(userViewModel) }
+            composable(Screen.Map.route) { MapScreen(pedometerViewModel, locationViewModel, userViewModel) }
+            composable(Screen.Settings.route) { MenuScreen(userViewModel, navController) }
             composable(Screen.Test.route) { TestScreen() }
+            composable(
+                route = "friendProfile/{userId}",
+                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                FriendProfileScreen(
+                    userId = userId,
+                    vm = userViewModel,
+                    navController = navController
+                )
+            }
         }
     }
 }
