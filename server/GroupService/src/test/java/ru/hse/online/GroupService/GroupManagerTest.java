@@ -58,7 +58,7 @@ class GroupManagerTest {
         Long newGroup = groupManager.getGroupId("user1");
         assertNotEquals(originalGroup, newGroup);
         assertEquals(1, groupManager.getGroup(newGroup).size());
-        assertTrue(groupManager.getGroup(originalGroup).isEmpty());
+        assertNull(groupManager.getGroup(originalGroup));
     }
 
     @Test
