@@ -37,7 +37,6 @@ class GroupManagerTest {
         assertNull(groupManager.getGroup(0L));
     }
 
-    // TODO
     @Test
     void joinUserGroupsShouldMergeGroups() {
         Long group1 = groupManager.addUser("user1");
