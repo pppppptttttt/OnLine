@@ -10,10 +10,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.hse.online.client.repository.storage.LocationRepository
+import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.services.location.LocationService
 import ru.hse.online.client.services.pedometer.ContextProvider
 
-class LocationViewModel(private val contextProvider: ContextProvider, private val repository: LocationRepository) : ViewModel() {
+class LocationViewModel(
+    private val contextProvider: ContextProvider,
+    private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
     private val TAG: String = "APP_LOCATION_VIEW_MODEL"
     
     private var _routePoints: MutableStateFlow<List<LatLng>> =
@@ -25,10 +30,10 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
 
     private val _isOnline = MutableStateFlow(false)
     private val _isPaused = MutableStateFlow(false)
-    val previewPath: StateFlow<List<LatLng>> = repository.previewPath
+    val previewPath: StateFlow<List<LatLng>> = locationRepository.previewPath
 
     init {
-        repository.locationState
+        locationRepository.locationState
             .onEach { state ->
                 Log.i(TAG, "Updating location")
                 when (state) {
@@ -78,11 +83,15 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
         }
     }
 
-    fun goOffLine() {
+    fun goOffLine(savePath: Boolean) {
         _isOnline.value = false
+        if (savePath) {
+            userRepository.savePath(_routePoints.value)
+        }
+        _routePoints.value = emptyList()
     }
 
     fun clearPreview() {
-        repository.clearPreview()
+        locationRepository.clearPreview()
     }
 }

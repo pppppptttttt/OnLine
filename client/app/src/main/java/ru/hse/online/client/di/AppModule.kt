@@ -46,7 +46,8 @@ val appModule = module {
     viewModel<LocationViewModel> {
         LocationViewModel(
             contextProvider = get(),
-            repository = get()
+            locationRepository = get(),
+            userRepository = get()
         )
     }
 

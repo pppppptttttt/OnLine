@@ -1,4 +1,5 @@
 package ru.hse.online.client.repository.networking.api_data
+import androidx.compose.ui.graphics.Color
 import java.util.UUID
 
 
@@ -7,7 +8,8 @@ data class Friend(
     val username: String,
     val email: String,
     val stats: Map<String, Double> = emptyMap(),
-    val paths: List<Path> = emptyList()
+    val paths: List<Path> = emptyList(),
+    var color: Color = Color(0)
 )
 
 data class User(

@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
 import ru.hse.online.client.presentation.friendlist.FriendsScreen
 import ru.hse.online.client.presentation.settings.SettingsScreen
-import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class AppPage(val title: String) {

@@ -1,5 +1,7 @@
 package ru.hse.online.client.repository.storage
 
+import androidx.compose.ui.graphics.Color
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +26,13 @@ class UserRepository {
     private val _friendProfile = MutableStateFlow<Friend?>(null)
     val friendProfile: StateFlow<Friend?> = _friendProfile.asStateFlow()
 
-    suspend fun loadFriends() {}
-    suspend fun addFriend(uuid: String) {}
-    suspend fun deleteFriend(uuid: String) {}
+    private val _group = MutableStateFlow<Map<UUID, Friend>>(emptyMap())
+    val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
+
+    fun loadFriends() {}
+    fun addFriend(uuid: String) {}
+    fun deleteFriend(uuid: String) {}
+    fun savePath(path: List<LatLng>) {}
 
     init {
         val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0))
@@ -37,5 +43,9 @@ class UserRepository {
 
     fun createGroup() {
         _isInGroup.value = true
+        val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), emptyList(), Color.Red)
+        val fr2 = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), emptyList(), Color.Blue)
+        _group.value += Pair(fr.userId, fr)
+        _group.value += Pair(fr2.userId, fr2)
     }
 }

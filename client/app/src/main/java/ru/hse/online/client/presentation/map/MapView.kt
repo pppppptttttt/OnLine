@@ -10,9 +10,8 @@ import ru.hse.online.client.viewModels.UserViewModel
 
 @Composable
 fun MapScreen(pedometerViewModel: PedometerViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
-    val mapOverlay: MapOverlayView = MapOverlayView()
     Surface(modifier = Modifier.fillMaxSize()) {
         GoogleMapView(locationViewModel)
-        mapOverlay.Draw(pedometerViewModel, locationViewModel, userViewModel)
+        MapOverlayView(pedometerViewModel, locationViewModel, userViewModel)
     }
 }
