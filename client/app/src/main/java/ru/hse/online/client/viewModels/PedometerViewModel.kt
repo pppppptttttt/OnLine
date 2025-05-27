@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import ru.hse.online.client.services.pedometer.ContextProvider
-import ru.hse.online.client.services.pedometer.StepCounterService
-import ru.hse.online.client.services.pedometer.StepServiceConnector
+import ru.hse.online.client.services.ContextProvider
+import ru.hse.online.client.services.StepCounterService
+import ru.hse.online.client.services.StepServiceConnector
 
 class PedometerViewModel(
     private val connector: StepServiceConnector,

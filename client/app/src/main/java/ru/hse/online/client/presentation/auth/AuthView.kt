@@ -43,9 +43,10 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import ru.hse.online.client.R
-import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.ui.theme.ClientTheme
+import ru.hse.online.client.viewModels.AuthViewModel
 
 class AuthView : ComponentActivity() {
     private val authModel: AuthViewModel by viewModel { parametersOf(this) }

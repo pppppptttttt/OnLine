@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation.friendlist
+package ru.hse.online.client.presentation.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,8 +19,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,7 +33,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +49,6 @@ import ru.hse.online.client.presentation.Screen
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.Path
 import ru.hse.online.client.viewModels.UserViewModel
-import java.util.UUID
 
 @Composable
 fun FriendsScreen(viewModel: UserViewModel, navController: NavController) {

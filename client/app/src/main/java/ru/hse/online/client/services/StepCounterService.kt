@@ -1,4 +1,4 @@
-package ru.hse.online.client.services.pedometer
+package ru.hse.online.client.services
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
 import android.hardware.Sensor
 import android.hardware.SensorEvent

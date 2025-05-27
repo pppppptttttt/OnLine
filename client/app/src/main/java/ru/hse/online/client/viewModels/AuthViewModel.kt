@@ -1,12 +1,10 @@
-package ru.hse.online.client.presentation.auth
+package ru.hse.online.client.viewModels
 
 import android.content.Intent
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
-import ru.hse.online.client.common.NET_LOGCAT_TAG
 import ru.hse.online.client.presentation.MainActivity
-import ru.hse.online.client.presentation.settings.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthResult
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.usecase.AuthUseCase
@@ -20,6 +18,7 @@ class AuthViewModel(
     private val createUserUseCase: CreateUserUseCase,
     private val authView: ComponentActivity
 ) : ViewModel() {
+    private val TAG: String = "APP_AUTH_VIEWMODEL"
 
     suspend fun handleAuth(
         authType: AuthType,
@@ -71,6 +70,6 @@ class AuthViewModel(
     }
 
     private fun handleError(code: Int, message: String?) {
-        Log.i(NET_LOGCAT_TAG, "Failed to authenticate with code $code. Message: $message")
+        Log.i(TAG, "Failed to authenticate with code $code. Message: $message")
     }
 }

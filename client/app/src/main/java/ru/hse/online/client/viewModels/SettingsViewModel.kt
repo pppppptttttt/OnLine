@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation.settings
+package ru.hse.online.client.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -5,18 +5,22 @@ import androidx.activity.ComponentActivity
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import ru.hse.online.client.viewModels.LocationViewModel
-import ru.hse.online.client.presentation.auth.AuthViewModel
+import ru.hse.online.client.viewModels.AuthViewModel
 import ru.hse.online.client.viewModels.PedometerViewModel
-import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
-import ru.hse.online.client.services.pedometer.ContextProvider
-import ru.hse.online.client.services.pedometer.StepServiceConnector
+import ru.hse.online.client.services.ContextProvider
+import ru.hse.online.client.services.StepServiceConnector
 import ru.hse.online.client.viewModels.UserViewModel
 
 val appModule = module {
     includes(networkModule)
+
+    single<AppDataStore> { AppDataStore(context = get()) }
+    single { LocationRepository() }
+    single { UserRepository() }
 
     single<StepServiceConnector> {
         StepServiceConnector(
@@ -30,8 +34,6 @@ val appModule = module {
         }
     }
 
-    single<AppDataStore> { AppDataStore(context = get()) }
-
     viewModel<SettingsViewModel> { SettingsViewModel(get()) }
 
     viewModel<PedometerViewModel> {
@@ -41,8 +43,6 @@ val appModule = module {
         )
     }
 
-    single { LocationRepository() }
-
     viewModel<LocationViewModel> {
         LocationViewModel(
             contextProvider = get(),
@@ -50,8 +50,6 @@ val appModule = module {
             userRepository = get()
         )
     }
-
-    single { UserRepository() }
 
     viewModel<UserViewModel> {
         UserViewModel(

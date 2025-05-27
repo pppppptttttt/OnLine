@@ -1,4 +1,4 @@
-package ru.hse.online.client.repository
+package ru.hse.online.client.repository.storage
 
 import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResult

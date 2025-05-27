@@ -1,4 +1,4 @@
-package ru.hse.online.client.services.location
+package ru.hse.online.client.services
 
 import android.Manifest
 import android.annotation.SuppressLint

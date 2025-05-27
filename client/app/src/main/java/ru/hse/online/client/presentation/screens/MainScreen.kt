@@ -1,4 +1,4 @@
-﻿package ru.hse.online.client.presentation.pedometer
+﻿package ru.hse.online.client.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.viewModels.PedometerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

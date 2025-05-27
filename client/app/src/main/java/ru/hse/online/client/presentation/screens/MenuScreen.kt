@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation
+package ru.hse.online.client.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -26,8 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavController
-import ru.hse.online.client.presentation.friendlist.FriendsScreen
-import ru.hse.online.client.presentation.settings.SettingsScreen
 import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class AppPage(val title: String) {

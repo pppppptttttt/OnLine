@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
-import ru.hse.online.client.services.location.LocationService
-import ru.hse.online.client.services.pedometer.ContextProvider
+import ru.hse.online.client.services.LocationService
+import ru.hse.online.client.services.ContextProvider
 
 class LocationViewModel(
     private val contextProvider: ContextProvider,
