@@ -29,7 +29,7 @@ import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinContext
 import ru.hse.online.client.presentation.screens.FriendProfileScreen
-import ru.hse.online.client.presentation.map.MapScreen
+import ru.hse.online.client.presentation.screens.MapScreen
 import ru.hse.online.client.presentation.screens.MainScreen
 import ru.hse.online.client.presentation.screens.MenuScreen
 import ru.hse.online.client.presentation.screens.PermissionScreen

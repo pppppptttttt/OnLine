@@ -67,6 +67,7 @@ class AuthView : ComponentActivity() {
     @Composable
     fun Draw(settingsModel: SettingsViewModel = koinViewModel()) {
         val email by settingsModel.userEmail.collectAsState(initial = "")
+        val username by settingsModel.userName.collectAsState(initial = "")
         val password by settingsModel.userPassword.collectAsState(initial = "")
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
@@ -119,6 +120,19 @@ class AuthView : ComponentActivity() {
 
                 }
 
+                if (authType == AuthType.SIGNUP) {
+                    OutlinedTextField(
+                        value = username,
+                        label = { Text("Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        onValueChange = {
+                            settingsModel.saveUserName(it)
+                        }
+                    )
+                }
+
                 if (authType != AuthType.NONE) {
                     OutlinedTextField(
                         value = email,
@@ -127,7 +141,6 @@ class AuthView : ComponentActivity() {
                             .fillMaxWidth()
                             .padding(8.dp),
                         onValueChange = {
-                            settingsModel.saveUserName(it)
                             settingsModel.saveUserEmail(it)
                         }
                     )

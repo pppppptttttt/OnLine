@@ -30,9 +30,9 @@ import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class AppPage(val title: String) {
     data object Profile : AppPage("Profile")
-    data object Roads : AppPage("Roads")
     data object Friends : AppPage("Friends")
     data object Leaderboard : AppPage("Leaderboard")
+    data object Statistics: AppPage("Statistics")
     data object Settings : AppPage("Settings")
 }
 
@@ -49,9 +49,9 @@ fun MenuScreen(viewModel: UserViewModel, navController: NavController) {
         ) {
             listOf(
                 AppPage.Profile,
-                AppPage.Roads,
                 AppPage.Friends,
                 AppPage.Leaderboard,
+                AppPage.Statistics,
                 AppPage.Settings
             ).forEach { page ->
                 MenuRow(
@@ -75,9 +75,9 @@ fun MenuScreen(viewModel: UserViewModel, navController: NavController) {
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedPage) {
                     AppPage.Profile -> ProfileScreen()
-                    AppPage.Roads -> RoadsScreen()
-                    AppPage.Friends -> FriendsScreen(viewModel, navController)
                     AppPage.Leaderboard -> LeaderboardScreen()
+                    AppPage.Friends -> FriendsScreen(viewModel, navController)
+                    AppPage.Statistics -> StatisticsScreen()
                     AppPage.Settings -> SettingsScreen()
                 }
             }
@@ -106,26 +106,5 @@ fun MenuRow(title: String, isSelected: Boolean, onClick: () -> Unit) {
             color = if (isSelected) MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.onSurface
         )
-    }
-}
-
-@Composable
-fun ProfileScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Profile Screen Content")
-    }
-}
-
-@Composable
-fun RoadsScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Roads Screen Content")
-    }
-}
-
-@Composable
-fun LeaderboardScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Leaderboard Screen Content")
     }
 }

@@ -7,27 +7,32 @@ import ru.hse.online.client.repository.storage.AppDataStore
 import java.util.UUID
 
 class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
+    val userName = dataStore.getValueFlow(
+        AppDataStore.USER_NAME,
+        defaultValue = ""
+    )
+    val userEmail = dataStore.getValueFlow(
+        AppDataStore.USER_EMAIL,
+        defaultValue = ""
+    )
+    val userPassword = dataStore.getValueFlow(
+        AppDataStore.USER_PASSWORD,
+        defaultValue = ""
+    )
+    val userId = dataStore.getUserIdFlow()
+
     fun saveUserName(name: String) {
         viewModelScope.launch {
             dataStore.saveValue(AppDataStore.USER_NAME, name)
         }
     }
 
-    val userName = dataStore.getValueFlow(
-        AppDataStore.USER_NAME,
-        defaultValue = ""
-    )
 
     fun saveUserEmail(email: String) {
         viewModelScope.launch {
             dataStore.saveValue(AppDataStore.USER_EMAIL, email)
         }
     }
-
-    val userEmail = dataStore.getValueFlow(
-        AppDataStore.USER_EMAIL,
-        defaultValue = ""
-    )
 
     fun saveUserPassword(password: String) {
         viewModelScope.launch {
@@ -40,13 +45,6 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
             dataStore.saveUserId(userId)
         }
     }
-
-    val userId = dataStore.getUserIdFlow()
-
-    val userPassword = dataStore.getValueFlow(
-        AppDataStore.USER_PASSWORD,
-        defaultValue = ""
-    )
 
     fun saveUserToken(token: String) {
         viewModelScope.launch {
