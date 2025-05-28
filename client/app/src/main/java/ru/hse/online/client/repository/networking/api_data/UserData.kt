@@ -1,7 +1,14 @@
 package ru.hse.online.client.repository.networking.api_data
+import java.util.UUID
+
+data class Friend(
+    val userId: String,
+    val username: String,
+    val email: String
+)
 
 data class User(
-    val userId: String,
+    val userId: UUID,
     val username: String,
     val email: String,
     val friends: List<String> = emptyList()

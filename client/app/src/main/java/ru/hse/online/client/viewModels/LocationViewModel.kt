@@ -23,6 +23,9 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
     private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
     val location: StateFlow<LatLng> = _locationState.asStateFlow()
 
+    private val _isOnline = MutableStateFlow(false)
+    private val _isPaused = MutableStateFlow(false)
+
     init {
         repository.locationState
             .onEach { state ->
@@ -33,7 +36,9 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
                             LatLng(it.latitude, it.longitude)
                         }
                         _locationState.value = newPoint
-                        _routePoints.value += newPoint
+                        if (_isOnline.value) {
+                            _routePoints.value += newPoint
+                        }
                         Log.i(TAG, "New location: $newPoint")
                     }
                     is LocationRepository.LocationState.Error -> {
@@ -46,7 +51,7 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
         startService()
     }
 
-    fun startService() {
+    private fun startService() {
         Log.i(TAG, "Starting location service")
         LocationService.startService(contextProvider.getContext())
     }
@@ -54,5 +59,25 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
     override fun onCleared() {
         LocationService.stopService(contextProvider.getContext())
         super.onCleared()
+    }
+
+    fun goOnLine() {
+        _isOnline.value = true
+    }
+
+    fun pauseOnline() {
+        if (_isOnline.value) {
+            _isPaused.value = true
+        }
+    }
+
+    fun resumeOnline() {
+        if (_isOnline.value) {
+            _isPaused.value = false
+        }
+    }
+
+    fun goOffLine() {
+        _isOnline.value = false
     }
 }

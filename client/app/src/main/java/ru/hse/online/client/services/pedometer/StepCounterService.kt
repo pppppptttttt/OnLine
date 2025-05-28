@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -42,6 +43,7 @@ class StepCounterService : Service(), SensorEventListener {
     private val _KM_PER_STEP = 0.00762
 
     private var isOnline = false
+    private var isPaused = false
 
     private val _steps = MutableStateFlow<Int>(0)
     val steps: StateFlow<Int> = _steps.asStateFlow()
@@ -76,11 +78,11 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     fun pauseOnline() {
-        isOnline = false
+        isPaused = true
     }
 
     fun resumeOnline() {
-        isOnline = true
+        isPaused = false
     }
 
     fun goOffline() {
@@ -161,7 +163,7 @@ class StepCounterService : Service(), SensorEventListener {
     private fun startForeground() {
         createNotificationChannel()
         val notification = buildNotification()
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_HEALTH)
     }
 
     private fun createNotificationChannel() {

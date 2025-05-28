@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import java.util.UUID
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
 
@@ -57,6 +58,17 @@ class AppDataStore(
             }
             .map { preferences ->
                 preferences[key] ?: defaultValue
+            }
+    }
+
+    suspend fun saveUserId(value: UUID) {
+        saveValue(USER_ID, value.toString())
+    }
+
+    fun getUserIdFlow(): Flow<UUID> {
+        return getValueFlow(USER_ID, "00000000-0000-0000-0000-000000000000")
+            .map { uuidString ->
+                UUID.fromString(uuidString)
             }
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.storage.AppDataStore
+import java.util.UUID
 
 class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
     fun saveUserName(name: String) {
@@ -14,11 +15,6 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
 
     val userName = dataStore.getValueFlow(
         AppDataStore.USER_NAME,
-        defaultValue = ""
-    )
-
-    val userId = dataStore.getValueFlow(
-        AppDataStore.USER_ID,
         defaultValue = ""
     )
 
@@ -39,11 +35,13 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         }
     }
 
-    fun saveUserId(userId: String) {
+    fun saveUserId(userId: UUID) {
         viewModelScope.launch {
-            dataStore.saveValue(AppDataStore.USER_ID, userId)
+            dataStore.saveUserId(userId)
         }
     }
+
+    val userId = dataStore.getUserIdFlow()
 
     val userPassword = dataStore.getValueFlow(
         AppDataStore.USER_PASSWORD,

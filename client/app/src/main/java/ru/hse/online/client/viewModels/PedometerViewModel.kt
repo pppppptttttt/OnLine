@@ -1,7 +1,9 @@
 package ru.hse.online.client.viewModels
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import ru.hse.online.client.services.pedometer.ContextProvider
 import ru.hse.online.client.services.pedometer.StepCounterService
 import ru.hse.online.client.services.pedometer.StepServiceConnector
@@ -21,6 +23,15 @@ class PedometerViewModel(
     val onlineDistance: StateFlow<Double> = connector.distanceTraveledOnline
     val onlineTime: StateFlow<Long> = connector.timeElapsedOnline
 
+    private val _isOnline = MutableStateFlow(false)
+    val isOnline: StateFlow<Boolean> = _isOnline.asStateFlow()
+
+    private val _isPaused = MutableStateFlow(false)
+    val isPaused: StateFlow<Boolean> = _isPaused.asStateFlow()
+
+    private val _isInGroup = MutableStateFlow(false)
+    val isInGroup: StateFlow<Boolean> = _isInGroup.asStateFlow()
+
     init {
         connector.bind()
         StepCounterService.startService(contextProvider.getContext())
@@ -32,18 +43,26 @@ class PedometerViewModel(
     }
 
     fun goOnLine() {
+        _isOnline.value = true
         connector.goOnline()
     }
 
     fun pauseOnline() {
-        connector.pauseOnline()
+        if (_isOnline.value) {
+            _isPaused.value = true
+            connector.pauseOnline()
+        }
     }
 
     fun resumeOnline() {
-        connector.resumeOnline()
+        if (_isOnline.value) {
+            _isPaused.value = false
+            connector.resumeOnline()
+        }
     }
 
     fun goOffLine() {
+        _isOnline.value = false
         connector.goOffline()
     }
 }

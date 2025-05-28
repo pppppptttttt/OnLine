@@ -12,6 +12,6 @@ fun MapScreen(pedometerViewModel: PedometerViewModel, locationViewModel: Locatio
     val mapOverlay: MapOverlayView = MapOverlayView()
     Surface(modifier = Modifier.fillMaxSize()) {
         GoogleMapView(locationViewModel)
-        mapOverlay.Draw(pedometerViewModel)
+        mapOverlay.Draw(pedometerViewModel, locationViewModel)
     }
 }

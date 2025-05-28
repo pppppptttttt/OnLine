@@ -2,6 +2,7 @@ package ru.hse.online.client.usecase
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.core.Koin
 import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserResult
 import ru.hse.online.client.repository.networking.api_service.UserDataApiService

@@ -5,19 +5,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DoubleArrow
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,14 +35,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ru.hse.online.client.viewModels.LocationViewModel
 import ru.hse.online.client.viewModels.PedometerViewModel
 
 class MapOverlayView() {
@@ -44,7 +57,11 @@ class MapOverlayView() {
     }
 
     @Composable
-    fun Draw(viewModel: PedometerViewModel) {
+    fun Draw(viewModel: PedometerViewModel, locationViewModel: LocationViewModel) {
+        var showDialog by remember { mutableStateOf(false) }
+        val isOnline by viewModel.isOnline.collectAsStateWithLifecycle(false)
+        val isPaused by viewModel.isPaused.collectAsStateWithLifecycle(false)
+        val isInGroup by viewModel.isInGroup.collectAsStateWithLifecycle(false)
 
         Column(
             verticalArrangement = Arrangement.Top,
@@ -80,28 +97,127 @@ class MapOverlayView() {
                         }
                     }
                 }
+            }
+        }
 
-                Column {
-                    var iconPlay by remember { mutableStateOf(false) }
-                    var dialogDraw by remember { mutableStateOf(false) }
+        Row (
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(bottom = paddingTop, start = paddingStart, end = paddingEnd).fillMaxWidth()
+        ) {
+            Button(
+                onClick = {
+                    if (isPaused) {
+                        viewModel.resumeOnline()
+                        locationViewModel.resumeOnline()
+                    } else {
+                        viewModel.pauseOnline()
+                        locationViewModel.pauseOnline()
+                    }
+                },
+                modifier = Modifier.widthIn(min = 50.dp).alpha(if (isOnline) 1f else 0f),
+                enabled = isOnline
+            ) {
+                if (!isPaused)
+                    Icon(Icons.Filled.Pause, contentDescription = "Pause badtrip")
+                else
+                    Icon(Icons.Filled.DoubleArrow, contentDescription = "Resume badtrip")
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Button(
+                onClick = {
+                    if (isOnline) {
+                        viewModel.goOffLine()
+                        locationViewModel.goOffLine()
+                    } else {
+                        viewModel.goOnLine()
+                        locationViewModel.goOnLine()
+                    }
+                },
+                modifier = Modifier.widthIn(min = 50.dp)
+            ) {
+                if (!isOnline)
+                    Icon(Icons.Filled.PlayArrow, contentDescription = "Start badtrip")
+                else
+                    Icon(Icons.Filled.Stop, contentDescription = "Stop badtrip")
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Button(
+                onClick = { showDialog = true },
+                modifier = Modifier.widthIn(min = 50.dp).alpha(if (!isOnline) 1f else 0f),
+                enabled = !isOnline
+            ) {
+                Icon(Icons.Filled.Group, contentDescription = "GroupMenu")
+            }
+        }
+
+        if (showDialog) {
+            GroupCreationDialog(
+                onConfirmation = { showDialog = false }
+            )
+        }
+    }
+
+    @Composable
+    fun GroupCreationDialog(
+        onConfirmation: () -> Unit,
+    ) {
+        var groupId by remember { mutableStateOf("") }
+
+        Dialog(onDismissRequest = onConfirmation) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Button(
                         onClick = {
-                            iconPlay = !iconPlay
-                            if (iconPlay) viewModel.goOnLine()
-                            else {
-                                viewModel.goOffLine()
-                                dialogDraw = true
-                            }
+                            //viewModel.onCreateGroup()
+                            onConfirmation()
                         },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        if (iconPlay)
-                            Icon(Icons.Filled.Pause, contentDescription = "Start badtrip")
-                        else
-                            Icon(Icons.Filled.PlayArrow, contentDescription = "Pause badtrip")
+                        Text("Create New Group")
                     }
 
-                    if (dialogDraw) {
-                        Dialog_({ dialogDraw = false }, { dialogDraw = false })
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TextField(
+                            value = groupId,
+                            onValueChange = { groupId = it },
+                            label = { Text("Enter group id") },
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    //viewModel.onAddMember(groupId)
+                                    groupId = ""
+                                }
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                //viewModel.onAddMember(groupId)
+                                groupId = ""
+                            },
+                            enabled = groupId.isNotBlank()
+                        ) {
+                            Icon(Icons.Filled.PlayArrow, contentDescription = "Connect to group")
+                        }
                     }
                 }
             }
