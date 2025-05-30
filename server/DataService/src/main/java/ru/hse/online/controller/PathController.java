@@ -44,8 +44,11 @@ public class PathController {
             @RequestBody
             @Schema(example = """
                     {
-                        "userId": "770e8400-e29b-41d4-a716-446655440000",
-                        "polyline": "line"
+                      "userId": "770e8400-e29b-41d4-a716-446655440000",
+                      "polyline": "some_polyline_string",
+                      "name": "Morning Run",
+                      "distance": 5000.5,
+                      "duration": 1800.0
                     }""")
             Path path) {
         try {

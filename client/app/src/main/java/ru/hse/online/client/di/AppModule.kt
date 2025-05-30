@@ -13,6 +13,7 @@ import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.services.ContextProvider
 import ru.hse.online.client.services.StepServiceConnector
+import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import ru.hse.online.client.viewModels.UserViewModel
 
 val appModule = module {
@@ -55,6 +56,12 @@ val appModule = module {
         UserViewModel(
             repository = get(),
             locationRepository = get()
+        )
+    }
+
+    viewModel<LeaderBoardViewModel> {
+        LeaderBoardViewModel(
+            userRepository = get()
         )
     }
 
