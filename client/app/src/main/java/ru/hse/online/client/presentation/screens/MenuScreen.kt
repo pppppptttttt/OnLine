@@ -75,7 +75,7 @@ fun MenuScreen(viewModel: UserViewModel, navController: NavController) {
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedPage) {
                     AppPage.Profile -> ProfileScreen()
-                    AppPage.Leaderboard -> LeaderboardScreen()
+                    AppPage.Leaderboard -> LeaderBoardScreen()
                     AppPage.Friends -> FriendsScreen(viewModel, navController)
                     AppPage.Statistics -> StatisticsScreen()
                     AppPage.Settings -> SettingsScreen()
