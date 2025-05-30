@@ -1,12 +1,19 @@
 package ru.hse.online.client.repository
 
+import kotlinx.coroutines.flow.first
 import ru.hse.online.client.repository.networking.api_data.FriendshipResult
 import ru.hse.online.client.repository.networking.api_service.FriendshipApiService
+import ru.hse.online.client.repository.storage.AppDataStore
 import java.util.UUID
 
-class FriendshipRepository(private val friendshipApiService: FriendshipApiService) {
+class FriendshipRepository(
+    private val friendshipApiService: FriendshipApiService,
+    private val appDataStore: AppDataStore
+) {
 
-    suspend fun getFriends(token: String, userId: UUID): FriendshipResult {
+    suspend fun getFriends(): FriendshipResult {
+        val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
             val response = friendshipApiService.getFriends("Bearer $token", userId)
             when (response.code()) {
@@ -19,7 +26,9 @@ class FriendshipRepository(private val friendshipApiService: FriendshipApiServic
         }
     }
 
-    suspend fun addFriend(token: String, userId: UUID, friendId: UUID): FriendshipResult {
+    suspend fun addFriend(friendId: UUID): FriendshipResult {
+        val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
             val response = friendshipApiService.addFriend("Bearer $token", userId, friendId)
             when (response.code()) {
@@ -31,7 +40,9 @@ class FriendshipRepository(private val friendshipApiService: FriendshipApiServic
         }
     }
 
-    suspend fun removeFriend(token: String, userId: UUID, friendId: UUID): FriendshipResult {
+    suspend fun removeFriend(friendId: UUID): FriendshipResult {
+        val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
             val response = friendshipApiService.removeFriend("Bearer $token", userId, friendId)
             when (response.code()) {

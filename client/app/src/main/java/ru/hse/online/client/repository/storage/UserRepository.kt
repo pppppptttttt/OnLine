@@ -5,15 +5,17 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.PathResponse
-import ru.hse.online.client.repository.networking.api_data.UserResult
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import java.time.LocalDate
-import java.util.Date
 import java.util.UUID
 
-class UserRepository {
+class UserRepository(
+    private val appDataStore: AppDataStore,
+    private val statisticsRepository: StatisticsRepository
+) {
     private val _friends = MutableStateFlow<List<Friend>>(emptyList())
     val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
 
@@ -38,11 +40,8 @@ class UserRepository {
     private val _stats = MutableStateFlow<Map<Pair<String, LocalDate>, Double>>(emptyMap())
     private val stats: StateFlow<Map<Pair<String, LocalDate>, Double>> = _stats.asStateFlow()
 
-    fun loadAll(user: UserResult) {
-        // TODO: loadPaths
-        // fill _friends
-        // get user stats
-        // get path if existed from appdata
+    suspend fun loadStats() {
+        statisticsRepository.getStatistics()
     }
     fun loadFriends() {}
     fun addFriend(uuid: String) {}

@@ -15,6 +15,7 @@ import ru.hse.online.client.repository.networking.api_service.FriendshipApiServi
 import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.networking.adapter.LocalDateAdapter
 import ru.hse.online.client.repository.networking.api_service.UserDataApiService
+import ru.hse.online.client.repository.storage.PathRepository
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.usecase.CreateUserUseCase
 import ru.hse.online.client.usecase.GetUserUseCase
@@ -35,9 +36,6 @@ val networkModule = module {
     factory<CreateUserUseCase> { CreateUserUseCase(get()) }
     factory<GetUserUseCase> { GetUserUseCase(get()) }
     factory<AuthUseCase> { AuthUseCase(get()) }
-
-    factory<StatisticsRepository> { StatisticsRepository(get()) }
-    factory<FriendshipRepository> { FriendshipRepository(get()) }
 }
 
 private fun provideBaseUrl(): String = "http://51.250.111.207:80"

@@ -21,7 +21,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "us
 class AppDataStore(
     private val context: Context
 ) {
-    companion object {
+     companion object {
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PASSWORD = stringPreferencesKey("user_password")
@@ -61,14 +61,18 @@ class AppDataStore(
             }
     }
 
-    suspend fun saveUserId(value: UUID) {
-        saveValue(USER_ID, value.toString())
-    }
-
     fun getUserIdFlow(): Flow<UUID> {
         return getValueFlow(USER_ID, "00000000-0000-0000-0000-000000000000")
             .map { uuidString ->
                 UUID.fromString(uuidString)
             }
+    }
+
+    suspend fun saveCredentials(token: String, userId: UUID, email: String, name: String, password: String) {
+        saveValue(USER_TOKEN, token)
+        saveValue(USER_ID, userId.toString())
+        saveValue(USER_EMAIL, email)
+        saveValue(USER_NAME, name)
+        saveValue(USER_PASSWORD, password)
     }
 }

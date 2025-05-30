@@ -1,23 +1,28 @@
 package ru.hse.online.client.repository
 
+import kotlinx.coroutines.flow.first
 import ru.hse.online.client.repository.networking.api_data.StatisticsResult
 import ru.hse.online.client.repository.networking.api_data.UserStatistics
 import ru.hse.online.client.repository.networking.api_service.StatisticsApiService
+import ru.hse.online.client.repository.storage.AppDataStore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-class StatisticsRepository(private val statisticsApiService: StatisticsApiService) {
+class StatisticsRepository(
+    private val statisticsApiService: StatisticsApiService,
+    private val appDataStore: AppDataStore
+) {
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     suspend fun getStatistics(
-        token: String,
-        userId: UUID,
         name: String,
         start: LocalDate,
         end: LocalDate
     ): StatisticsResult {
+        val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
             val response = statisticsApiService.getStatistics(
                 token = "Bearer $token",
@@ -36,7 +41,8 @@ class StatisticsRepository(private val statisticsApiService: StatisticsApiServic
         }
     }
 
-    suspend fun addStatistics(token: String, stats: List<UserStatistics>): StatisticsResult {
+    suspend fun addStatistics(stats: List<UserStatistics>): StatisticsResult {
+        val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
         return try {
             val response = statisticsApiService.addStatistics("Bearer $token", stats)
             when (response.code()) {
