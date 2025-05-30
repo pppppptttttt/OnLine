@@ -5,16 +5,24 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import ru.hse.online.client.presentation.map.toGoogleMapsFormat
+import ru.hse.online.client.repository.FriendshipRepository
 import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.networking.api_data.Friend
+import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
+import ru.hse.online.client.viewModels.StatsViewModel
 import java.time.LocalDate
 import java.util.UUID
 
 class UserRepository(
     private val appDataStore: AppDataStore,
-    private val statisticsRepository: StatisticsRepository
+    private val statisticsRepository: StatisticsRepository,
+    private val pathRepository: PathRepository,
+    private val friendshipRepository: FriendshipRepository,
+    private val statsViewModel: StatsViewModel
 ) {
     private val _friends = MutableStateFlow<List<Friend>>(emptyList())
     val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
@@ -43,11 +51,34 @@ class UserRepository(
     suspend fun loadStats() {
         statisticsRepository.getStatistics()
     }
-    fun loadFriends() {}
-    fun addFriend(uuid: String) {}
-    fun deleteFriend(uuid: String) {}
-    fun savePath(path: List<LatLng>) {
-        // TODO: PathRepository.createPath
+
+    suspend fun loadFriends() {
+        friendshipRepository.getFriends();
+    }
+
+    suspend fun addFriend(uuid: UUID) {
+        friendshipRepository.addFriend(
+            uuid
+        );
+    }
+
+    suspend fun deleteFriend(uuid: UUID) {
+        friendshipRepository.removeFriend(
+            uuid
+        );
+    }
+
+    suspend fun savePath(path: List<LatLng>) {
+        pathRepository.createPath(
+            PathRequest(
+                userId = UUID.randomUUID(),
+                polyline = path.toGoogleMapsFormat(),
+                created = LocalDate.now(),
+                name = "aboba",
+                distance = statsViewModel.onlineDistance.first(),
+                duration = statsViewModel.onlineTime.first() as Double
+            )
+        );
     }
 
     init {

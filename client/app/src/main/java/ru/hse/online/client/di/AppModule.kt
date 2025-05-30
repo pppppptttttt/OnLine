@@ -24,10 +24,15 @@ val appModule = module {
 
     single<AppDataStore> { AppDataStore(context = get()) }
     single { LocationRepository() }
-    single { UserRepository(
-        appDataStore = get(),
-        statisticsRepository = get()
-    ) }
+    single {
+        UserRepository(
+            appDataStore = get(),
+            statisticsRepository = get(),
+            pathRepository = get(),
+            friendshipRepository = get(),
+            statsViewModel = get()
+        )
+    }
 
     single<StepServiceConnector> {
         StepServiceConnector(
