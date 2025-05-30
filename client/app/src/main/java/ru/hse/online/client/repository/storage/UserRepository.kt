@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.Path
+import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import java.util.Date
 import java.util.UUID
 
@@ -47,5 +48,9 @@ class UserRepository {
         val fr2 = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), emptyList(), Color.Blue)
         _group.value += Pair(fr.userId, fr)
         _group.value += Pair(fr2.userId, fr2)
+    }
+
+    fun getLeaderboard(timeFrame: LeaderBoardViewModel.TimeFrame): List<LeaderBoardViewModel.LeaderBoardUser> {
+        return emptyList()
     }
 }

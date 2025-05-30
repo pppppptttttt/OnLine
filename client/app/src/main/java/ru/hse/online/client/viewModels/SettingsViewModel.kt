@@ -20,6 +20,10 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         defaultValue = ""
     )
     val userId = dataStore.getUserIdFlow()
+    val dailyStepGoal = dataStore.getValueFlow(
+        AppDataStore.DAILY_STEP_COUNT,
+        defaultValue = 6000
+    )
 
     fun saveUserName(name: String) {
         viewModelScope.launch {
@@ -52,14 +56,9 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         }
     }
 
-    fun saveDailyStepCount(steps: Int) {
+    fun saveDailyStepGoal(steps: Int) {
         viewModelScope.launch {
             dataStore.saveValue(AppDataStore.DAILY_STEP_COUNT, steps)
         }
     }
-
-    val dailyStepCount = dataStore.getValueFlow(
-        AppDataStore.DAILY_STEP_COUNT,
-        defaultValue = 6000
-    )
 }

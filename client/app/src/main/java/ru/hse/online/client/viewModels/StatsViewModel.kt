@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.hse.online.client.services.ContextProvider
 import ru.hse.online.client.services.StepCounterService
 import ru.hse.online.client.services.StepServiceConnector
+import java.util.Date
 
-class PedometerViewModel(
+class StatsViewModel(
     private val connector: StepServiceConnector,
     private val contextProvider: ContextProvider
 ) : ViewModel() {
@@ -31,6 +32,9 @@ class PedometerViewModel(
 
     private val _isInGroup = MutableStateFlow(false)
     val isInGroup: StateFlow<Boolean> = _isInGroup.asStateFlow()
+
+    private val _stepsByDate = MutableStateFlow<Map<Date, Int>>(emptyMap())
+    val stepsByDate: StateFlow<Map<Date, Int>> = _stepsByDate.asStateFlow()
 
     init {
         connector.bind()

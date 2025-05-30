@@ -6,7 +6,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import ru.hse.online.client.viewModels.LocationViewModel
 import ru.hse.online.client.viewModels.AuthViewModel
-import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.StatsViewModel
 import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.LocationRepository
@@ -36,8 +36,8 @@ val appModule = module {
 
     viewModel<SettingsViewModel> { SettingsViewModel(get()) }
 
-    viewModel<PedometerViewModel> {
-        PedometerViewModel(
+    viewModel<StatsViewModel> {
+        StatsViewModel(
             connector = get(),
             contextProvider = get()
         )

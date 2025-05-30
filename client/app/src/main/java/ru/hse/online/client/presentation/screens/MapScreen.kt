@@ -7,13 +7,13 @@ import androidx.compose.ui.Modifier
 import ru.hse.online.client.presentation.map.GoogleMapView
 import ru.hse.online.client.presentation.map.MapOverlayView
 import ru.hse.online.client.viewModels.LocationViewModel
-import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.StatsViewModel
 import ru.hse.online.client.viewModels.UserViewModel
 
 @Composable
-fun MapScreen(pedometerViewModel: PedometerViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
+fun MapScreen(statsViewModel: StatsViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
     Surface(modifier = Modifier.fillMaxSize()) {
         GoogleMapView(locationViewModel)
-        MapOverlayView(pedometerViewModel, locationViewModel, userViewModel)
+        MapOverlayView(statsViewModel, locationViewModel, userViewModel)
     }
 }

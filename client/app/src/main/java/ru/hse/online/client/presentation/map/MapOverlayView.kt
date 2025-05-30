@@ -63,17 +63,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.hse.online.client.presentation.screens.formatTime
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.viewModels.LocationViewModel
-import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.StatsViewModel
 import ru.hse.online.client.viewModels.UserViewModel
 import java.util.UUID
 
 @Composable
-fun MapOverlayView(pedometerViewModel: PedometerViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
+fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
     var showGroupDialog by remember { mutableStateOf(false) }
     var showPathSaveDialog by remember { mutableStateOf(false) }
-    val isOnline by pedometerViewModel.isOnline.collectAsStateWithLifecycle(false)
-    val isPaused by pedometerViewModel.isPaused.collectAsStateWithLifecycle(false)
-    val isInGroup by pedometerViewModel.isInGroup.collectAsStateWithLifecycle(false)
+    val isOnline by statsViewModel.isOnline.collectAsStateWithLifecycle(false)
+    val isPaused by statsViewModel.isPaused.collectAsStateWithLifecycle(false)
+    val isInGroup by statsViewModel.isInGroup.collectAsStateWithLifecycle(false)
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -84,10 +84,10 @@ fun MapOverlayView(pedometerViewModel: PedometerViewModel, locationViewModel: Lo
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().background(color = Color(0x77000000))
         ) {
-                val onLineStepCount by pedometerViewModel.onlineSteps.collectAsStateWithLifecycle(0)
-                val onLineCalories by pedometerViewModel.onlineCalories.collectAsStateWithLifecycle(0.0)
-                val onLineDistance by pedometerViewModel.onlineDistance.collectAsStateWithLifecycle(0.0)
-                val onLineTime by pedometerViewModel.onlineTime.collectAsStateWithLifecycle(0L)
+                val onLineStepCount by statsViewModel.onlineSteps.collectAsStateWithLifecycle(0)
+                val onLineCalories by statsViewModel.onlineCalories.collectAsStateWithLifecycle(0.0)
+                val onLineDistance by statsViewModel.onlineDistance.collectAsStateWithLifecycle(0.0)
+                val onLineTime by statsViewModel.onlineTime.collectAsStateWithLifecycle(0L)
 
                 SmallMetricCard(
                     icon = Icons.Filled.AssistWalker,
@@ -141,10 +141,10 @@ fun MapOverlayView(pedometerViewModel: PedometerViewModel, locationViewModel: Lo
         Button(
             onClick = {
                 if (isPaused) {
-                    pedometerViewModel.resumeOnline()
+                    statsViewModel.resumeOnline()
                     locationViewModel.resumeOnline()
                 } else {
-                    pedometerViewModel.pauseOnline()
+                    statsViewModel.pauseOnline()
                     locationViewModel.pauseOnline()
                 }
             },
@@ -173,7 +173,7 @@ fun MapOverlayView(pedometerViewModel: PedometerViewModel, locationViewModel: Lo
                 if (isOnline) {
                     showPathSaveDialog = true
                 } else {
-                    pedometerViewModel.goOnLine()
+                    statsViewModel.goOnLine()
                     locationViewModel.goOnLine()
                 }
             },
@@ -200,13 +200,13 @@ fun MapOverlayView(pedometerViewModel: PedometerViewModel, locationViewModel: Lo
         PathSavingDialog(
             onDismissRequest = {
                 showPathSaveDialog = false
-                pedometerViewModel.goOffLine()
+                statsViewModel.goOffLine()
                 locationViewModel.goOffLine(savePath = false)
 
             },
             onConfirmation = {
                 showPathSaveDialog = false
-                pedometerViewModel.goOffLine()
+                statsViewModel.goOffLine()
                 locationViewModel.goOffLine(savePath = true)
             },
             onCancel = {
