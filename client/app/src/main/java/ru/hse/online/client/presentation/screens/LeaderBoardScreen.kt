@@ -24,10 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 
 @Composable
-fun LeaderBoardScreen(viewModel: LeaderBoardViewModel) {
+fun LeaderBoardScreen(viewModel: LeaderBoardViewModel = koinViewModel()) {
     val selectedTimeFrame by viewModel.selectedTimeFrame.collectAsStateWithLifecycle()
     val leaderboardState by viewModel.leaderboardState.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()

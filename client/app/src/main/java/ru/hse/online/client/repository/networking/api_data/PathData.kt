@@ -21,7 +21,10 @@ data class PathResponse(
     val userId: UUID,
     val pathId: UUID,
     val polyline: String,
-    val created: Date
+    val created: Date,
+    val name: String,
+    val distance: Double,
+    val duration: Double
 )
 
 sealed class PathResult {
