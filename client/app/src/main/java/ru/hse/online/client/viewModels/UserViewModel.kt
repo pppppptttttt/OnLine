@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.networking.api_data.Friend
-import ru.hse.online.client.repository.networking.api_data.Path
+import ru.hse.online.client.repository.networking.api_data.PathResponse
 import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
 import java.util.UUID
@@ -16,7 +16,7 @@ class UserViewModel(
 ): ViewModel() {
     val friends: StateFlow<List<Friend>> = repository.friends
     val isInGroup: StateFlow<Boolean> = repository.isInGroup
-    val friendPublicPaths: StateFlow<List<Path>> = repository.friendPublicPaths
+    val friendPublicPaths: StateFlow<List<PathResponse>> = repository.friendPublicPaths
     val friendProfile: StateFlow<Friend?> = repository.friendProfile
     val group: StateFlow<Map<UUID, Friend>> = repository.group
 
@@ -46,8 +46,8 @@ class UserViewModel(
     fun inviteToGroup(uuid: UUID) {}
     fun loadFriendProfile(userId: String) {}
     fun loadPublicPaths(userId: UUID) {}
-    fun addPathToCollection(path: Path) {}
-    fun previewPath(path: Path) {
+    fun addPathToCollection(path: PathResponse) {}
+    fun previewPath(path: PathResponse) {
         locationRepository.loadPreviewPath(path.polyline)
     }
 

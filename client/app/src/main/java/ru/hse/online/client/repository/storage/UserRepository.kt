@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.hse.online.client.repository.StatisticsRepository
+import ru.hse.online.client.repository.StatisticsRepository.Stats
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.PathResponse
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
@@ -37,11 +38,11 @@ class UserRepository(
     private val _group = MutableStateFlow<Map<UUID, Friend>>(emptyMap())
     val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
 
-    private val _stats = MutableStateFlow<Map<Pair<String, LocalDate>, Double>>(emptyMap())
-    private val stats: StateFlow<Map<Pair<String, LocalDate>, Double>> = _stats.asStateFlow()
+    private val _stats = MutableStateFlow<Map<Pair<Stats, LocalDate>, Double>>(emptyMap())
+    private val stats: StateFlow<Map<Pair<Stats, LocalDate>, Double>> = _stats.asStateFlow()
 
     suspend fun loadStats() {
-        statisticsRepository.getStatistics()
+        _stats.value = statisticsRepository.getTodayStats()
     }
     fun loadFriends() {}
     fun addFriend(uuid: String) {}

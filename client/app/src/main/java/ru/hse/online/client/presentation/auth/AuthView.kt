@@ -74,6 +74,10 @@ class AuthView : ComponentActivity() {
 
         val coroutineScope = rememberCoroutineScope()
 
+//        coroutineScope.launch {
+//          TODO: Handle if token already exists
+//        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

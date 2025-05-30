@@ -16,8 +16,31 @@ class StatisticsRepository(
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
+    enum class Stats {
+        STEPS,
+        KCALS,
+        DISTANCE
+    }
+
+    suspend fun getTodayStats(): Map<Pair<Stats, LocalDate>, Double> {
+        val result: MutableMap<Pair<Stats, LocalDate>, Double> = emptyMap<Pair<Stats, LocalDate>, Double>().toMutableMap()
+        val date = LocalDate.now()
+        Stats.entries.forEach {
+            when (val getRes = getStatistics(it, date, date)) {
+                is StatisticsResult.SuccessGet -> {
+                    result[Pair(it, date)] = getRes.statistics[0].value
+                }
+                is StatisticsResult.SuccessPost -> {}
+                is StatisticsResult.Failure -> {
+                    result[Pair(it, date)] = 0.0
+                }
+            }
+        }
+        return result
+    }
+
     suspend fun getStatistics(
-        name: String,
+        name: Stats,
         start: LocalDate,
         end: LocalDate
     ): StatisticsResult {
@@ -27,7 +50,7 @@ class StatisticsRepository(
             val response = statisticsApiService.getStatistics(
                 token = "Bearer $token",
                 userId = userId,
-                name = name,
+                name = name.name,
                 start = start.format(dateFormatter),
                 end = end.format(dateFormatter)
             )

@@ -10,6 +10,8 @@ import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserResult
+import ru.hse.online.client.repository.storage.AppDataStore
+import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.usecase.CreateUserUseCase
 import ru.hse.online.client.usecase.GetUserUseCase
 import kotlin.random.Random
@@ -18,6 +20,7 @@ class AuthViewModel(
     private val authUseCase: AuthUseCase,
     private val createUserUseCase: CreateUserUseCase,
     private val getUserUseCase: GetUserUseCase,
+    private val dataStore: AppDataStore,
     private val authView: ComponentActivity
 ) : ViewModel() {
     private val TAG: String = "APP_AUTH_VIEWMODEL"
@@ -44,7 +47,7 @@ class AuthViewModel(
                         is UserResult.Success -> {
                             settingsModel.saveUserToken(authResult.token)
                             settingsModel.saveUserId(authResult.userId)
-                            // TODO: userRepository.loadAll(User)
+                            dataStore.saveCredentials(authResult.token, authResult.userId, email, username, password)
                             startMainActivity()
                         }
 
@@ -56,7 +59,7 @@ class AuthViewModel(
                 } else {
                     settingsModel.saveUserToken(authResult.token)
                     settingsModel.saveUserId(authResult.userId)
-                    // TODO: getUserUseCase
+                    dataStore.saveCredentials(authResult.token, authResult.userId, email, username, password)
                     // userRepository.loadAll(User)
                     startMainActivity()
                 }
