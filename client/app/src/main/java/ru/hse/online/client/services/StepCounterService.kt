@@ -38,7 +38,7 @@ class StepCounterService : Service(), SensorEventListener {
     private var autoSaveJob: Job? = null
 
     private val _KKAL_PER_STEP = 0.04
-    private val _KM_PER_STEP = 0.00762
+    private val _KM_PER_STEP = 0.000762
 
     private var isOnline = false
     private var isPaused = false

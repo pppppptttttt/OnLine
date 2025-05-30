@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
@@ -53,13 +52,14 @@ import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: StatsViewModel) {
-    val stepCount by viewModel.totalSteps.collectAsStateWithLifecycle(0)
-    val calories by viewModel.totalCalories.collectAsStateWithLifecycle(0.0)
-    val distance by viewModel.totalDistance.collectAsStateWithLifecycle(0.0)
-    val time by viewModel.totalTime.collectAsStateWithLifecycle(0L)
-
-    val settingsViewModel = koinViewModel<SettingsViewModel>()
+fun MainScreen(
+    statsViewModel: StatsViewModel,
+    settingsViewModel: SettingsViewModel = koinViewModel()
+) {
+    val stepCount by statsViewModel.totalSteps.collectAsStateWithLifecycle(0)
+    val calories by statsViewModel.totalCalories.collectAsStateWithLifecycle(0.0)
+    val distance by statsViewModel.totalDistance.collectAsStateWithLifecycle(0.0)
+    val time by statsViewModel.totalTime.collectAsStateWithLifecycle(0L)
     val dailyStepGoal by settingsViewModel.dailyStepGoal.collectAsState(initial = 6000)
     
     Scaffold(
@@ -101,7 +101,7 @@ fun MainScreen(viewModel: StatsViewModel) {
                 )
 
                 StepsProgress(
-                    viewModel,
+                    statsViewModel,
                     dailyStepGoal = dailyStepGoal
                 )
             }
@@ -275,6 +275,8 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
             }.time
         }.reversed()
     }
+
+    // TODO: LaucnhedLoadStats
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,

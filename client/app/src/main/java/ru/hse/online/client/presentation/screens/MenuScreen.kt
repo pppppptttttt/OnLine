@@ -43,7 +43,7 @@ fun MenuScreen(viewModel: UserViewModel, navController: NavController) {
     Row(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .width(200.dp)
+                .width(50.dp)
                 .fillMaxHeight()
                 .background(MaterialTheme.colorScheme.background)
         ) {

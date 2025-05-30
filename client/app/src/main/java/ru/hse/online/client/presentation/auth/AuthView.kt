@@ -171,7 +171,7 @@ class AuthView : ComponentActivity() {
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                authModel.handleAuth(authType, email, password, settingsModel)
+                                authModel.handleAuth(authType, email, password, username, settingsModel)
                             }
                         },
                         modifier = Modifier.fillMaxWidth()

@@ -8,7 +8,6 @@ data class Friend(
     val username: String,
     val email: String,
     val stats: Map<String, Double> = emptyMap(),
-    val paths: List<Path> = emptyList(),
     var color: Color = Color(0)
 )
 
@@ -17,6 +16,7 @@ data class User(
     val username: String,
     val email: String,
     val friends: List<String> = emptyList()
+
 )
 
 sealed class UserResult {

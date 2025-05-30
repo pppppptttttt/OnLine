@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import ru.hse.online.client.services.ContextProvider
 import ru.hse.online.client.services.StepCounterService
 import ru.hse.online.client.services.StepServiceConnector
+import java.time.LocalDate
 import java.util.Date
 
 class StatsViewModel(

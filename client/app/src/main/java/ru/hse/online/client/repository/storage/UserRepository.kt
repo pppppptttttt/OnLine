@@ -6,8 +6,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.hse.online.client.repository.networking.api_data.Friend
-import ru.hse.online.client.repository.networking.api_data.Path
+import ru.hse.online.client.repository.networking.api_data.PathResponse
+import ru.hse.online.client.repository.networking.api_data.UserResult
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
+import java.time.LocalDate
 import java.util.Date
 import java.util.UUID
 
@@ -15,14 +17,17 @@ class UserRepository {
     private val _friends = MutableStateFlow<List<Friend>>(emptyList())
     val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
 
+    private val _paths = MutableStateFlow<List<PathResponse>>(emptyList())
+    val paths: StateFlow<List<PathResponse>> = _paths.asStateFlow()
+
     private val _isInGroup = MutableStateFlow(false)
     val isInGroup: StateFlow<Boolean> = _isInGroup.asStateFlow()
 
     private val _groupId = MutableStateFlow<UUID?>(null)
     val groupId: StateFlow<UUID?> = _groupId.asStateFlow()
 
-    private val _friendPublicPaths = MutableStateFlow<List<Path>>(emptyList())
-    val friendPublicPaths: StateFlow<List<Path>> = _friendPublicPaths.asStateFlow()
+    private val _friendPublicPaths = MutableStateFlow<List<PathResponse>>(emptyList())
+    val friendPublicPaths: StateFlow<List<PathResponse>> = _friendPublicPaths.asStateFlow()
 
     private val _friendProfile = MutableStateFlow<Friend?>(null)
     val friendProfile: StateFlow<Friend?> = _friendProfile.asStateFlow()
@@ -30,22 +35,33 @@ class UserRepository {
     private val _group = MutableStateFlow<Map<UUID, Friend>>(emptyMap())
     val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
 
+    private val _stats = MutableStateFlow<Map<Pair<String, LocalDate>, Double>>(emptyMap())
+    private val stats: StateFlow<Map<Pair<String, LocalDate>, Double>> = _stats.asStateFlow()
+
+    fun loadAll(user: UserResult) {
+        // TODO: loadPaths
+        // fill _friends
+        // get user stats
+        // get path if existed from appdata
+    }
     fun loadFriends() {}
     fun addFriend(uuid: String) {}
     fun deleteFriend(uuid: String) {}
-    fun savePath(path: List<LatLng>) {}
+    fun savePath(path: List<LatLng>) {
+        // TODO: PathRepository.createPath
+    }
 
     init {
         val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0))
         _friends.value += fr
         _friendProfile.value = fr
-        _friendPublicPaths.value += Path(UUID.randomUUID(), UUID.randomUUID(), "}__uHwg_uDslDoneEji_CxmvD?oohD", Date(1,1,1), "aboba", 1.0,1.0)
+        _friendPublicPaths.value += PathResponse(UUID.randomUUID(), UUID.randomUUID(), "}__uHwg_uDslDoneEji_CxmvD?oohD", LocalDate.of(1,1,1), "aboba", 1.0,1.0)
     }
 
     fun createGroup() {
         _isInGroup.value = true
-        val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), emptyList(), Color.Red)
-        val fr2 = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), emptyList(), Color.Blue)
+        val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), Color.Red)
+        val fr2 = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), Color.Blue)
         _group.value += Pair(fr.userId, fr)
         _group.value += Pair(fr2.userId, fr2)
     }

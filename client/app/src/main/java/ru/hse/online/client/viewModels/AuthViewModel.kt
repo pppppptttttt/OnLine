@@ -11,11 +11,13 @@ import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserResult
 import ru.hse.online.client.usecase.CreateUserUseCase
+import ru.hse.online.client.usecase.GetUserUseCase
 import kotlin.random.Random
 
 class AuthViewModel(
     private val authUseCase: AuthUseCase,
     private val createUserUseCase: CreateUserUseCase,
+    private val getUserUseCase: GetUserUseCase,
     private val authView: ComponentActivity
 ) : ViewModel() {
     private val TAG: String = "APP_AUTH_VIEWMODEL"
@@ -24,6 +26,7 @@ class AuthViewModel(
         authType: AuthType,
         email: String,
         password: String,
+        username: String,
         settingsModel: SettingsViewModel
     ) {
         when (val authResult = authUseCase.execute(authType, email, password)) {
@@ -33,7 +36,7 @@ class AuthViewModel(
                         token = authResult.token,
                         User(
                             email = email,
-                            username = "aboba" + Random.nextInt(1, 100),
+                            username = username,
                             userId = authResult.userId
                         )
                     )
@@ -41,6 +44,7 @@ class AuthViewModel(
                         is UserResult.Success -> {
                             settingsModel.saveUserToken(authResult.token)
                             settingsModel.saveUserId(authResult.userId)
+                            // TODO: userRepository.loadAll(User)
                             startMainActivity()
                         }
 
@@ -52,6 +56,8 @@ class AuthViewModel(
                 } else {
                     settingsModel.saveUserToken(authResult.token)
                     settingsModel.saveUserId(authResult.userId)
+                    // TODO: getUserUseCase
+                    // userRepository.loadAll(User)
                     startMainActivity()
                 }
             }

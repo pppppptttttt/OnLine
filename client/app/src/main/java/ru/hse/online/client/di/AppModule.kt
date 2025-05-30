@@ -69,8 +69,8 @@ val appModule = module {
         AuthViewModel(
             authUseCase = get(),
             createUserUseCase = get(),
+            getUserUseCase = get(),
             authView = activity
-
         )
     }
 }
