@@ -51,7 +51,7 @@ fun GoogleMapView(viewModel: LocationViewModel) {
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
         googleMapOptionsFactory = {
-            GoogleMapOptions().mapColorScheme(MapColorScheme.FOLLOW_SYSTEM)
+            GoogleMapOptions().mapColorScheme(MapColorScheme.DARK)
         },
         uiSettings = MapUiSettings(zoomControlsEnabled = false),
         onMapClick = { coord ->
@@ -59,7 +59,7 @@ fun GoogleMapView(viewModel: LocationViewModel) {
         },
         onMapLongClick = { coord ->
             markers.remove(coord)
-        }
+        },
     ) {
         Polyline(
             points = routePoints,

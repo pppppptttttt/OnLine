@@ -28,10 +28,10 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinContext
 import ru.hse.online.client.presentation.map.MapScreen
 import ru.hse.online.client.presentation.pedometer.MainScreen
-import ru.hse.online.client.viewModels.PedometerViewModel
 import ru.hse.online.client.presentation.settings.SettingsScreen
 import ru.hse.online.client.ui.theme.ClientTheme
 import ru.hse.online.client.viewModels.LocationViewModel
+import ru.hse.online.client.viewModels.PedometerViewModel
 
 sealed class Screen(
     val route: String,

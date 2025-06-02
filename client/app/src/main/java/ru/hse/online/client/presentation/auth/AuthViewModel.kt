@@ -68,4 +68,13 @@ class AuthViewModel(private val authView: ComponentActivity) {
     private fun handleError(code: Int, message: String?) {
         Log.i(UI_LOGCAT_TAG, "Failed to authenticate with code $code. Message: $message")
     }
+
+    fun start() {
+        startMainActivity()
+    }
+
+    private fun startMainActivity() {
+        val intent = Intent(authView, MainActivity::class.java)
+        authView.startActivity(intent)
+    }
 }

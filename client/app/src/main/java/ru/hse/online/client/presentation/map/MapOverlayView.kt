@@ -156,9 +156,7 @@ class MapOverlayView() {
 }
 
 private fun Number.format(scale: Int): String =
-    if (this is Int) {
-        "%d".format(this)
-    } else if (this is Double) {
+    if (this is Double) {
         "%.${scale}f".format(this)
     } else {
         toString()
