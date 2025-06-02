@@ -28,13 +28,15 @@ class UserViewModel(
 
     fun addFriend(uuid: String) {
         viewModelScope.launch {
-            repository.addFriend(uuid)
+            // FIXME
+//            repository.addFriend(uuid)
         }
     }
 
     fun deleteFriend(uuid: String) {
         viewModelScope.launch {
-            repository.deleteFriend(uuid)
+            // FIXME
+//            repository.deleteFriend(uuid)
         }
     }
 

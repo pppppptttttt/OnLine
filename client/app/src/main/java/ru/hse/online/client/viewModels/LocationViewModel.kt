@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.services.LocationService
@@ -86,7 +87,9 @@ class LocationViewModel(
     fun goOffLine(savePath: Boolean) {
         _isOnline.value = false
         if (savePath) {
-            userRepository.savePath(_routePoints.value)
+            viewModelScope.launch {
+                userRepository.savePath(_routePoints.value)
+            }
         }
         _routePoints.value = emptyList()
     }

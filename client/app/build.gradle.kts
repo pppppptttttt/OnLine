@@ -48,7 +48,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.maps.compose)
     implementation(libs.material.icons.extended)
-
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.ktor.client.logging)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
