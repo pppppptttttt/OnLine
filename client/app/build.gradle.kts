@@ -80,6 +80,8 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.converter.scalars)
+    implementation(libs.logging.interceptor)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.navigation.compose)
 }

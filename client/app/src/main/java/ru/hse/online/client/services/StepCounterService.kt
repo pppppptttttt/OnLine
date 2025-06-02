@@ -1,4 +1,4 @@
-package ru.hse.online.client.services.pedometer
+package ru.hse.online.client.services
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -6,7 +6,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import ru.hse.online.client.common.UI_LOGCAT_TAG
 import ru.hse.online.client.repository.storage.AppDataStore
 import kotlin.random.Random
 
@@ -39,9 +38,10 @@ class StepCounterService : Service(), SensorEventListener {
     private var autoSaveJob: Job? = null
 
     private val _KKAL_PER_STEP = 0.04
-    private val _KM_PER_STEP = 0.00762
+    private val _KM_PER_STEP = 0.000762
 
     private var isOnline = false
+    private var isPaused = false
 
     private val _steps = MutableStateFlow<Int>(0)
     val steps: StateFlow<Int> = _steps.asStateFlow()
@@ -76,11 +76,11 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     fun pauseOnline() {
-        isOnline = false
+        isPaused = true
     }
 
     fun resumeOnline() {
-        isOnline = true
+        isPaused = false
     }
 
     fun goOffline() {
@@ -161,7 +161,7 @@ class StepCounterService : Service(), SensorEventListener {
     private fun startForeground() {
         createNotificationChannel()
         val notification = buildNotification()
-        startForeground(NOTIFICATION_ID, notification)
+        startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_HEALTH)
     }
 
     private fun createNotificationChannel() {
@@ -210,9 +210,6 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onSensorChanged(event: SensorEvent?) {
-        Log.i(
-            UI_LOGCAT_TAG, "bebra"
-        )
         event?.let {
             if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
                 Log.e(TAG, "Step detected, ${_steps.value}")

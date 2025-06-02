@@ -40,13 +40,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import ru.hse.online.client.R
-import ru.hse.online.client.presentation.settings.SettingsViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.repository.networking.api_data.AuthType
 import ru.hse.online.client.ui.theme.ClientTheme
+import ru.hse.online.client.viewModels.AuthViewModel
 
 class AuthView : ComponentActivity() {
-    private val authModel: AuthViewModel = AuthViewModel(this)
+    private val authModel: AuthViewModel by viewModel { parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,11 +67,16 @@ class AuthView : ComponentActivity() {
     @Composable
     fun Draw(settingsModel: SettingsViewModel = koinViewModel()) {
         val email by settingsModel.userEmail.collectAsState(initial = "")
+        val username by settingsModel.userName.collectAsState(initial = "")
         val password by settingsModel.userPassword.collectAsState(initial = "")
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
 
         val coroutineScope = rememberCoroutineScope()
+
+//        coroutineScope.launch {
+//          TODO: Handle if token already exists
+//        }
 
         Box(
             modifier = Modifier
@@ -113,6 +121,20 @@ class AuthView : ComponentActivity() {
                     }) {
                         Text("Bypass")
                     }
+
+                }
+
+                if (authType == AuthType.SIGNUP) {
+                    OutlinedTextField(
+                        value = username,
+                        label = { Text("Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        onValueChange = {
+                            settingsModel.saveUserName(it)
+                        }
+                    )
                 }
 
                 if (authType != AuthType.NONE) {
@@ -123,7 +145,6 @@ class AuthView : ComponentActivity() {
                             .fillMaxWidth()
                             .padding(8.dp),
                         onValueChange = {
-                            settingsModel.saveUserName(it)
                             settingsModel.saveUserEmail(it)
                         }
                     )
@@ -154,7 +175,7 @@ class AuthView : ComponentActivity() {
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                authModel.handleAuth(authType, email, password, settingsModel)
+                                authModel.handleAuth(authType, email, password, username, settingsModel)
                             }
                         },
                         modifier = Modifier.fillMaxWidth()

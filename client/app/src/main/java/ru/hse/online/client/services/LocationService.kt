@@ -1,4 +1,4 @@
-package ru.hse.online.client.services.location
+package ru.hse.online.client.services
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -6,6 +6,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.location.Location
 import android.os.*
 import android.util.Log
@@ -50,7 +51,7 @@ class LocationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "OnStartCommand")
-        startForeground(NOTIFICATION_ID, buildNotification("Starting location tracking..."))
+        startForeground(NOTIFICATION_ID, buildNotification("Starting location tracking..."), FOREGROUND_SERVICE_TYPE_LOCATION)
         startLocationUpdates()
         return START_STICKY
     }
@@ -83,7 +84,9 @@ class LocationService : Service() {
 
     private fun hasPermissions(): Boolean {
         return checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                checkSelfPermission(Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun createNotificationChannel() {

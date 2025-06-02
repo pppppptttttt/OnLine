@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation.settings
+package ru.hse.online.client.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
 
 @Composable
 fun SettingsScreen() {

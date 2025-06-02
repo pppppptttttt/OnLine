@@ -20,18 +20,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinContext
-import ru.hse.online.client.presentation.map.MapScreen
-import ru.hse.online.client.presentation.pedometer.MainScreen
-import ru.hse.online.client.presentation.settings.SettingsScreen
+import ru.hse.online.client.presentation.screens.FriendProfileScreen
+import ru.hse.online.client.presentation.screens.MapScreen
+import ru.hse.online.client.presentation.screens.MainScreen
+import ru.hse.online.client.presentation.screens.MenuScreen
+import ru.hse.online.client.presentation.screens.PermissionScreen
+import ru.hse.online.client.viewModels.StatsViewModel
 import ru.hse.online.client.ui.theme.ClientTheme
 import ru.hse.online.client.viewModels.LocationViewModel
-import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class Screen(
     val route: String,
@@ -77,7 +82,9 @@ fun BottomNavigationBar(navController: NavController) {
 fun NavigationComponent() {
     val navController = rememberNavController()
     val locationViewModel: LocationViewModel = koinViewModel()
-    val pedometerViewModel: PedometerViewModel = koinViewModel()
+    val statsViewModel: StatsViewModel = koinViewModel()
+    val userViewModel: UserViewModel = koinViewModel()
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { padding ->
@@ -86,10 +93,21 @@ fun NavigationComponent() {
             startDestination = Screen.Main.route,
             modifier = Modifier.padding(padding)
         ) {
-            composable(Screen.Main.route) { MainScreen(pedometerViewModel) }
-            composable(Screen.Map.route) { MapScreen(pedometerViewModel, locationViewModel) }
-            composable(Screen.Settings.route) { SettingsScreen() }
-            composable(Screen.Test.route) { TestScreen(locationViewModel) }
+            composable(Screen.Main.route) { MainScreen(statsViewModel) }
+            composable(Screen.Map.route) { MapScreen(statsViewModel, locationViewModel, userViewModel) }
+            composable(Screen.Settings.route) { MenuScreen(userViewModel, navController) }
+            composable(Screen.Test.route) { TestScreen() }
+            composable(
+                route = "friendProfile/{userId}",
+                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                FriendProfileScreen(
+                    userId = userId,
+                    vm = userViewModel,
+                    navController = navController
+                )
+            }
         }
     }
 }
@@ -102,7 +120,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KoinContext {
                 ClientTheme {
-                    NavigationComponent()
+                    PermissionScreen()
                 }
             }
         }

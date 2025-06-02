@@ -10,10 +10,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.hse.online.client.repository.storage.LocationRepository
-import ru.hse.online.client.services.location.LocationService
-import ru.hse.online.client.services.pedometer.ContextProvider
+import ru.hse.online.client.repository.storage.UserRepository
+import ru.hse.online.client.services.LocationService
+import ru.hse.online.client.services.ContextProvider
 
-class LocationViewModel(private val contextProvider: ContextProvider, private val repository: LocationRepository) : ViewModel() {
+class LocationViewModel(
+    private val contextProvider: ContextProvider,
+    private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
     private val TAG: String = "APP_LOCATION_VIEW_MODEL"
     
     private var _routePoints: MutableStateFlow<List<LatLng>> =
@@ -23,8 +28,12 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
     private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
     val location: StateFlow<LatLng> = _locationState.asStateFlow()
 
+    private val _isOnline = MutableStateFlow(false)
+    private val _isPaused = MutableStateFlow(false)
+    val previewPath: StateFlow<List<LatLng>> = locationRepository.previewPath
+
     init {
-        repository.locationState
+        locationRepository.locationState
             .onEach { state ->
                 Log.i(TAG, "Updating location")
                 when (state) {
@@ -33,7 +42,9 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
                             LatLng(it.latitude, it.longitude)
                         }
                         _locationState.value = newPoint
-                        _routePoints.value += newPoint
+                        if (_isOnline.value) {
+                            _routePoints.value += newPoint
+                        }
                         Log.i(TAG, "New location: $newPoint")
                     }
                     is LocationRepository.LocationState.Error -> {
@@ -46,7 +57,7 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
         startService()
     }
 
-    fun startService() {
+    private fun startService() {
         Log.i(TAG, "Starting location service")
         LocationService.startService(contextProvider.getContext())
     }
@@ -54,5 +65,33 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
     override fun onCleared() {
         LocationService.stopService(contextProvider.getContext())
         super.onCleared()
+    }
+
+    fun goOnLine() {
+        _isOnline.value = true
+    }
+
+    fun pauseOnline() {
+        if (_isOnline.value) {
+            _isPaused.value = true
+        }
+    }
+
+    fun resumeOnline() {
+        if (_isOnline.value) {
+            _isPaused.value = false
+        }
+    }
+
+    fun goOffLine(savePath: Boolean) {
+        _isOnline.value = false
+        if (savePath) {
+            userRepository.savePath(_routePoints.value)
+        }
+        _routePoints.value = emptyList()
+    }
+
+    fun clearPreview() {
+        locationRepository.clearPreview()
     }
 }
