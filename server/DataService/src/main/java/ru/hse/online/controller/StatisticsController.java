@@ -14,14 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hse.online.model.User;
 import ru.hse.online.model.UserStatistics;
-import ru.hse.online.service.FriendshipService;
 import ru.hse.online.service.StatisticsService;
-import ru.hse.online.service.UserService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -29,8 +27,6 @@ import java.util.stream.Collectors;
 public class StatisticsController {
 
     private final StatisticsService statisticsService;
-    private final FriendshipService friendshipService;
-    private final UserService userService;
 
     @Operation(summary = "Get statistics data")
     @GetMapping("get/statistics/")
@@ -58,36 +54,23 @@ public class StatisticsController {
         );
     }
 
+    @Operation(summary = "Get leaderboard of user and friends by total steps")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Leaderboard retrieved",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = Object.class))))
+    })
+    @GetMapping("get/leaderboard/")
     public ResponseEntity<List<Pair<User, Double>>> getLeaderBoard(
-            @Parameter(description = "User ID")
-            @RequestParam(name = "userId")
-            UUID userId,
-            @Parameter(description = "Start date (YYYY-MM-DD)")
-            @RequestParam(name = "start")
-            String startStr,
-            @Parameter(description = "End date (YYYY-MM-DD)")
-            @RequestParam(name = "end")
-            String endStr) {
-        LocalDate start = LocalDate.parse(startStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        LocalDate end = LocalDate.parse(endStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            @Parameter(description = "User ID") @RequestParam(name = "userId") UUID userId,
+            @Parameter(description = "Start date (YYYY-MM-DD)") @RequestParam(name = "start") String start,
+            @Parameter(description = "End date (YYYY-MM-DD)") @RequestParam(name = "end") String end) {
 
-        List<User> boardIds = friendshipService.getFriendsList(userId);
-        boardIds.add(userService.getUserById(userId));
+        LocalDate startDate = LocalDate.parse(start, DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(end, DateTimeFormatter.ISO_DATE);
 
-
-        List<Pair<User, Double>> leaderBoard = boardIds.stream()
-                .map(user -> {
-                    List<UserStatistics> stats = statisticsService.getStatisticsForPeriod(user.getUserId(), "STEPS", start, end);
-                    double totalSteps = stats.stream()
-                            .mapToDouble(UserStatistics::getValue)
-                            .sum();
-
-                    return Pair.of(user, totalSteps);
-                })
-                .sorted((entry1, entry2) -> -Double.compare(entry2.getSecond(), entry1.getSecond()))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(leaderBoard);
+        return ResponseEntity.ok(
+                statisticsService.getLeaderBoard(userId, startDate, endDate)
+        );
     }
 
     @PostMapping("create/statistics/")

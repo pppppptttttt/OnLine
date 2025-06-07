@@ -1,6 +1,7 @@
 package ru.hse.online.client.repository
 
 import kotlinx.coroutines.flow.first
+import ru.hse.online.client.repository.networking.api_data.LeaderBoardResponse
 import ru.hse.online.client.repository.networking.api_data.StatisticsResult
 import ru.hse.online.client.repository.networking.api_data.UserStatistics
 import ru.hse.online.client.repository.networking.api_service.StatisticsApiService
@@ -74,6 +75,27 @@ class StatisticsRepository(
             }
         } catch (e: Exception) {
             StatisticsResult.Failure(message = e.localizedMessage)
+        }
+    }
+
+    suspend fun getLeaderBoard(
+        userId: UUID,
+        start: LocalDate,
+        end: LocalDate
+    ): List<LeaderBoardResponse> {
+        val token = "Bearer " + appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val response = statisticsApiService.getLeaderBoard(
+            token = token,
+            userId = userId,
+            start = start.format(dateFormatter),
+            end = end.format(dateFormatter)
+        )
+
+        if (response.isSuccessful) {
+            return response.body() ?: emptyList()
+        } else {
+            throw Exception("Failed to load leaderboard: ${response.code()}")
         }
     }
 } 
