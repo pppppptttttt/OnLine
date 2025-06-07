@@ -77,7 +77,7 @@ class UserRepository(
                 created = LocalDate.now(),
                 name = "aboba",
                 distance = statsViewModel.onlineDistance.first(),
-                duration = statsViewModel.onlineTime.first() as Double
+                duration = statsViewModel.onlineTime.first().toDouble()
             )
         );
     }

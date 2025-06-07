@@ -96,7 +96,7 @@ fun MainScreen(
 
                 TextField(
                     value = "$dailyStepGoal",
-                    onValueChange = { if (it.isDigitsOnly()) settingsViewModel.saveDailyStepGoal(it.toInt()) },
+                    onValueChange = { settingsViewModel.saveDailyStepGoal((it)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 

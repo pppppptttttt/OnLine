@@ -133,7 +133,6 @@ fun PermissionScreen() {
         onPermissionsGranted = { permissionsGranted = true },
         onPermissionsDenied = {  }
     )
-    Log.e("TAG", permissionsGranted.toString())
     if (permissionsGranted) {
         NavigationComponent()
     } else {

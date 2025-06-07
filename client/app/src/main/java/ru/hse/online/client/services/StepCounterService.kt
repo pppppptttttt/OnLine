@@ -212,7 +212,7 @@ class StepCounterService : Service(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
             if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
-                Log.e(TAG, "Step detected, ${_steps.value}")
+                Log.i(TAG, "Step detected, ${_steps.value}")
                 _steps.value++
                 if (isOnline) {
                     _stepsOnline.value++

@@ -38,7 +38,7 @@ class AppDataStore(
         val USER_ONLINE_DISTANCE = doublePreferencesKey("user_online_distance")
         val USER_ONLINE_TIME = longPreferencesKey("user_online_time")
 
-        val DAILY_STEP_COUNT = intPreferencesKey("daily_step_count")
+        val DAILY_STEP_GOAL = intPreferencesKey("daily_step_count")
     }
 
     suspend fun <T> saveValue(key: Preferences.Key<T>, value: T) {
