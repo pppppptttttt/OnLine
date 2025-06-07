@@ -25,7 +25,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import ru.hse.online.client.repository.storage.AppDataStore
-import kotlin.random.Random
+import java.time.LocalDateTime
+import java.time.Duration
 
 class StepCounterService : Service(), SensorEventListener {
     private val TAG: String = "APP_STEP_COUNTER_SERVICE"
@@ -39,6 +40,9 @@ class StepCounterService : Service(), SensorEventListener {
 
     private val _KKAL_PER_STEP = 0.04
     private val _KM_PER_STEP = 0.000762
+
+    private val _INACTIVE_INTERVAL_MILIS = 5*1000;
+    private var prevActionTime = LocalDateTime.now();
 
     private var isOnline = false
     private var isPaused = false
@@ -103,7 +107,6 @@ class StepCounterService : Service(), SensorEventListener {
         loadSavedData()
         startForeground()
         registerSensor()
-//        startTesting()
         startAutoSave()
     }
 
@@ -145,19 +148,6 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-
-    private fun startTesting() {
-        testJob = CoroutineScope(Dispatchers.Default).launch {
-            while (true) {
-                delay(1000)
-                _steps.value += Random.nextInt(1, 5)
-                if (isOnline) _stepsOnline.value += Random.nextInt(1, 5)
-                updateDerivedMetrics()
-            }
-
-        }
-    }
-
     private fun startForeground() {
         createNotificationChannel()
         val notification = buildNotification()
@@ -179,16 +169,14 @@ class StepCounterService : Service(), SensorEventListener {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("OnLine")
             .setContentText("Counting your steps...")
-            //.setSmallIcon(R.drawable.ic_walk)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
     }
 
-    private fun updateNotification(steps: Int) {
+    private fun updateNotification(steps: Int, distance: Int) {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("OnLine")
-            .setContentText("Steps: $steps")
-            //.addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
+            .setContentText("steps: $steps | dist: $distance" )
             .build()
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
@@ -235,10 +223,18 @@ class StepCounterService : Service(), SensorEventListener {
     private fun updateDerivedMetrics() {
         _caloriesBurned.value += _KKAL_PER_STEP
         _distanceTraveled.value += _KM_PER_STEP
+        val dur = Duration.between(prevActionTime, LocalDateTime.now()).toMillis()
+        if (dur in 1.._INACTIVE_INTERVAL_MILIS) {
+            _timeElapsed.value += dur
+        }
         if (isOnline) {
             _caloriesBurnedOnline.value += _KKAL_PER_STEP
             _distanceTraveledOnline.value += _KM_PER_STEP
+            if (dur in 1.._INACTIVE_INTERVAL_MILIS) {
+                _timeElapsedOnline.value += dur
+            }
         }
+        prevActionTime = LocalDateTime.now()
     }
 
     private fun saveData() {
