@@ -28,8 +28,12 @@ constraintlayout = "2.2.0"
 navigationCompose = "2.8.9"
 playServicesLocation = "21.0.1"
 retrofit = "2.9.0"
+rxjava = "2.2.21"
+rxandroid = "2.1.1"
 secretsGradlePlugin = "2.0.1"
 lifecycleService = "2.8.7"
+stompProtocolAndroid = "1.6.6"
+stompprotocolandroidVersion = "1.6.6"
 workRuntimeKtx = "2.10.0"
 loggingInterceptor = "4.9.0"
 
@@ -78,11 +82,15 @@ material-icons-extended = { module = "androidx.compose.material:material-icons-e
 navigation-compose = { module = "androidx.navigation:navigation-compose" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+rxandroid = { module = "io.reactivex.rxjava2:rxandroid", version.ref = "rxandroid" }
+rxjava = { module = "io.reactivex.rxjava2:rxjava", version.ref = "rxjava" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "converterScalars" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+stomp-protocol-android = { module = "com.github.NaikSoftware:stomp-protocol-android", version.ref = "stompProtocolAndroid" }
+stompprotocolandroid = { module = "com.github.NaikSoftware:StompProtocolAndroid", version.ref = "stompprotocolandroidVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -48,10 +48,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.maps.compose)
     implementation(libs.material.icons.extended)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.websockets)
-    implementation(libs.ktor.client.logging)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -84,6 +80,10 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.navigation.compose)
+
+    implementation(libs.stompprotocolandroid)
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
 }
 
 secrets {

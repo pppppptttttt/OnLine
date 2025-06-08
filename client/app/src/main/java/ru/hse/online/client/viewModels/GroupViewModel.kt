@@ -1,148 +1,186 @@
 package ru.hse.online.client.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.StompClient
+import ua.naiksoftware.stomp.dto.StompMessage
 import kotlinx.coroutines.flow.MutableStateFlow
-import ru.hse.online.client.repository.networking.WebsocketClient
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-data class GroupState(
-    val username: String? = null,
-    val groupId: Long? = null,
-    val isConnected: Boolean = false,
-    val isConnecting: Boolean = false,
-    val error: String? = null,
-    val invitations: List<String> = emptyList(),
-    val locations: Map<String, Location> = emptyMap()
-)
-
-data class Location(
-    val lat: Double,
-    val lng: Double
-)
-
-data class LocationFromJson(
-    val from: String,
-    val lat: Double,
-    val lng: Double
-)
-
-data class Invite(
-    val fromWho: String,
-    val toWho: String
-)
+import ua.naiksoftware.stomp.dto.LifecycleEvent
 
 class GroupViewModel : ViewModel() {
+
     companion object {
         private val gson = Gson()
+        private const val TAG = "APP_GROUP_VIEWMODEL";
     }
 
-    private val wsClient = WebsocketClient()
-    private val mutableState = MutableStateFlow(GroupState())
-    val state: StateFlow<GroupState> = mutableState.asStateFlow();
+    private val _connectionStatus = MutableStateFlow(false)
+    val connectionStatus: StateFlow<Boolean> = _connectionStatus.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            wsClient.incomingMessages.collect { handleMessage(it) }
+    private val _username = MutableStateFlow("")
+    val username: StateFlow<String> = _username.asStateFlow()
+
+    private val _groupId = MutableStateFlow(-1L)
+    val groupId: StateFlow<Long> = _groupId.asStateFlow()
+
+    private val _logs = MutableStateFlow("")
+    val logs: StateFlow<String> = _logs.asStateFlow()
+
+    private lateinit var stompClient: StompClient
+    private val compositeDisposable = CompositeDisposable()
+
+    fun connect() {
+        stompClient = Stomp.over(
+            Stomp.ConnectionProvider.OKHTTP,
+            "ws://10.0.2.2:8080/ws" // FIXME: localhost
+        )
+
+        compositeDisposable.add(
+            stompClient.lifecycle()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { lifecycleEvent ->
+                    when (lifecycleEvent.type) {
+                         LifecycleEvent.Type.OPENED -> {
+                            _connectionStatus.value = true
+                            addLog("Connected to server")
+                        }
+                        LifecycleEvent.Type.CLOSED -> {
+                            _connectionStatus.value = false
+                            addLog("Disconnected")
+                        }
+                        LifecycleEvent.Type.ERROR -> {
+                            _connectionStatus.value = false
+                            addLog("Error: ${lifecycleEvent.exception?.message}")
+                        }
+                        else -> {}
+                    }
+                }
+        )
+
+        subscribeToTopics()
+        stompClient.connect()
+    }
+
+    private fun subscribeToTopics() {
+        compositeDisposable.add(
+            stompClient.topic("/user/queue/startWalk")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleStartWalk, this::handleError)
+        )
+
+        compositeDisposable.add(
+            stompClient.topic("/user/queue/endWalk")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleEndWalk, this::handleError)
+        )
+
+        compositeDisposable.add(
+            stompClient.topic("/user/queue/msg")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleMessage, this::handleError)
+        )
+    }
+
+    private fun handleStartWalk(message: StompMessage) {
+        val groupId = message.payload.toLong()
+        _groupId.value = groupId
+        addLog("Registered! Group ID: $groupId")
+    }
+
+    private fun handleEndWalk(message: StompMessage) {
+        val username = message.payload
+        if (username == _username.value) {
+            _groupId.value = -1
+            addLog("Unregistered successfully")
         }
     }
 
-    fun connect(username: String) {
-        viewModelScope.launch {
-            mutableState.update { it.copy(isConnecting = true) }
-            try {
-                wsClient.connect(username)
-                mutableState.update {
-                    it.copy(
-                        username = username,
-                        isConnected = true,
-                        isConnecting = false
-                    )
-                }
-            } catch (e: Exception) {
-                mutableState.update {
-                    it.copy(
-                        error = "Connection failed: ${e.message}",
-                        isConnecting = false
-                    )
-                }
-            }
-        }
+    // TODO: actually handle message
+    private fun handleMessage(message: StompMessage) {
+        addLog("Received message: ${message.payload}")
     }
 
     fun disconnect() {
-        viewModelScope.launch {
-            mutableState.value.username?.let { wsClient.sendMessage("/stop $it") }
-            wsClient.disconnect()
-            mutableState.update { GroupState() }
+        compositeDisposable.clear()
+        if (::stompClient.isInitialized) {
+            stompClient.disconnect()
         }
     }
 
-    fun sendInvite(targetUser: String) {
-        viewModelScope.launch {
-            val currentUser = mutableState.value.username ?: return@launch
-            wsClient.sendMessage("/invite {\"fromWho\":\"$currentUser\",\"toWho\":\"$targetUser\"}")
-        }
+    fun register(username: String) {
+        _username.value = username
+        stompClient.send("/app/start", "\"$username\"")
+            .subscribe()
+        addLog("Registration sent: $username")
     }
 
-    fun acceptInvite(inviter: String) {
-        viewModelScope.launch {
-            val currentUser = mutableState.value.username ?: return@launch
-            wsClient.sendMessage("/joinGroup {\"fromWho\":\"$currentUser\",\"toWho\":\"$inviter\"}")
-        }
+    fun unregister() {
+        val username = _username.value
+        stompClient.send("/app/stop", "\"$username\"")
+            .subscribe()
+        addLog("Unregistration sent: $username")
+    }
+
+    fun sendInvite(toUser: String) {
+        val invite = Invite(_username.value, toUser)
+        stompClient.send("/app/invite", gson.toJson(invite))
+            .subscribe()
+        addLog("Invite sent to: $toUser")
+    }
+
+    fun joinGroup(inviter: String) {
+        val invite = Invite(inviter, _username.value) // inviter -> fromWho, current user -> toWho
+        stompClient.send("/app/joinGroup", gson.toJson(invite))
+            .subscribe()
+        addLog("Joining group of: $inviter")
     }
 
     fun quitGroup() {
+        val username = _username.value
+        stompClient.send("/app/quitGroup", "\"$username\"")
+            .subscribe()
+        addLog("Quit group request sent")
+    }
+
+    fun sendLocation(lat: Double, lng: Double) {
+        val location = Location(lat, lng)
+        val payload = gson.toJson(FromUsernameAndLocation(_username.value, location))
+        stompClient.send("/app/updateLocation", payload)
+            .subscribe()
+        addLog("Location updated: ($lat, $lng)")
+    }
+
+    private fun addLog(message: String) {
         viewModelScope.launch {
-            mutableState.value.username?.let {
-                wsClient.sendMessage("/quitGroup $it")
-            }
+            _logs.value += "$message\n"
+            Log.i(TAG, message)
         }
     }
 
-    fun updateLocation(lat: Double, lng: Double) {
-        viewModelScope.launch {
-            val currentUser = mutableState.value.username ?: return@launch
-            wsClient.sendMessage("/updateLocation {\"from\":\"$currentUser\",\"location\":{\"lat\":$lat,\"lng\":$lng}}")
-        }
+    private fun handleError(throwable: Throwable) {
+        addLog("Error: ${throwable.message}")
     }
 
-    private fun handleMessage(message: String) {
-        when {
-            message.startsWith("{\"from\":") -> handleLocationUpdate(message)
-            message.startsWith("{\"fromWho\":") -> handleInvite(message)
-            else -> handleGroupId(message)
-        }
-    }
-    private fun handleLocationUpdate(json: String) {
-        val location = parseLocation(json)
-        mutableState.update { state ->
-            state.copy(locations = state.locations + (location.from to Location(location.lat, location.lng)))
-        }
+    override fun onCleared() {
+        super.onCleared()
+        disconnect()
     }
 
-    private fun handleInvite(json: String) {
-        val invite = parseInvite(json)
-        mutableState.update { state ->
-            state.copy(invitations = state.invitations + invite.fromWho)
-        }
-    }
-
-    private fun handleGroupId(message: String) {
-        val groupId = message.toLongOrNull()
-        if (groupId != null) {
-            mutableState.update { it.copy(groupId = groupId) }
-        }
-    }
-
-    private fun parseLocation(json: String): LocationFromJson {
-        return gson.fromJson(json, LocationFromJson::class.java)
-    }
-
-    private fun parseInvite(json: String): Invite {
-        return gson.fromJson(json, Invite::class.java)
-    }
-
+    data class Invite(val fromWho: String, val toWho: String)
+    data class Location(val lat: Double, val lng: Double)
+    data class FromUsernameAndLocation(val from: String, val location: Location)
 }
+
