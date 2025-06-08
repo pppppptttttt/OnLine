@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import ru.hse.online.client.presentation.map.toGoogleMapsFormat
 import ru.hse.online.client.repository.FriendshipRepository
-import ru.hse.online.client.repository.StatisticsRepository
-import ru.hse.online.client.repository.StatisticsRepository.Stats
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
@@ -20,7 +18,6 @@ import java.util.UUID
 
 class UserRepository(
     private val appDataStore: AppDataStore,
-    private val statisticsRepository: StatisticsRepository,
     private val pathRepository: PathRepository,
     private val friendshipRepository: FriendshipRepository,
     private val statsViewModel: StatsViewModel
@@ -45,13 +42,6 @@ class UserRepository(
 
     private val _group = MutableStateFlow<Map<UUID, Friend>>(emptyMap())
     val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
-
-    private val _stats = MutableStateFlow<Map<Pair<Stats, LocalDate>, Double>>(emptyMap())
-    private val stats: StateFlow<Map<Pair<Stats, LocalDate>, Double>> = _stats.asStateFlow()
-
-    suspend fun loadStats() {
-        _stats.value = statisticsRepository.getTodayStats()
-    }
 
     suspend fun loadFriends() {
         friendshipRepository.getFriends();

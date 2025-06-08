@@ -203,7 +203,8 @@ fun MetricsGrid(
             stepGoal = stepGoal
         )
         Row(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center
         ) {
             AdditionalMetricCard(
                 icon = Icons.Default.Add,

@@ -27,7 +27,6 @@ val appModule = module {
     single {
         UserRepository(
             appDataStore = get(),
-            statisticsRepository = get(),
             pathRepository = get(),
             friendshipRepository = get(),
             statsViewModel = get()
