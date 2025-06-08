@@ -35,6 +35,7 @@ import ru.hse.online.client.presentation.screens.MenuScreen
 import ru.hse.online.client.presentation.screens.PermissionScreen
 import ru.hse.online.client.viewModels.StatsViewModel
 import ru.hse.online.client.ui.theme.ClientTheme
+import ru.hse.online.client.viewModels.GroupViewModel
 import ru.hse.online.client.viewModels.LocationViewModel
 import ru.hse.online.client.viewModels.UserViewModel
 

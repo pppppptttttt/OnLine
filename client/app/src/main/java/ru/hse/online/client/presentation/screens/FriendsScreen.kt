@@ -47,7 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import ru.hse.online.client.presentation.Screen
 import ru.hse.online.client.repository.networking.api_data.Friend
-import ru.hse.online.client.repository.networking.api_data.Path
+import ru.hse.online.client.repository.networking.api_data.*
 import ru.hse.online.client.viewModels.UserViewModel
 
 @Composable
@@ -280,7 +280,7 @@ fun StatCard(title: String, value: String) {
 }
 
 @Composable
-fun PathCard(path: Path, onAddClick: () -> Unit, onPreview: () -> Unit) {
+fun PathCard(path: PathResponse, onAddClick: () -> Unit, onPreview: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

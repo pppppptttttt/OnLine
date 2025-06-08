@@ -16,6 +16,7 @@ import ru.hse.online.client.repository.storage.PathRepository
 import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.services.ContextProvider
 import ru.hse.online.client.services.StepServiceConnector
+import ru.hse.online.client.viewModels.GroupViewModel
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import ru.hse.online.client.viewModels.UserViewModel
 
@@ -66,6 +67,8 @@ val appModule = module {
             appDataStore = get()
         )
     }
+
+    viewModel<GroupViewModel> { GroupViewModel() }
 
     viewModel<SettingsViewModel> { SettingsViewModel(get()) }
 
