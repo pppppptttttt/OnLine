@@ -46,8 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import ru.hse.online.client.presentation.Screen
-import ru.hse.online.client.repository.networking.api_data.Friend
-import ru.hse.online.client.repository.networking.api_data.PathResponse
+import ru.hse.online.client.repository.networking.api_data.*
 import ru.hse.online.client.viewModels.UserViewModel
 
 @Composable
