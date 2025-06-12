@@ -62,6 +62,13 @@ services:
       - backend
     restart: unless-stopped
 
+  group-service:
+    image: aluze/online-groupservice:latest
+    container_name: group-service
+    networks:
+      - backend
+    restart: unless-stopped
+
   nginx:
     image: nginx:latest
     ports:
@@ -71,6 +78,7 @@ services:
     depends_on:
       - data-service
       - auth-service
+      - group-service
     networks:
       - backend
 
