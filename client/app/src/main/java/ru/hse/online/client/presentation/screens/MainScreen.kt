@@ -96,7 +96,7 @@ fun MainScreen(
 
                 TextField(
                     value = "$dailyStepGoal",
-                    onValueChange = { if (it.isDigitsOnly()) settingsViewModel.saveDailyStepGoal(it.toInt()) },
+                    onValueChange = { settingsViewModel.saveDailyStepGoal((it)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
@@ -203,7 +203,8 @@ fun MetricsGrid(
             stepGoal = stepGoal
         )
         Row(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center
         ) {
             AdditionalMetricCard(
                 icon = Icons.Default.Add,

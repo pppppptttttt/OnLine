@@ -1,5 +1,6 @@
 package ru.hse.online.client.viewModels
 
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
     )
     val userId = dataStore.getUserIdFlow()
     val dailyStepGoal = dataStore.getValueFlow(
-        AppDataStore.DAILY_STEP_COUNT,
+        AppDataStore.USER_DAILY_GOAL,
         defaultValue = 6000
     )
 
@@ -60,9 +61,11 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         }
     }
 
-    fun saveDailyStepGoal(steps: Int) {
-        viewModelScope.launch {
-            dataStore.saveValue(AppDataStore.DAILY_STEP_COUNT, steps)
+    fun saveDailyStepGoal(steps: String) {
+        if (steps.isNotBlank() && steps.isDigitsOnly()) {
+            viewModelScope.launch {
+                dataStore.saveValue(AppDataStore.USER_DAILY_GOAL, steps.toInt())
+            }
         }
     }
 }

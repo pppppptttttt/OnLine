@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import java.time.LocalDate
 import java.util.UUID
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
@@ -28,17 +29,13 @@ class AppDataStore(
         val USER_TOKEN = stringPreferencesKey("user_token")
         val USER_ID = stringPreferencesKey("user_id")
 
-        val USER_TOTAL_STEPS = intPreferencesKey("user_total_steps")
-        val USER_TOTAL_CALORIES = doublePreferencesKey("user_total_calories")
-        val USER_TOTAL_DISTANCE = doublePreferencesKey("user_total_distance")
-        val USER_TOTAL_TIME = longPreferencesKey("user_total_time")
-
         val USER_ONLINE_STEPS = intPreferencesKey("user_online_steps")
         val USER_ONLINE_CALORIES = doublePreferencesKey("user_online_calories")
         val USER_ONLINE_DISTANCE = doublePreferencesKey("user_online_distance")
         val USER_ONLINE_TIME = longPreferencesKey("user_online_time")
+        val USER_PREVIOUS_DATE = stringPreferencesKey("user_previous_date")
 
-        val DAILY_STEP_COUNT = intPreferencesKey("daily_step_count")
+        val USER_DAILY_GOAL = intPreferencesKey("daily_step_goal")
     }
 
     suspend fun <T> saveValue(key: Preferences.Key<T>, value: T) {

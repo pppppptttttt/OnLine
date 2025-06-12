@@ -9,7 +9,6 @@ import ru.hse.online.repository.PathRepository;
 import ru.hse.online.service.PathService;
 import ru.hse.online.storage.PathData;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

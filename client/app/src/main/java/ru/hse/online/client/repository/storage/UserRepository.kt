@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import ru.hse.online.client.presentation.map.toGoogleMapsFormat
 import ru.hse.online.client.repository.FriendshipRepository
-import ru.hse.online.client.repository.StatisticsRepository
-import ru.hse.online.client.repository.StatisticsRepository.Stats
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
@@ -20,7 +18,6 @@ import java.util.UUID
 
 class UserRepository(
     private val appDataStore: AppDataStore,
-    private val statisticsRepository: StatisticsRepository,
     private val pathRepository: PathRepository,
     private val friendshipRepository: FriendshipRepository,
     private val statsViewModel: StatsViewModel
@@ -46,13 +43,6 @@ class UserRepository(
     private val _group = MutableStateFlow<Map<UUID, Friend>>(emptyMap())
     val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
 
-    private val _stats = MutableStateFlow<Map<Pair<Stats, LocalDate>, Double>>(emptyMap())
-    private val stats: StateFlow<Map<Pair<Stats, LocalDate>, Double>> = _stats.asStateFlow()
-
-    suspend fun loadStats() {
-        _stats.value = statisticsRepository.getTodayStats()
-    }
-
     suspend fun loadFriends() {
         friendshipRepository.getFriends();
     }
@@ -72,32 +62,77 @@ class UserRepository(
     suspend fun savePath(path: List<LatLng>) {
         pathRepository.createPath(
             PathRequest(
-                userId = UUID.randomUUID(),
+                userId = appDataStore.getUserIdFlow().first(),
                 polyline = path.toGoogleMapsFormat(),
                 created = LocalDate.now(),
                 name = "aboba",
                 distance = statsViewModel.onlineDistance.first(),
-                duration = statsViewModel.onlineTime.first() as Double
+                duration = statsViewModel.onlineTime.first().toDouble()
             )
         );
     }
 
     init {
-        val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0))
+        val fr = Friend(
+            UUID.randomUUID(),
+            "lol",
+            "kek",
+            hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0)
+        )
         _friends.value += fr
         _friendProfile.value = fr
-        _friendPublicPaths.value += PathResponse(UUID.randomUUID(), UUID.randomUUID(), "}__uHwg_uDslDoneEji_CxmvD?oohD", LocalDate.of(1,1,1), "aboba", 1.0,1.0)
+        _friendPublicPaths.value += PathResponse(
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            "}__uHwg_uDslDoneEji_CxmvD?oohD",
+            LocalDate.of(1, 1, 1),
+            "aboba",
+            1.0,
+            1.0
+        )
     }
 
     fun createGroup() {
         _isInGroup.value = true
-        val fr = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), Color.Red)
-        val fr2 = Friend(UUID.randomUUID(), "lol", "kek", hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0), Color.Blue)
+        val fr = Friend(
+            UUID.randomUUID(),
+            "lol",
+            "kek",
+            hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0),
+            Color.Red
+        )
+        val fr2 = Friend(
+            UUID.randomUUID(),
+            "lol",
+            "kek",
+            hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0),
+            Color.Blue
+        )
         _group.value += Pair(fr.userId, fr)
         _group.value += Pair(fr2.userId, fr2)
     }
 
-    fun getLeaderboard(timeFrame: LeaderBoardViewModel.TimeFrame): List<LeaderBoardViewModel.LeaderBoardUser> {
-        return emptyList()
+    suspend fun getLeaderboard(timeFrame: LeaderBoardViewModel.TimeFrame): List<LeaderBoardViewModel.LeaderBoardUser> {
+        val end = LocalDate.now()
+        val start = when (timeFrame) {
+            LeaderBoardViewModel.TimeFrame.DAILY -> end.minusDays(1)
+            LeaderBoardViewModel.TimeFrame.WEEKLY -> end.minusWeeks(1)
+            LeaderBoardViewModel.TimeFrame.MONTHLY -> end.minusMonths(1)
+        }
+
+        val res = statisticsRepository.getLeaderBoard(
+            appDataStore.getUserIdFlow().first(),
+            start,
+            end
+        )
+
+        return res.map { userStat ->
+            LeaderBoardViewModel.LeaderBoardUser(
+                id = userStat.user.userId.toString(),
+                email = userStat.user.email,
+                username = userStat.user.username,
+                steps = userStat.steps.toInt()
+            )
+        }
     }
 }
