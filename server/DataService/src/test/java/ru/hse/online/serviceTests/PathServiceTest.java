@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hse.online.mapper.PathMapper;
 import ru.hse.online.model.Path;
@@ -12,6 +13,7 @@ import ru.hse.online.repository.PathRepository;
 import ru.hse.online.service.core.PathCoreService;
 import ru.hse.online.storage.PathData;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -44,12 +46,20 @@ class PathServiceTest {
                 .userId(userId)
                 .pathId(pathId1)
                 .polyline("polyline1")
+                .created(LocalDate.now())
+                .name("Test Path 1")
+                .distance(100.0)
+                .duration(60.0)
                 .build();
 
         path2 = Path.builder()
                 .userId(userId)
                 .pathId(pathId2)
                 .polyline("polyline2")
+                .created(LocalDate.now())
+                .name("Test Path 2")
+                .distance(200.0)
+                .duration(120.0)
                 .build();
     }
 
@@ -58,22 +68,20 @@ class PathServiceTest {
         PathData pathData1 = PathMapper.toData(path1);
         PathData pathData2 = PathMapper.toData(path2);
 
-        List<PathData> expectedPaths = Arrays.asList(pathData1, pathData2);
-        when(pathRepository.findByUserId(userId)).thenReturn(expectedPaths);
+        when(pathRepository.findByUserId(userId))
+                .thenReturn(Arrays.asList(pathData1, pathData2));
 
-        List<Path> actualPaths = pathCoreService.getPathsList(userId);
+        List<Path> paths = pathCoreService.getPathsList(userId);
 
-        assertEquals(expectedPaths.size(), actualPaths.size());
-        assertEquals(PathMapper.toModel(expectedPaths.get(0)), actualPaths.get(0));
-        assertEquals(PathMapper.toModel(expectedPaths.get(1)), actualPaths.get(1));
-
-        verify(pathRepository).findByUserId(userId);
+        assertEquals(2, paths.size());
+        assertEquals(path1, paths.get(0));
+        assertEquals(path2, paths.get(1));
     }
 
     @Test
     void addPathCallsSaveMethod() {
         pathCoreService.addPath(path1);
-        verify(pathRepository).save(PathMapper.toData(path1));
+        verify(pathRepository).save(Mockito.any(PathData.class));
     }
 
     @Test

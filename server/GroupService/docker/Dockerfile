@@ -1,4 +1,4 @@
-FROM openjdk:24-jdk
+FROM astita/openjdk21-alpine
 WORKDIR /app
 
 ADD ./build/libs/group-service.jar app.jar

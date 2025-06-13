@@ -1,8 +1,7 @@
-package ru.hse.online.client.presentation
+package ru.hse.online.client.presentation.screens
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -33,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import ru.hse.online.client.presentation.NavigationComponent
 
 @Composable
 fun LocationPermissionRequest(
@@ -133,7 +133,6 @@ fun PermissionScreen() {
         onPermissionsGranted = { permissionsGranted = true },
         onPermissionsDenied = {  }
     )
-
     if (permissionsGranted) {
         NavigationComponent()
     } else {

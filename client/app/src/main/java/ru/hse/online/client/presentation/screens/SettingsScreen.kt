@@ -1,4 +1,4 @@
-package ru.hse.online.client.presentation.settings
+package ru.hse.online.client.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,16 +23,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
 
 @Composable
 fun SettingsScreen() {
     val viewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
     val userName by viewModel.userName.collectAsState(initial = "")
     val userEmail by viewModel.userEmail.collectAsState(initial = "")
+    val userDailyGoal by viewModel.dailyStepGoal.collectAsState(initial = "")
 
     var selectedUnitsIndex by remember { mutableIntStateOf(0) }
-    val units = listOf("Metric system", "Burgers per eagle")
+    //val units = listOf("Metric system", "Burgers per eagle")
 
     Column(
         modifier = Modifier
@@ -43,6 +46,7 @@ fun SettingsScreen() {
         for (field in arrayOf(
             Pair(userName, "Nickname") to viewModel::saveUserName,
             Pair(userEmail, "Email") to viewModel::saveUserEmail,
+            Pair(userDailyGoal.toString(), "Daily goal") to viewModel::saveDailyStepGoal
         )) {
             OutlinedTextField(
                 value = field.first.first,
@@ -55,20 +59,20 @@ fun SettingsScreen() {
         }
 
 
-        SingleChoiceSegmentedButtonRow {
-            units.forEachIndexed { index, label ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = units.size
-                    ),
-                    onClick = { selectedUnitsIndex = index },
-                    selected = index == selectedUnitsIndex,
-                    label = { Text(label) }
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+//        SingleChoiceSegmentedButtonRow {
+//            units.forEachIndexed { index, label ->
+//                SegmentedButton(
+//                    shape = SegmentedButtonDefaults.itemShape(
+//                        index = index,
+//                        count = units.size
+//                    ),
+//                    onClick = { selectedUnitsIndex = index },
+//                    selected = index == selectedUnitsIndex,
+//                    label = { Text(label) }
+//                )
+//            }
+//        }
+//        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             modifier = Modifier

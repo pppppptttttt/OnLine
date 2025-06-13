@@ -58,6 +58,7 @@ class GroupManagerTest {
         assertNotEquals(originalGroup, newGroup);
         assertEquals(1, groupManager.getGroup(newGroup).size());
         assertNull(groupManager.getGroup(originalGroup));
+
     }
 
     @Test

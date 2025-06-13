@@ -26,5 +26,9 @@ CREATE TABLE IF NOT EXISTS OnLine.paths
     user_id  uuid,
     path_id  uuid,
     polyline text,
+    created  date,
+    name     text,
+    distance double,
+    duration double,
     PRIMARY KEY ((user_id), path_id)
 );

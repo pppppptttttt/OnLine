@@ -9,8 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hse.online.model.User;
 import ru.hse.online.model.UserStatistics;
 import ru.hse.online.service.StatisticsService;
 
@@ -49,6 +51,25 @@ public class StatisticsController {
         LocalDate end = LocalDate.parse(endStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         return ResponseEntity.ok(
                 statisticsService.getStatisticsForPeriod(userId, name, start, end)
+        );
+    }
+
+    @Operation(summary = "Get leaderboard of user and friends by total steps")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Leaderboard retrieved",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = Object.class))))
+    })
+    @GetMapping("get/leaderboard/")
+    public ResponseEntity<List<Pair<User, Double>>> getLeaderBoard(
+            @Parameter(description = "User ID") @RequestParam(name = "userId") UUID userId,
+            @Parameter(description = "Start date (YYYY-MM-DD)") @RequestParam(name = "start") String start,
+            @Parameter(description = "End date (YYYY-MM-DD)") @RequestParam(name = "end") String end) {
+
+        LocalDate startDate = LocalDate.parse(start, DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(end, DateTimeFormatter.ISO_DATE);
+
+        return ResponseEntity.ok(
+                statisticsService.getLeaderBoard(userId, startDate, endDate)
         );
     }
 

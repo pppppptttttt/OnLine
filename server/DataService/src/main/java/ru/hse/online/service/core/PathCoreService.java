@@ -27,18 +27,11 @@ public class PathCoreService implements PathService {
 
     @Transactional
     public void addPath(Path path) {
-        PathData pathData = PathMapper.toData(path);
-        if (pathData.getKey().getPathId() == null) {
-            PathData.PathKey newKey = PathData.PathKey.builder()
-                    .userId(pathData.getKey().getUserId())
-                    .pathId(UUID.randomUUID())
-                    .build();
-            pathData = PathData.builder()
-                    .key(newKey)
-                    .polyline(pathData.getPolyline())
-                    .build();
-        }
-        pathRepository.save(pathData);
+        UUID pathIdToSet = path.getPathId() == null ? UUID.randomUUID() : path.getPathId();
+        path.setPathId(pathIdToSet);
+
+        PathData pathDataToSave = PathMapper.toData(path);
+        pathRepository.save(pathDataToSave);
     }
 
     @Transactional

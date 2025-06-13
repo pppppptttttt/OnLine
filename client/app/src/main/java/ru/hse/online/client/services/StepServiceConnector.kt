@@ -1,10 +1,11 @@
-package ru.hse.online.client.services.pedometer
+package ru.hse.online.client.services
 
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,26 +54,29 @@ class StepServiceConnector(
     override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
         val serviceBinder = binder as StepCounterService.LocalBinder
         service = serviceBinder.getService()
-
         CoroutineScope(Dispatchers.Default).launch {
             launch {
                 service?.steps?.collect { steps ->
-                    _steps.value = steps
+                    _steps.value = steps.toInt()
+                    Log.e("TAG", "Steps in connector $steps ${_steps.value}")
                 }
             }
+
             launch {
                 service?.caloriesBurned?.collect { value ->
                     _caloriesBurned.value = value
                 }
             }
+
             launch {
                 service?.distanceTraveled?.collect { steps ->
                     _distanceTraveled.value = steps
                 }
             }
+
             launch {
                 service?.timeElapsed?.collect { steps ->
-                    _timeElapsed.value = steps
+                    _timeElapsed.value = steps.toLong()
                 }
             }
 

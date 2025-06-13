@@ -1,5 +1,7 @@
-﻿package ru.hse.online.client.presentation.pedometer
+﻿package ru.hse.online.client.presentation.screens
 
+import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +19,12 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,28 +33,34 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import ru.hse.online.client.presentation.settings.SettingsViewModel
-import ru.hse.online.client.viewModels.PedometerViewModel
+import ru.hse.online.client.viewModels.SettingsViewModel
+import ru.hse.online.client.viewModels.StatsViewModel
+import java.util.Locale
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: PedometerViewModel) {
-    val stepCount by viewModel.totalSteps.collectAsStateWithLifecycle(0)
-    val calories by viewModel.totalCalories.collectAsStateWithLifecycle(0.0)
-    val distance by viewModel.totalDistance.collectAsStateWithLifecycle(0.0)
-    val time by viewModel.totalTime.collectAsStateWithLifecycle(0L)
-
-    val settingsViewModel = koinViewModel<SettingsViewModel>()
-    val dailyStepCount by settingsViewModel.dailyStepCount.collectAsState(initial = 6000)
+fun MainScreen(
+    statsViewModel: StatsViewModel,
+    settingsViewModel: SettingsViewModel = koinViewModel()
+) {
+    val stepCount by statsViewModel.totalSteps.collectAsStateWithLifecycle(0)
+    val calories by statsViewModel.totalCalories.collectAsStateWithLifecycle(0.0)
+    val distance by statsViewModel.totalDistance.collectAsStateWithLifecycle(0.0)
+    val time by statsViewModel.totalTime.collectAsStateWithLifecycle(0L)
+    val dailyStepGoal by settingsViewModel.dailyStepGoal.collectAsState(initial = 6000)
     
     Scaffold(
         topBar = {
@@ -77,21 +88,27 @@ fun MainScreen(viewModel: PedometerViewModel) {
             Row {
                 MetricsGrid(
                     stepCount = stepCount,
-                    stepGoal = dailyStepCount,
+                    stepGoal = dailyStepGoal,
                     calories = calories,
                     distance = distance,
                     time = time
                 )
 
                 TextField(
-                    value = "$dailyStepCount",
-                    onValueChange = { if (it.isDigitsOnly()) settingsViewModel.saveDailyStepCount(it.toInt()) },
+                    value = "$dailyStepGoal",
+                    onValueChange = { settingsViewModel.saveDailyStepGoal((it)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                StepsProgress(
+                    statsViewModel,
+                    dailyStepGoal = dailyStepGoal
                 )
             }
         }
     }
 }
+
 @Composable
 fun AdditionalMetricCard(
     icon: ImageVector,
@@ -181,8 +198,13 @@ fun MetricsGrid(
             stepCount = stepCount,
             stepGoal = stepGoal
         )
+        DailyStepProgress(
+            stepCount = stepCount,
+            stepGoal = stepGoal
+        )
         Row(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center
         ) {
             AdditionalMetricCard(
                 icon = Icons.Default.Add,
@@ -203,6 +225,106 @@ fun MetricsGrid(
     }
 }
 
+@Composable
+fun DailyStepProgress(stepCount: Int, stepGoal: Int) {
+    val progress = remember(stepCount, stepGoal) {
+        if (stepGoal > 0) min(stepCount.toFloat() / stepGoal, 1f) else 0f
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(36.dp)
+        ) {
+            LinearProgressIndicator(
+                progress = { 1f },
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+            )
+
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxSize(),
+                color = if (progress >= 1f) Color.Green else MaterialTheme.colorScheme.primary,
+            )
+        }
+
+        if (progress >= 1f) {
+            Text(
+                text = "Daily goal achieved!",
+                color = Color.Green,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
+    val stepsMap by statsViewModel.stepsByDate.collectAsState()
+    val dateFormat = remember { SimpleDateFormat("EEE", Locale.getDefault()) }
+    val prevDays = remember {
+        List(7) { index ->
+            Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -index)
+            }.time
+        }.reversed()
+    }
+
+    // TODO: LaucnhedLoadStats
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        prevDays.forEach { date ->
+            val steps = stepsMap[date] ?: 0
+            val progress = if (dailyStepGoal > 0) min(steps.toFloat() / dailyStepGoal, 1f) else 0f
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Text(
+                    text = dateFormat.format(date).take(3),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        progress = { 1f },
+                        modifier = Modifier.size(36.dp),
+                        color = Color.LightGray,
+                        strokeWidth = 3.dp,
+                        trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+                    )
+                    CircularProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.size(36.dp),
+                        color = if (progress >= 1f) Color.Green else MaterialTheme.colorScheme.primary,
+                        strokeWidth = 3.dp,
+                        trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+                    )
+                }
+
+                Text(
+                    text = steps.toString(),
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
 
 fun formatTime(millis: Long): String {
     val minutes = (millis / (1000 * 60)) % 60

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -14,14 +15,27 @@ import java.util.UUID;
 public class Path {
     @NotNull
     @Schema(description = "Path's userId")
-    private final UUID userId;
+    private UUID userId;
 
     @NotNull
     @Schema(description = "Path's Id")
-    private final UUID pathId;
+    private UUID pathId;
 
     @NotNull
     @Schema(description = "Polyline coordinates")
-    private final String polyline;
+    private String polyline;
+
+    @NotNull
+    @Schema(description = "Creation timestamp")
+    private LocalDate created;
+
+    @Schema(description = "Name of the path", nullable = true)
+    private String name;
+
+    @Schema(description = "Distance of the path in meters", nullable = true)
+    private Double distance;
+
+    @Schema(description = "Duration of the path in seconds", nullable = true)
+    private Double duration;
 }
 

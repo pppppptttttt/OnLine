@@ -14,6 +14,10 @@ public class PathMapper {
                 .userId(pathData.getKey().getUserId())
                 .pathId(pathData.getKey().getPathId())
                 .polyline(pathData.getPolyline())
+                .created(pathData.getCreated())
+                .name(pathData.getName())
+                .distance(pathData.getDistance())
+                .duration(pathData.getDuration())
                 .build();
     }
 
@@ -30,6 +34,10 @@ public class PathMapper {
         return PathData.builder()
                 .key(key)
                 .polyline(path.getPolyline())
+                .created(path.getCreated())
+                .name(path.getName())
+                .distance(path.getDistance())
+                .duration(path.getDuration())
                 .build();
     }
 }

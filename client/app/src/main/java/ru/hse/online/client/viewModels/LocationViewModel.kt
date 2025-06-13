@@ -4,16 +4,24 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.storage.LocationRepository
-import ru.hse.online.client.services.location.LocationService
-import ru.hse.online.client.services.pedometer.ContextProvider
+import ru.hse.online.client.repository.storage.UserRepository
+import ru.hse.online.client.services.LocationService
+import ru.hse.online.client.services.ContextProvider
 
-class LocationViewModel(private val contextProvider: ContextProvider, private val repository: LocationRepository) : ViewModel() {
+class LocationViewModel(
+    private val contextProvider: ContextProvider,
+    private val locationRepository: LocationRepository,
+    private val userRepository: UserRepository
+) : ViewModel() {
     private val TAG: String = "APP_LOCATION_VIEW_MODEL"
     
     private var _routePoints: MutableStateFlow<List<LatLng>> =
@@ -23,11 +31,15 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
     private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
     val location: StateFlow<LatLng> = _locationState.asStateFlow()
 
+    private val _centerCameraEvents = Channel<Unit>(Channel.BUFFERED)
+    val centerCameraEvents = _centerCameraEvents.receiveAsFlow()
+
     private val _isOnline = MutableStateFlow(false)
     private val _isPaused = MutableStateFlow(false)
+    val previewPath: StateFlow<List<LatLng>> = locationRepository.previewPath
 
     init {
-        repository.locationState
+        locationRepository.locationState
             .onEach { state ->
                 Log.i(TAG, "Updating location")
                 when (state) {
@@ -77,7 +89,23 @@ class LocationViewModel(private val contextProvider: ContextProvider, private va
         }
     }
 
-    fun goOffLine() {
+    fun goOffLine(savePath: Boolean) {
         _isOnline.value = false
+        if (savePath) {
+            viewModelScope.launch {
+                userRepository.savePath(_routePoints.value)
+            }
+        }
+        _routePoints.value = emptyList()
+    }
+
+    fun clearPreview() {
+        locationRepository.clearPreview()
+    }
+
+    fun centerCamera() {
+        viewModelScope.launch {
+            _centerCameraEvents.send(Unit)
+        }
     }
 }

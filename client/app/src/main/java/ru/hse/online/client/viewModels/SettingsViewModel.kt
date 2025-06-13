@@ -1,5 +1,6 @@
-package ru.hse.online.client.presentation.settings
+package ru.hse.online.client.viewModels
 
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -7,27 +8,40 @@ import ru.hse.online.client.repository.storage.AppDataStore
 import java.util.UUID
 
 class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
+    val userName = dataStore.getValueFlow(
+        AppDataStore.USER_NAME,
+        defaultValue = ""
+    )
+    val userEmail = dataStore.getValueFlow(
+        AppDataStore.USER_EMAIL,
+        defaultValue = ""
+    )
+    val userPassword = dataStore.getValueFlow(
+        AppDataStore.USER_PASSWORD,
+        defaultValue = ""
+    )
+    val token = dataStore.getValueFlow(
+        AppDataStore.USER_TOKEN,
+        defaultValue = ""
+    )
+    val userId = dataStore.getUserIdFlow()
+    val dailyStepGoal = dataStore.getValueFlow(
+        AppDataStore.USER_DAILY_GOAL,
+        defaultValue = 6000
+    )
+
     fun saveUserName(name: String) {
         viewModelScope.launch {
             dataStore.saveValue(AppDataStore.USER_NAME, name)
         }
     }
 
-    val userName = dataStore.getValueFlow(
-        AppDataStore.USER_NAME,
-        defaultValue = ""
-    )
 
     fun saveUserEmail(email: String) {
         viewModelScope.launch {
             dataStore.saveValue(AppDataStore.USER_EMAIL, email)
         }
     }
-
-    val userEmail = dataStore.getValueFlow(
-        AppDataStore.USER_EMAIL,
-        defaultValue = ""
-    )
 
     fun saveUserPassword(password: String) {
         viewModelScope.launch {
@@ -37,16 +51,9 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
 
     fun saveUserId(userId: UUID) {
         viewModelScope.launch {
-            dataStore.saveUserId(userId)
+            dataStore.saveValue(AppDataStore.USER_ID, userId.toString())
         }
     }
-
-    val userId = dataStore.getUserIdFlow()
-
-    val userPassword = dataStore.getValueFlow(
-        AppDataStore.USER_PASSWORD,
-        defaultValue = ""
-    )
 
     fun saveUserToken(token: String) {
         viewModelScope.launch {
@@ -54,14 +61,11 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         }
     }
 
-    fun saveDailyStepCount(steps: Int) {
-        viewModelScope.launch {
-            dataStore.saveValue(AppDataStore.DAILY_STEP_COUNT, steps)
+    fun saveDailyStepGoal(steps: String) {
+        if (steps.isNotBlank() && steps.isDigitsOnly()) {
+            viewModelScope.launch {
+                dataStore.saveValue(AppDataStore.USER_DAILY_GOAL, steps.toInt())
+            }
         }
     }
-
-    val dailyStepCount = dataStore.getValueFlow(
-        AppDataStore.DAILY_STEP_COUNT,
-        defaultValue = 6000
-    )
 }
