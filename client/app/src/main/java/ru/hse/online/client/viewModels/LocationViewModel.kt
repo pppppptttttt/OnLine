@@ -89,11 +89,11 @@ class LocationViewModel(
         }
     }
 
-    fun goOffLine(savePath: Boolean) {
+    fun goOffLine(savePath: Boolean, description: String = "") {
         _isOnline.value = false
         if (savePath) {
             viewModelScope.launch {
-                userRepository.savePath(_routePoints.value)
+                userRepository.savePath(description, _routePoints.value)
             }
         }
         _routePoints.value = emptyList()
