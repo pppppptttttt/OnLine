@@ -3,6 +3,7 @@ package ru.hse.online.client.di
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.core.module.dsl.viewModel
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -19,6 +20,9 @@ import ru.hse.online.client.repository.storage.PathRepository
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.usecase.CreateUserUseCase
 import ru.hse.online.client.usecase.GetUserUseCase
+import ru.hse.online.client.viewModels.GroupViewModel
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.StompClient
 
 val networkModule = module {
     single { provideBaseUrl() }
@@ -26,6 +30,13 @@ val networkModule = module {
     single { provideOkHttpClient() }
 
     single { provideRetrofit(get(), get(), get()) }
+
+    viewModel<GroupViewModel> {
+        GroupViewModel(
+            dataStore = get(),
+            stompClient = provideStompClient()
+        )
+    }
 
     single<AuthApiService> { provideAuthService(get()) }
     single<UserDataApiService> { provideUserDataService(get()) }
@@ -49,6 +60,14 @@ private fun provideOkHttpClient(): OkHttpClient {
         .addInterceptor(loggingInterceptor)
         .build()
 }
+
+private fun provideStompClient(): StompClient {
+    return Stomp.over(
+        Stomp.ConnectionProvider.OKHTTP,
+        provideBaseUrl() + "/group/ws"
+    )
+}
+
 private fun provideGson() = GsonBuilder()
     .registerTypeAdapter(java.time.LocalDate::class.java, LocalDateAdapter())
     .create()

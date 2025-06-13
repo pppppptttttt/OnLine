@@ -68,8 +68,6 @@ val appModule = module {
         )
     }
 
-    viewModel<GroupViewModel> { GroupViewModel() }
-
     viewModel<SettingsViewModel> { SettingsViewModel(get()) }
 
     viewModel<StatsViewModel> {

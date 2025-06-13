@@ -7,16 +7,19 @@ import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.StompMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.hse.online.client.repository.storage.AppDataStore
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 
-class GroupViewModel : ViewModel() {
+class GroupViewModel(
+        private val dataStore: AppDataStore,
+        private val stompClient: StompClient
+    ) : ViewModel() {
 
     companion object {
         private val gson = Gson()
@@ -25,6 +28,11 @@ class GroupViewModel : ViewModel() {
 
     private val _connectionStatus = MutableStateFlow(false)
     val connectionStatus: StateFlow<Boolean> = _connectionStatus.asStateFlow()
+
+    private val _email = dataStore.getValueFlow(
+        AppDataStore.USER_EMAIL,
+        defaultValue = ""
+    ) // TODO
 
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username.asStateFlow()
@@ -35,15 +43,9 @@ class GroupViewModel : ViewModel() {
     private val _logs = MutableStateFlow("")
     val logs: StateFlow<String> = _logs.asStateFlow()
 
-    private lateinit var stompClient: StompClient
     private val compositeDisposable = CompositeDisposable()
 
     fun connect() {
-        stompClient = Stomp.over(
-            Stomp.ConnectionProvider.OKHTTP,
-            "http://51.250.111.207:80/group/ws"
-        )
-
         compositeDisposable.add(
             stompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
@@ -113,11 +115,9 @@ class GroupViewModel : ViewModel() {
         addLog("Received message: ${message.payload}")
     }
 
-    fun disconnect() {
+    private fun disconnect() {
         compositeDisposable.clear()
-        if (::stompClient.isInitialized) {
-            stompClient.disconnect()
-        }
+        stompClient.disconnect()
     }
 
     fun register(username: String) {
