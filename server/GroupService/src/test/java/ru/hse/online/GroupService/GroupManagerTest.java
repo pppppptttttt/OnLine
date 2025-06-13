@@ -6,7 +6,7 @@ import ru.hse.online.GroupService.data.GroupManager;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
+import java.util.Set;
 
 class GroupManagerTest {
     private GroupManager groupManager;
@@ -66,10 +66,53 @@ class GroupManagerTest {
         groupManager.addUser("user1");
         groupManager.addUser("user2");
 
-        List<String> group0 = groupManager.getGroup(0L);
-        List<String> group1 = groupManager.getGroup(1L);
+        Set<String> group0 = groupManager.getGroup(0L);
+        Set<String> group1 = groupManager.getGroup(1L);
 
         assertTrue(group0.contains("user1"));
         assertTrue(group1.contains("user2"));
+    }
+
+    @Test
+    void addSingleUserMultipleTimes() {
+        String username = "a";
+
+        Long id = groupManager.addUser(username);
+        assertEquals(id, groupManager.addUser(username));
+        assertEquals(id, groupManager.addUser(username));
+        assertEquals(id, groupManager.addUser(username));
+        assertEquals(id, groupManager.addUser(username));
+        assertEquals(id, groupManager.addUser(username));
+
+        assertEquals(1, groupManager.getGroup(id).size());
+    }
+
+    @Test
+    void addTwoUsersMultipleTimes() {
+        String username1 = "a";
+        String username2 = "b";
+
+        Long id1 = groupManager.addUser(username1);
+
+        assertEquals(id1, groupManager.addUser(username1));
+        assertEquals(id1, groupManager.addUser(username1));
+        assertEquals(id1, groupManager.addUser(username1));
+        assertEquals(id1, groupManager.addUser(username1));
+        assertEquals(id1, groupManager.addUser(username1));
+
+        Long id2 = groupManager.addUser(username2);
+
+        assertEquals(id2, groupManager.addUser(username2));
+        assertEquals(id2, groupManager.addUser(username2));
+        assertEquals(id2, groupManager.addUser(username2));
+        assertEquals(id2, groupManager.addUser(username2));
+
+        assertEquals(1, groupManager.getGroup(id1).size());
+        assertEquals(1, groupManager.getGroup(id2).size());
+
+        groupManager.joinUserGroups(username1, username2);
+
+        Long groupId3 = groupManager.getGroupId(username1);
+        assertEquals(2, groupManager.getGroup(groupId3).size());
     }
 }

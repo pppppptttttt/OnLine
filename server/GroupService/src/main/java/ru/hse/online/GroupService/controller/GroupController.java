@@ -10,8 +10,7 @@ import ru.hse.online.GroupService.data.GroupManager;
 import ru.hse.online.GroupService.data.Invite;
 import ru.hse.online.GroupService.data.Location;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 public class GroupController {
@@ -69,7 +68,7 @@ public class GroupController {
         String from = usernameAndLocation.from;
         Location location = usernameAndLocation.location;
 
-        List<String> group = groupManager.getGroup(groupManager.getGroupId(from));
+        Set<String> group = groupManager.getGroup(groupManager.getGroupId(from));
         for (String to : group) {
             if (!Objects.equals(from, to)) {
                 messagingTemplate.convertAndSendToUser(to, "/msg", location.toJson());

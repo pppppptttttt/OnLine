@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class GroupManager {
     private final Map<String, Long> userToGroupId = new ConcurrentHashMap<>();
-    private final Map<Long, List<String>> groupIdToUsers = new ConcurrentHashMap<>();
+    private final Map<Long, Set<String>> groupIdToUsers = new ConcurrentHashMap<>();
     private final AtomicLong groupId = new AtomicLong(0);
 
     private void logGroups() {
@@ -15,13 +15,18 @@ public class GroupManager {
     }
     
     public Long addUser(String user) {
+        if (userToGroupId.containsKey(user)) {
+            System.out.println("ebat daun vtoroy raz regayetsa");
+            return userToGroupId.get(user);
+        }
+
         logGroups();
         userToGroupId.put(user, groupId.get());
 
-        List<String> group = groupIdToUsers.get(groupId.get());
+        Set<String> group = groupIdToUsers.get(groupId.get());
 
         if (group == null) {
-            group = new ArrayList<>();
+            group = new HashSet<>();
         }
 
         group.add(user);
@@ -69,7 +74,7 @@ public class GroupManager {
         return userToGroupId.get(user);
     }
 
-    public List<String> getGroup(Long id) {
+    public Set<String> getGroup(Long id) {
         return groupIdToUsers.get(id);
     }
 }
