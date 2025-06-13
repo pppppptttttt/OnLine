@@ -15,7 +15,7 @@ public class GroupManager {
     }
     
     public Long addUser(String user) {
-//        logGroups();
+        logGroups();
         userToGroupId.put(user, groupId.get());
 
         List<String> group = groupIdToUsers.get(groupId.get());
@@ -25,12 +25,12 @@ public class GroupManager {
 
         group.add(user);
         groupIdToUsers.put(groupId.get(), group);
-//        logGroups();
+        logGroups();
         return groupId.getAndIncrement();
     }
 
     public void removeUser(String user) {
-//        logGroups();
+        logGroups();
         Long id = userToGroupId.get(user);
 
         groupIdToUsers.get(id).remove(user);
@@ -39,23 +39,23 @@ public class GroupManager {
         }
 
         userToGroupId.remove(user);
-//        logGroups();
+        logGroups();
     }
 
     public void joinUserGroups(String user1, String user2) {
-//        logGroups();
+        logGroups();
         removeUser(user1);
         Long id2 = userToGroupId.get(user2);
         userToGroupId.put(user1, id2);
         groupIdToUsers.get(id2).add(user1);
-//        logGroups();
+        logGroups();
     }
 
     public void moveUserToNewGroup(String user) {
-//        logGroups();
+        logGroups();
         removeUser(user);
         addUser(user);
-//        logGroups();
+        logGroups();
     }
 
     public Long getGroupId(String user) {
