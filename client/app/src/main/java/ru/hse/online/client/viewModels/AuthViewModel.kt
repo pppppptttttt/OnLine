@@ -1,6 +1,7 @@
 package ru.hse.online.client.viewModels
 
 import android.content.Intent
+import android.util.JsonToken
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,7 @@ import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.UserRepository
 import ru.hse.online.client.usecase.CreateUserUseCase
 import ru.hse.online.client.usecase.GetUserUseCase
+import java.util.UUID
 import kotlin.random.Random
 
 class AuthViewModel(

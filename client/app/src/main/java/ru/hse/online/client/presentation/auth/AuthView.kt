@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,12 +72,18 @@ class AuthView : ComponentActivity() {
         val password by settingsModel.userPassword.collectAsState(initial = "")
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
+        var autoLoginAttempted by rememberSaveable { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
 
-//        coroutineScope.launch {
-//          TODO: Handle if token already exists
-//        }
+        LaunchedEffect(Unit) {
+            if (!autoLoginAttempted && email.isNotBlank() && password.isNotBlank()) {
+                autoLoginAttempted = true
+                coroutineScope.launch {
+                    authModel.handleAuth(AuthType.LOGIN, email, password, username, settingsModel)
+                }
+            }
+        }
 
         Box(
             modifier = Modifier
