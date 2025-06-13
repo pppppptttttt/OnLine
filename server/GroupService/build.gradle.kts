@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.4.5"
@@ -9,12 +11,19 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
 repositories {
 	mavenCentral()
+}
+
+tasks.withType<BootJar> {
+	archiveFileName.set("group-service.jar")
+	manifest {
+		attributes("Start-Class" to "ru.hse.online.GroupService.GroupServiceApplication")
+	}
 }
 
 dependencies {
@@ -25,9 +34,4 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
-}
-
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-	archiveFileName.set("groupService.jar")
-	mainClass.set("ru.hse.online.GroupService.GroupServiceApplication")
 }

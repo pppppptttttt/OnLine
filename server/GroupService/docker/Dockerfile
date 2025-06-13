@@ -1,5 +1,8 @@
 FROM astita/openjdk21-alpine
 WORKDIR /app
-COPY build/libs/groupService.jar .
+
+ADD ./build/libs/group-service.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "groupService.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

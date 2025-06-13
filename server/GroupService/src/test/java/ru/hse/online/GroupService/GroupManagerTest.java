@@ -37,7 +37,6 @@ class GroupManagerTest {
         assertNull(groupManager.getGroup(0L));
     }
 
-    // TODO
     @Test
     void joinUserGroupsShouldMergeGroups() {
         Long group1 = groupManager.addUser("user1");
@@ -58,7 +57,8 @@ class GroupManagerTest {
         Long newGroup = groupManager.getGroupId("user1");
         assertNotEquals(originalGroup, newGroup);
         assertEquals(1, groupManager.getGroup(newGroup).size());
-        assertTrue(groupManager.getGroup(originalGroup).isEmpty());
+        assertNull(groupManager.getGroup(originalGroup));
+
     }
 
     @Test
