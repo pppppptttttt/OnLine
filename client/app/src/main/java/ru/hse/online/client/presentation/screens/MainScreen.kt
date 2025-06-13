@@ -2,6 +2,7 @@
 
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,41 +13,47 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
+import java.time.LocalDate
 import java.util.Locale
 import kotlin.math.min
 
@@ -67,7 +74,7 @@ fun MainScreen(
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(30.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("OnLine")
@@ -83,28 +90,33 @@ fun MainScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Row {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 MetricsGrid(
                     stepCount = stepCount,
                     stepGoal = dailyStepGoal,
                     calories = calories,
                     distance = distance,
-                    time = time
-                )
-
-                TextField(
-                    value = "$dailyStepGoal",
-                    onValueChange = { settingsViewModel.saveDailyStepGoal((it)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-
-                StepsProgress(
-                    statsViewModel,
-                    dailyStepGoal = dailyStepGoal
+                    time = time,
+                    onStop = {
+                        statsViewModel.pauseAll()
+                    }
                 )
             }
+
+            Spacer(
+                modifier = Modifier.height(20.dp)
+            )
+
+            StepsProgress(
+                statsViewModel,
+                dailyStepGoal = dailyStepGoal
+            )
         }
     }
 }
@@ -121,6 +133,7 @@ fun AdditionalMetricCard(
         ),
         modifier = Modifier
             .padding(8.dp)
+            .wrapContentSize()
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -148,16 +161,18 @@ fun AdditionalMetricCard(
 @Composable
 fun StepsMetricCard(
     stepCount: Int,
-    stepGoal: Int
+    stepGoal: Int,
+    onStop: () -> Unit
 ) {
+    var isPaused by remember { mutableStateOf(false) }
     Card(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
         modifier = Modifier
-            .padding(8.dp)
+            .padding(10.dp)
             .fillMaxWidth()
-            .height(120.dp)
+            .height(200.dp)
     ) {
         Column(
             modifier = Modifier
@@ -165,19 +180,58 @@ fun StepsMetricCard(
                 .padding(8.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "%d".format(stepCount),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "%d".format(stepCount),
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 40.sp
+                )
+                IconButton(
+                    onClick = {
+                        onStop()
+                        isPaused = !isPaused
+                    },
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isPaused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                        contentDescription = "pause/resume",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
             Text(
                 text = "/%d Steps".format(stepGoal),
+                modifier = Modifier.padding(8.dp),
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = "There will be goal progress",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (isPaused) {
+                Card(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White, contentColor = Color.Black)
+                ) {
+                    Text(
+                        text = "Paused",
+                        color = Color.Black,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            } else {
+                DailyStepProgress(
+                    stepCount = stepCount,
+                    stepGoal = stepGoal
+                )
+            }
         }
     }
 }
@@ -189,22 +243,20 @@ fun MetricsGrid(
     stepGoal: Int,
     calories: Double,
     distance: Double,
-    time: Long
+    time: Long,
+    onStop: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
         StepsMetricCard(
             stepCount = stepCount,
-            stepGoal = stepGoal
-        )
-        DailyStepProgress(
-            stepCount = stepCount,
-            stepGoal = stepGoal
+            stepGoal = stepGoal,
+            onStop = onStop
         )
         Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             AdditionalMetricCard(
                 icon = Icons.Default.Add,
@@ -267,17 +319,12 @@ fun DailyStepProgress(stepCount: Int, stepGoal: Int) {
 
 @Composable
 fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
-    val stepsMap by statsViewModel.stepsByDate.collectAsState()
-    val dateFormat = remember { SimpleDateFormat("EEE", Locale.getDefault()) }
+    val stepsMap by statsViewModel.prevSevenDaysStats.collectAsStateWithLifecycle()
     val prevDays = remember {
         List(7) { index ->
-            Calendar.getInstance().apply {
-                add(Calendar.DAY_OF_YEAR, -index)
-            }.time
+           LocalDate.now().minusDays(index.toLong())
         }.reversed()
     }
-
-    // TODO: LaucnhedLoadStats
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -287,15 +334,15 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
             .padding(16.dp)
     ) {
         prevDays.forEach { date ->
-            val steps = stepsMap[date] ?: 0
+            val steps = stepsMap[date] ?: 9999
             val progress = if (dailyStepGoal > 0) min(steps.toFloat() / dailyStepGoal, 1f) else 0f
-
+            Log.e("TAG", progress.toString())
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
                 Text(
-                    text = dateFormat.format(date).take(3),
+                    text = date.dayOfWeek.toString().take(3),
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -310,7 +357,7 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
                     CircularProgressIndicator(
                         progress = { progress },
                         modifier = Modifier.size(36.dp),
-                        color = if (progress >= 1f) Color.Green else MaterialTheme.colorScheme.primary,
+                        color = Color.Green,
                         strokeWidth = 3.dp,
                         trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
                     )

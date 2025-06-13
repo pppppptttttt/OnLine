@@ -75,7 +75,8 @@ val appModule = module {
     viewModel<StatsViewModel> {
         StatsViewModel(
             connector = get(),
-            contextProvider = get()
+            contextProvider = get(),
+            statisticsRepository = get()
         )
     }
 

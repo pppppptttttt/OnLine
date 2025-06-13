@@ -110,6 +110,10 @@ class StepServiceConnector(
         service = null
     }
 
+    fun pauseAll() {
+        service?.pauseAll()
+    }
+
     fun goOnline() {
         service?.goOnline()
     }
