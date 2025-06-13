@@ -1,9 +1,12 @@
 package ru.hse.online.client.viewModels
 
+import android.icu.util.Calendar
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.services.ContextProvider
 import ru.hse.online.client.services.StepCounterService
 import ru.hse.online.client.services.StepServiceConnector
@@ -12,7 +15,8 @@ import java.util.Date
 
 class StatsViewModel(
     private val connector: StepServiceConnector,
-    private val contextProvider: ContextProvider
+    private val contextProvider: ContextProvider,
+    private val statisticsRepository: StatisticsRepository
 ) : ViewModel() {
 
     val totalSteps: StateFlow<Int> = connector.steps
@@ -34,12 +38,26 @@ class StatsViewModel(
     private val _isInGroup = MutableStateFlow(false)
     val isInGroup: StateFlow<Boolean> = _isInGroup.asStateFlow()
 
-    private val _stepsByDate = MutableStateFlow<Map<Date, Int>>(emptyMap())
-    val stepsByDate: StateFlow<Map<Date, Int>> = _stepsByDate.asStateFlow()
+    private val _prevSevenDaysStats = MutableStateFlow<MutableMap<LocalDate, Int>>(mutableMapOf())
+    val prevSevenDaysStats: StateFlow<MutableMap<LocalDate, Int>> = _prevSevenDaysStats.asStateFlow()
 
     init {
         connector.bind()
         StepCounterService.startService(contextProvider.getContext())
+
+        val prevDays = List(7) { index ->
+            LocalDate.now().minusDays(index.toLong())
+        }.reversed()
+
+        var value = 1;
+        for (prev in prevDays) {
+            _prevSevenDaysStats.value[prev] = 1234*value
+            value++;
+        }
+    }
+
+    fun pauseAll() {
+        connector.pauseAll()
     }
 
     override fun onCleared() {
