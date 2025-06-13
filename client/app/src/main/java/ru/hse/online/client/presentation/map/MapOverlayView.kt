@@ -84,7 +84,9 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().background(color = Color(0x77000000))
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(0x77000000))
         ) {
                 val onLineStepCount by statsViewModel.onlineSteps.collectAsStateWithLifecycle(0)
                 val onLineCalories by statsViewModel.onlineCalories.collectAsStateWithLifecycle(0.0)
@@ -127,7 +129,9 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
                 onClick = {
                     locationViewModel.clearPreview()
                 },
-                modifier = Modifier.widthIn(min = 50.dp).alpha(if (previewPath.isNotEmpty()) 1f else 0f),
+                modifier = Modifier
+                    .widthIn(min = 50.dp)
+                    .alpha(if (previewPath.isNotEmpty()) 1f else 0f),
                 enabled = previewPath.isNotEmpty()
             ) {
                 Icon(Icons.Filled.Clear, contentDescription = "Remove preview")
@@ -138,7 +142,9 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
     Row (
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(bottom = 30.dp, start = 10.dp, end = 10.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(bottom = 30.dp, start = 10.dp, end = 10.dp)
+            .fillMaxWidth()
     ) {
 
         Button(
@@ -162,7 +168,9 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
                     locationViewModel.pauseOnline()
                 }
             },
-            modifier = Modifier.widthIn(min = 50.dp).alpha(if (isOnline) 1f else 0f),
+            modifier = Modifier
+                .widthIn(min = 50.dp)
+                .alpha(if (isOnline) 1f else 0f),
             enabled = isOnline
         ) {
             if (!isPaused)
@@ -203,7 +211,9 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
 
         Button(
             onClick = { showGroupDialog = true },
-            modifier = Modifier.widthIn(min = 50.dp).alpha(if (!isOnline) 1f else 0f),
+            modifier = Modifier
+                .widthIn(min = 50.dp)
+                .alpha(if (!isOnline) 1f else 0f),
             enabled = !isOnline
         ) {
             Icon(Icons.Filled.Group, contentDescription = "GroupMenu")
@@ -219,13 +229,12 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
 
             },
             onConfirmation = {
+                value: String ->
                 showPathSaveDialog = false
                 statsViewModel.goOffLine()
-                locationViewModel.goOffLine(savePath = true)
+                locationViewModel.goOffLine(savePath = true, value)
             },
-            onCancel = {
-                showPathSaveDialog = false
-            }
+            statsViewModel = statsViewModel
         )
     }
 
@@ -342,9 +351,12 @@ fun GroupCreationDialog(
 @Composable
 fun PathSavingDialog(
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    onCancel: () -> Unit
+    onConfirmation: (String) -> Unit,
+    statsViewModel: StatsViewModel
 ) {
+    val distance by statsViewModel.onlineDistance.collectAsStateWithLifecycle(0)
+    val time by statsViewModel.onlineTime.collectAsStateWithLifecycle(0)
+    var pathDescription by remember { mutableStateOf("") }
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -360,25 +372,28 @@ fun PathSavingDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Save path?",
+                    text = "Would you like to save this path?",
                     modifier = Modifier.padding(16.dp),
                 )
+
+                Text(
+                    text = "You walked ${"%.1f".format(distance)} km for ${formatTime(time)}",
+                    modifier = Modifier.padding(16.dp),
+                )
+
+                TextField(
+                    value = pathDescription,
+                    onValueChange = { pathDescription = it },
+                    label = { Text("Enter description") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    IconButton(
-                        onClick = { onCancel() },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Cancel",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
                     IconButton(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
@@ -391,7 +406,10 @@ fun PathSavingDialog(
                     }
 
                     IconButton(
-                        onClick = { onConfirmation() },
+                        onClick = {
+                            onConfirmation(pathDescription)
+                            pathDescription = ""
+                        },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Icon(
@@ -416,7 +434,9 @@ fun TopSide() {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth().background(color = Color(0x77000000))
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(0x77000000))
         ) {
             val onLineStepCount = 6543
             val onLineCalories = 456.1

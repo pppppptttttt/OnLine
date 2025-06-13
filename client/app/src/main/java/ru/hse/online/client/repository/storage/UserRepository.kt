@@ -61,13 +61,13 @@ class UserRepository(
         );
     }
 
-    suspend fun savePath(path: List<LatLng>) {
+    suspend fun savePath(description: String, path: List<LatLng>) {
         pathRepository.createPath(
             PathRequest(
                 userId = appDataStore.getUserIdFlow().first(),
                 polyline = path.toGoogleMapsFormat(),
                 created = LocalDate.now(),
-                name = "aboba",
+                name = description,
                 distance = statsViewModel.onlineDistance.first(),
                 duration = statsViewModel.onlineTime.first().toDouble()
             )
