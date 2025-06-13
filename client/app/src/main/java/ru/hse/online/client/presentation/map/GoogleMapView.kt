@@ -39,12 +39,18 @@ fun GoogleMapView(viewModel: LocationViewModel) {
 
     LaunchedEffect(currentLocation) {
         if (isFirstAppearance) {
-            currentLocation.let { location ->
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(
-                        location,
-                        15f
+            if (previewPath.isEmpty()) {
+                currentLocation.let { location ->
+                    cameraPositionState.animate(
+                        CameraUpdateFactory.newLatLngZoom(
+                            location,
+                            15f
+                        )
                     )
+                }
+            } else {
+                cameraPositionState.animate(
+                    calculateCameraUpdate(previewPath)
                 )
             }
             isFirstAppearance = false
