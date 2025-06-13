@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoubleArrow
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.NearMe
 import androidx.compose.material.icons.filled.NotInterested
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -139,6 +140,18 @@ fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationVi
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.padding(bottom = 30.dp, start = 10.dp, end = 10.dp).fillMaxWidth()
     ) {
+
+        Button(
+            onClick = {
+                locationViewModel.centerCamera()
+            },
+            modifier = Modifier.widthIn(min = 50.dp)
+        ) {
+            Icon(Icons.Filled.NearMe, contentDescription = "Center to my location")
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
         Button(
             onClick = {
                 if (isPaused) {

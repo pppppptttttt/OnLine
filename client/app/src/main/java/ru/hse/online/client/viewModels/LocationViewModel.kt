@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.storage.LocationRepository
 import ru.hse.online.client.repository.storage.UserRepository
@@ -28,6 +30,9 @@ class LocationViewModel(
 
     private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
     val location: StateFlow<LatLng> = _locationState.asStateFlow()
+
+    private val _centerCameraEvents = Channel<Unit>(Channel.BUFFERED)
+    val centerCameraEvents = _centerCameraEvents.receiveAsFlow()
 
     private val _isOnline = MutableStateFlow(false)
     private val _isPaused = MutableStateFlow(false)
@@ -96,5 +101,11 @@ class LocationViewModel(
 
     fun clearPreview() {
         locationRepository.clearPreview()
+    }
+
+    fun centerCamera() {
+        viewModelScope.launch {
+            _centerCameraEvents.send(Unit)
+        }
     }
 }

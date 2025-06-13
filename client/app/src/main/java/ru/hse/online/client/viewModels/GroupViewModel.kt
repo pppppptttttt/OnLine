@@ -41,7 +41,7 @@ class GroupViewModel : ViewModel() {
     fun connect() {
         stompClient = Stomp.over(
             Stomp.ConnectionProvider.OKHTTP,
-            "ws://10.0.2.2:8080/ws" // FIXME: localhost
+            "http://51.250.111.207:80/group/ws"
         )
 
         compositeDisposable.add(
@@ -87,7 +87,7 @@ class GroupViewModel : ViewModel() {
         )
 
         compositeDisposable.add(
-            stompClient.topic("/user/queue/msg")
+            stompClient.topic("/user/Anton/msg")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleMessage, this::handleError)

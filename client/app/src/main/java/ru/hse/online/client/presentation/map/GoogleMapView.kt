@@ -6,7 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,24 +29,39 @@ fun GoogleMapView(viewModel: LocationViewModel) {
     val routePoints by viewModel.routePoints.collectAsState()
     val previewPath by viewModel.previewPath.collectAsState()
     val currentLocation by viewModel.location.collectAsState()
+    val centerCameraEvents = viewModel.centerCameraEvents
     val cameraPositionState = rememberCameraPositionState()
+    var isFirstAppearance by remember { mutableStateOf(true) }
 
     val markers = remember { mutableStateListOf<LatLng>() }
 
     val currentMarkerState = rememberMarkerState()
 
     LaunchedEffect(currentLocation) {
+        if (isFirstAppearance) {
+            currentLocation.let { location ->
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(
+                        location,
+                        15f
+                    )
+                )
+            }
+            isFirstAppearance = false
+        }
         currentMarkerState.position = currentLocation
     }
 
-    LaunchedEffect(currentLocation) {
-        currentLocation.let { location ->
-            cameraPositionState.animate(
-                CameraUpdateFactory.newLatLngZoom(
-                    location,
-                    15f
+    LaunchedEffect(centerCameraEvents) {
+        centerCameraEvents.collect {
+            currentLocation.let { location ->
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newLatLngZoom(
+                        location,
+                        15f
+                    )
                 )
-            )
+            }
         }
     }
 

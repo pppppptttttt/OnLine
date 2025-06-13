@@ -30,6 +30,7 @@ val appModule = module {
             appDataStore = get(),
             pathRepository = get(),
             friendshipRepository = get(),
+            statisticsRepository = get(),
             statsViewModel = get()
         )
     }

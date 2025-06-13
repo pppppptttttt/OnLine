@@ -49,7 +49,6 @@ private fun provideOkHttpClient(): OkHttpClient {
         .addInterceptor(loggingInterceptor)
         .build()
 }
-
 private fun provideGson() = GsonBuilder()
     .registerTypeAdapter(java.time.LocalDate::class.java, LocalDateAdapter())
     .create()

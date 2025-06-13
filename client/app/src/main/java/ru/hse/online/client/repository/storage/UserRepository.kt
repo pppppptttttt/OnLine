@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import ru.hse.online.client.presentation.map.toGoogleMapsFormat
 import ru.hse.online.client.repository.FriendshipRepository
+import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
@@ -20,6 +21,7 @@ class UserRepository(
     private val appDataStore: AppDataStore,
     private val pathRepository: PathRepository,
     private val friendshipRepository: FriendshipRepository,
+    private val statisticsRepository: StatisticsRepository,
     private val statsViewModel: StatsViewModel
 ) {
     private val _friends = MutableStateFlow<List<Friend>>(emptyList())
