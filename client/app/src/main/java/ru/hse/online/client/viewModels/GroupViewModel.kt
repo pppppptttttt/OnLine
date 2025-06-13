@@ -46,6 +46,10 @@ class GroupViewModel(
     private val compositeDisposable = CompositeDisposable()
 
     fun connect() {
+        if (stompClient.isConnected) {
+            _connectionStatus.value = true
+        }
+
         compositeDisposable.add(
             stompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
@@ -117,7 +121,7 @@ class GroupViewModel(
 
     private fun disconnect() {
         compositeDisposable.clear()
-        stompClient.disconnect()
+        //stompClient.disconnect()
     }
 
     fun register(username: String) {

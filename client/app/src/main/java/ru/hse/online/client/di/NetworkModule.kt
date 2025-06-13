@@ -31,10 +31,12 @@ val networkModule = module {
 
     single { provideRetrofit(get(), get(), get()) }
 
+    single { provideStompClient() }
+
     viewModel<GroupViewModel> {
         GroupViewModel(
             dataStore = get(),
-            stompClient = provideStompClient()
+            stompClient = get()
         )
     }
 
