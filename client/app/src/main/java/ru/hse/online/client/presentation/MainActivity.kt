@@ -85,6 +85,7 @@ fun NavigationComponent() {
     val locationViewModel: LocationViewModel = koinViewModel()
     val statsViewModel: StatsViewModel = koinViewModel()
     val userViewModel: UserViewModel = koinViewModel()
+    val groupViewModel: GroupViewModel = koinViewModel()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -96,7 +97,7 @@ fun NavigationComponent() {
         ) {
             composable(Screen.Main.route) { MainScreen(statsViewModel) }
             composable(Screen.Map.route) { MapScreen(statsViewModel, locationViewModel, userViewModel) }
-            composable(Screen.Settings.route) { MenuScreen(userViewModel, navController) }
+            composable(Screen.Settings.route) { MenuScreen(userViewModel, navController, groupViewModel) }
             composable(Screen.Test.route) { TestScreen() }
             composable(
                 route = "friendProfile/{userId}",

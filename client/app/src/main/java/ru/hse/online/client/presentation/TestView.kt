@@ -43,11 +43,9 @@ fun TestScreen() {
 @Composable
 fun Groups(viewModel: GroupViewModel = koinViewModel()) {
     val connectionStatus by viewModel.connectionStatus.collectAsState()
-    val username by viewModel.username.collectAsState()
     val groupId by viewModel.groupId.collectAsState()
     val logs by viewModel.logs.collectAsState()
 
-    var newUsername by remember { mutableStateOf("") }
     var inviteUser by remember { mutableStateOf("") }
     var joinUser by remember { mutableStateOf("") }
     var lat by remember { mutableStateOf("55.751244") }
@@ -77,10 +75,6 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "User: ${username.ifEmpty { "Not registered" }}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
                         text = "Group: ${if (groupId != -1L) groupId else "None"}",
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -95,15 +89,9 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
             Spacer(modifier = Modifier.height(16.dp))
 
             // Register
-            OutlinedTextField(
-                value = newUsername,
-                onValueChange = { newUsername = it },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
             Button(
-                onClick = { viewModel.register(newUsername) },
-                enabled = connectionStatus && newUsername.isNotBlank(),
+                onClick = { viewModel.register() },
+                enabled = connectionStatus,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Register")
@@ -111,7 +99,7 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
 
             Button(
                 onClick = { viewModel.unregister() },
-                enabled = connectionStatus && username.isNotBlank(),
+                enabled = connectionStatus,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Unregister")
@@ -131,7 +119,7 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
                     viewModel.sendInvite(inviteUser)
                     inviteUser = ""
                 },
-                enabled = connectionStatus && username.isNotBlank() && inviteUser.isNotBlank(),
+                enabled = connectionStatus && inviteUser.isNotBlank(),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Send Invite")
@@ -148,7 +136,7 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
                     viewModel.joinGroup(joinUser)
                     joinUser = ""
                 },
-                enabled = connectionStatus && username.isNotBlank() && joinUser.isNotBlank(),
+                enabled = connectionStatus && joinUser.isNotBlank(),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Join Group")
@@ -156,7 +144,7 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
 
             Button(
                 onClick = { viewModel.quitGroup() },
-                enabled = connectionStatus && username.isNotBlank() && groupId != -1L,
+                enabled = connectionStatus && groupId != -1L,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Quit Group")
@@ -183,7 +171,7 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
                 onClick = {
                     viewModel.sendLocation(lat.toDouble(), lng.toDouble())
                 },
-                enabled = connectionStatus && username.isNotBlank(),
+                enabled = connectionStatus,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Update Location")

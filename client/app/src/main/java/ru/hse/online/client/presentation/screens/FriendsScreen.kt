@@ -47,12 +47,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import ru.hse.online.client.presentation.Screen
 import ru.hse.online.client.repository.networking.api_data.*
+import ru.hse.online.client.viewModels.GroupViewModel
 import ru.hse.online.client.viewModels.UserViewModel
 
 @Composable
-fun FriendsScreen(viewModel: UserViewModel, navController: NavController) {
+fun FriendsScreen(userViewModel: UserViewModel, navController: NavController, groupViewModel: GroupViewModel) {
 
-    val friends by viewModel.friends.collectAsStateWithLifecycle()
+    val friends by userViewModel.friends.collectAsStateWithLifecycle()
     var newFriendName by remember { mutableStateOf("") }
 
     Column(
@@ -72,7 +73,7 @@ fun FriendsScreen(viewModel: UserViewModel, navController: NavController) {
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        viewModel.addFriend(newFriendName)
+                        userViewModel.addFriend(newFriendName)
                         newFriendName = ""
                     }
                 )
@@ -82,7 +83,7 @@ fun FriendsScreen(viewModel: UserViewModel, navController: NavController) {
 
             Button(
                 onClick = {
-                    viewModel.addFriend(newFriendName)
+                    userViewModel.addFriend(newFriendName)
                     newFriendName = ""
                 },
                 enabled = newFriendName.isNotBlank()
@@ -111,15 +112,15 @@ fun FriendsScreen(viewModel: UserViewModel, navController: NavController) {
             }
 
             items(friends) { friend ->
-                FriendCard(friend = friend, vm = viewModel, navController = navController)
+                FriendCard(friend = friend, vm = userViewModel, navController = navController, groupViewModel = groupViewModel)
             }
         }
     }
 }
 
 @Composable
-fun FriendCard(friend: Friend, vm: UserViewModel, navController: NavController) {
-    val canInvite by vm.isInGroup.collectAsStateWithLifecycle()
+fun FriendCard(friend: Friend, vm: UserViewModel, navController: NavController, groupViewModel: GroupViewModel) {
+//    val canInvite by vm.isInGroup.collectAsStateWithLifecycle()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -146,9 +147,11 @@ fun FriendCard(friend: Friend, vm: UserViewModel, navController: NavController) 
             }
 
             Button(
-                onClick = { vm.inviteToGroup(friend.userId) },
-                modifier = Modifier.widthIn(min = 50.dp).alpha(if (canInvite) 1f else 0f),
-                enabled = canInvite
+                onClick = {
+                    groupViewModel.sendInvite(friend.email)
+                },
+//                modifier = Modifier.widthIn(min = 50.dp).alpha(if (canInvite) 1f else 0f),
+//                enabled = canInvite
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Invite to group")
             }

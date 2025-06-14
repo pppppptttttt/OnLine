@@ -16,12 +16,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -42,9 +44,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.viewModels.GroupViewModel
 import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
 import java.util.Locale
@@ -54,7 +56,8 @@ import kotlin.math.min
 @Composable
 fun MainScreen(
     statsViewModel: StatsViewModel,
-    settingsViewModel: SettingsViewModel = koinViewModel()
+    settingsViewModel: SettingsViewModel = koinViewModel(),
+    groupViewModel: GroupViewModel = koinViewModel()
 ) {
     val stepCount by statsViewModel.totalSteps.collectAsStateWithLifecycle(0)
     val calories by statsViewModel.totalCalories.collectAsStateWithLifecycle(0.0)
@@ -105,6 +108,8 @@ fun MainScreen(
                     dailyStepGoal = dailyStepGoal
                 )
             }
+
+            InvitesList(groupViewModel = groupViewModel)
         }
     }
 }
@@ -320,6 +325,60 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
                     text = steps.toString(),
                     fontSize = 10.sp,
                     modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InvitesList(groupViewModel: GroupViewModel) {
+    if (groupViewModel.receivedInvites.isEmpty()) {
+        return
+    }
+
+    for (from in groupViewModel.receivedInvites) {
+        InviteCard(from = from, groupViewModel = groupViewModel)
+    }
+}
+
+@Composable
+private fun InviteCard(from: String, groupViewModel: GroupViewModel) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = from,
+                style = MaterialTheme.typography.titleMedium
+            )
+            IconButton(
+                onClick = {
+                    groupViewModel.receivedInvites = groupViewModel.receivedInvites.minus(from)
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Reject invite"
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    groupViewModel.joinGroup(from)
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Join group by invite"
                 )
             }
         }

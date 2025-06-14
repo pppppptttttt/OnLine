@@ -3,39 +3,71 @@ package ru.hse.online.client.viewModels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.StompMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.storage.AppDataStore
+import ru.hse.online.client.repository.storage.LocationRepository
 import ua.naiksoftware.stomp.dto.LifecycleEvent
+import kotlin.collections.plus
 
 class GroupViewModel(
-        private val dataStore: AppDataStore,
-        private val stompClient: StompClient
-    ) : ViewModel() {
+    private val dataStore: AppDataStore,
+    private val stompClient: StompClient,
+    private val locationRepository: LocationRepository
+) : ViewModel() {
 
     companion object {
         private val gson = Gson()
         private const val TAG = "APP_GROUP_VIEWMODEL";
     }
 
+    private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
+    var location: StateFlow<LatLng> = _locationState.asStateFlow()
+
     private val _connectionStatus = MutableStateFlow(false)
     val connectionStatus: StateFlow<Boolean> = _connectionStatus.asStateFlow()
 
-    private val _email = dataStore.getValueFlow(
-        AppDataStore.USER_EMAIL,
-        defaultValue = ""
-    ) // TODO
+    private lateinit var email: String
 
-    private val _username = MutableStateFlow("")
-    val username: StateFlow<String> = _username.asStateFlow()
+    var receivedInvites: Set<String> = emptySet()
+
+    init {
+        viewModelScope.launch {
+            email = dataStore.getValueFlow(
+                AppDataStore.USER_EMAIL,
+                defaultValue = ""
+            ).first()
+        }
+
+        locationRepository.locationState
+            .onEach { state ->
+                Log.i(TAG, "Updating location")
+                when (state) {
+                    is LocationRepository.LocationState.Available -> {
+                        _locationState.value = state.location.let {
+                            LatLng(it.latitude, it.longitude)
+                        }
+                    }
+                    is LocationRepository.LocationState.Error -> {
+                        Log.i(TAG, state.message)
+                    }
+                    else -> {}
+                }
+            }.launchIn(viewModelScope)
+    }
 
     private val _groupId = MutableStateFlow(-1L)
     val groupId: StateFlow<Long> = _groupId.asStateFlow()
@@ -56,18 +88,21 @@ class GroupViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { lifecycleEvent ->
                     when (lifecycleEvent.type) {
-                         LifecycleEvent.Type.OPENED -> {
+                        LifecycleEvent.Type.OPENED -> {
                             _connectionStatus.value = true
                             addLog("Connected to server")
                         }
+
                         LifecycleEvent.Type.CLOSED -> {
                             _connectionStatus.value = false
                             addLog("Disconnected")
                         }
+
                         LifecycleEvent.Type.ERROR -> {
                             _connectionStatus.value = false
                             addLog("Error: ${lifecycleEvent.exception?.message}")
                         }
+
                         else -> {}
                     }
                 }
@@ -75,6 +110,14 @@ class GroupViewModel(
 
         subscribeToTopics()
         stompClient.connect()
+
+        viewModelScope.launch {
+            // TODO: larger delay
+            while (true) {
+                delay(30000L)
+                sendLocation(location.value.latitude, location.value.longitude)
+            }
+        }
     }
 
     private fun subscribeToTopics() {
@@ -93,7 +136,7 @@ class GroupViewModel(
         )
 
         compositeDisposable.add(
-            stompClient.topic("/user/Anton/msg")
+            stompClient.topic("/user/$email/msg")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleMessage, this::handleError)
@@ -107,8 +150,8 @@ class GroupViewModel(
     }
 
     private fun handleEndWalk(message: StompMessage) {
-        val username = message.payload
-        if (username == _username.value) {
+        val receivedEmail = message.payload
+        if (receivedEmail == email) {
             _groupId.value = -1
             addLog("Unregistered successfully")
         }
@@ -116,52 +159,65 @@ class GroupViewModel(
 
     // TODO: actually handle message
     private fun handleMessage(message: StompMessage) {
+        val text = message.payload
+        if (text.contains("lat", ignoreCase = true)) {
+            handleUpdateLocation(text)
+        } else {
+            handleInvite(text)
+        }
         addLog("Received message: ${message.payload}")
     }
+
+    private fun handleUpdateLocation(text: String) {
+        TODO("Not yet implemented")
+    }
+
+    private fun handleInvite(text: String) {
+        val invite = gson.fromJson(text, Invite::class.java)
+        receivedInvites = receivedInvites.plus(invite.fromWho)
+    }
+
 
     private fun disconnect() {
         compositeDisposable.clear()
         //stompClient.disconnect()
     }
 
-    fun register(username: String) {
-        _username.value = username
-        stompClient.send("/app/start", "\"$username\"")
+    fun register() {
+        stompClient.send("/app/start", "\"$email\"")
             .subscribe()
-        addLog("Registration sent: $username")
+        addLog("Registration sent: $email")
     }
 
     fun unregister() {
-        val username = _username.value
-        stompClient.send("/app/stop", "\"$username\"")
+        stompClient.send("/app/stop", "\"$email\"")
             .subscribe()
-        addLog("Unregistration sent: $username")
+        addLog("Unregistration sent: $email")
     }
 
     fun sendInvite(toUser: String) {
-        val invite = Invite(_username.value, toUser)
+        val invite = Invite(email, toUser)
         stompClient.send("/app/invite", gson.toJson(invite))
             .subscribe()
         addLog("Invite sent to: $toUser")
     }
 
     fun joinGroup(inviter: String) {
-        val invite = Invite(inviter, _username.value) // inviter -> fromWho, current user -> toWho
+        val invite = Invite(inviter, email) // inviter -> fromWho, current user -> toWho
         stompClient.send("/app/joinGroup", gson.toJson(invite))
             .subscribe()
         addLog("Joining group of: $inviter")
     }
 
     fun quitGroup() {
-        val username = _username.value
-        stompClient.send("/app/quitGroup", "\"$username\"")
+        stompClient.send("/app/quitGroup", "\"$email\"")
             .subscribe()
         addLog("Quit group request sent")
     }
 
     fun sendLocation(lat: Double, lng: Double) {
         val location = Location(lat, lng)
-        val payload = gson.toJson(FromUsernameAndLocation(_username.value, location))
+        val payload = gson.toJson(FromUsernameAndLocation(email, location))
         stompClient.send("/app/updateLocation", payload)
             .subscribe()
         addLog("Location updated: ($lat, $lng)")
