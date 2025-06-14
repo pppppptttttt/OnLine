@@ -43,7 +43,8 @@ class GroupViewModel(
 
     private lateinit var email: String
 
-    var receivedInvites: Set<String> = emptySet()
+    private var _receivedInvites: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet());
+    var receivedInvites: StateFlow<Set<String>> = _receivedInvites.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -72,9 +73,6 @@ class GroupViewModel(
 
     private val _groupId = MutableStateFlow(-1L)
     val groupId: StateFlow<Long> = _groupId.asStateFlow()
-
-    private val _logs = MutableStateFlow("")
-    val logs: StateFlow<String> = _logs.asStateFlow()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -111,6 +109,8 @@ class GroupViewModel(
 
         subscribeToTopics()
         stompClient.connect()
+
+        register()
 
         viewModelScope.launch {
             while (true) {
@@ -159,24 +159,28 @@ class GroupViewModel(
 
     private fun handleMessage(message: StompMessage) {
         val text = message.payload
+        addLog("Received message: $text")
+
         if (text.contains("lat", ignoreCase = true)) {
-            val nameAndLocation = gson.fromJson(text, UsernameAndLocationFromServer::class.java)
+            val nameAndLocation = gson.fromJson(text, UsernameAndLocation::class.java)
             handleUpdateLocation(nameAndLocation.from, nameAndLocation.lat, nameAndLocation.lng)
         } else {
             val invite = gson.fromJson(text, Invite::class.java)
-            handleInvite(invite.fromWho)
+            receiveInvite(invite.fromWho)
         }
-        addLog("Received message: ${message.payload}")
     }
 
     private fun handleUpdateLocation(fromWho: String, lat: Double, lng: Double) {
         // TODO: anton
     }
 
-    private fun handleInvite(fromWho: String) {
-        receivedInvites = receivedInvites.plus(fromWho)
+    fun receiveInvite(fromWho: String) {
+        _receivedInvites.value += fromWho
     }
 
+    fun rejectInvite(fromWho: String) {
+        _receivedInvites.value -= fromWho
+    }
 
     private fun disconnect() {
         compositeDisposable.clear()
@@ -216,8 +220,7 @@ class GroupViewModel(
     }
 
     fun sendLocation(lat: Double, lng: Double) {
-        val location = Location(lat, lng)
-        val payload = gson.toJson(FromUsernameAndLocation(email, location))
+        val payload = gson.toJson(UsernameAndLocation(email, lat, lng))
         stompClient.send("/app/updateLocation", payload)
             .subscribe()
         addLog("Location updated: ($lat, $lng)")
@@ -225,7 +228,6 @@ class GroupViewModel(
 
     private fun addLog(message: String) {
         viewModelScope.launch {
-            _logs.value += "$message\n"
             Log.i(TAG, message)
         }
     }
@@ -240,8 +242,6 @@ class GroupViewModel(
     }
 
     data class Invite(val fromWho: String, val toWho: String)
-    data class Location(val lat: Double, val lng: Double)
-    data class FromUsernameAndLocation(val from: String, val location: Location)
-    data class UsernameAndLocationFromServer(val from: String, val lat: Double, val lng: Double) // i am dima iblan
+    data class UsernameAndLocation(val from: String, val lat: Double, val lng: Double)
 }
 

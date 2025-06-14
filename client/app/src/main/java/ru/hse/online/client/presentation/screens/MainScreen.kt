@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -116,10 +118,10 @@ fun MainScreen(
 
             StepsProgress(
                 statsViewModel,
-                dailyStepGoal = dailyStepGoal
+                dailyStepGoal = dailyStepGoal,
+                groupViewModel = groupViewModel
             )
 
-            InvitesList(groupViewModel = groupViewModel)
         }
     }
 }
@@ -323,7 +325,7 @@ fun DailyStepProgress(stepCount: Int, stepGoal: Int) {
 }
 
 @Composable
-fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
+fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int, groupViewModel: GroupViewModel) {
     val stepsMap by statsViewModel.prevSixDaysStats.collectAsStateWithLifecycle()
     val todaySteps by statsViewModel.totalSteps.collectAsStateWithLifecycle()
     val prevDays = remember {
@@ -358,6 +360,8 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
         fontSize = 16.sp,
         modifier = Modifier.padding(16.dp)
     )
+
+    InvitesList(groupViewModel = groupViewModel)
 }
 
 @Composable
@@ -398,11 +402,18 @@ fun ProgressCircle(date: LocalDate, progress: Float, steps: Int) {
 
 @Composable
 private fun InvitesList(groupViewModel: GroupViewModel) {
-    if (groupViewModel.receivedInvites.isEmpty()) {
+    val invites by groupViewModel.receivedInvites.collectAsStateWithLifecycle()
+
+    if (invites.isEmpty()) {
         return
     }
 
-    for (from in groupViewModel.receivedInvites) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(invites.toList()) { it ->
+            InviteCard(from = it, groupViewModel = groupViewModel)
+        }
+    }
+    for (from in invites) {
         InviteCard(from = from, groupViewModel = groupViewModel)
     }
 }
@@ -425,7 +436,7 @@ private fun InviteCard(from: String, groupViewModel: GroupViewModel) {
             )
             IconButton(
                 onClick = {
-                    groupViewModel.receivedInvites = groupViewModel.receivedInvites.minus(from)
+                    groupViewModel.rejectInvite(from)
                 },
                 modifier = Modifier.size(48.dp)
             ) {
