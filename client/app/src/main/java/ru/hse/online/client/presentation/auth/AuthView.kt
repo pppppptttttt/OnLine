@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -67,20 +69,38 @@ class AuthView : ComponentActivity() {
 
     @Composable
     fun Draw(settingsModel: SettingsViewModel = koinViewModel()) {
-        val email by settingsModel.userEmail.collectAsState(initial = "")
-        val username by settingsModel.userName.collectAsState(initial = "")
-        val password by settingsModel.userPassword.collectAsState(initial = "")
+        var emailState by remember { mutableStateOf("") }
+        var usernameState by remember { mutableStateOf("") }
+        var passwordState by remember { mutableStateOf("") }
+
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
         var authType by rememberSaveable { mutableStateOf(AuthType.NONE) }
         var autoLoginAttempted by rememberSaveable { mutableStateOf(false) }
 
         val coroutineScope = rememberCoroutineScope()
 
-        LaunchedEffect(Unit) {
-            if (!autoLoginAttempted && email.isNotBlank() && password.isNotBlank()) {
+        val emailFlow by settingsModel.userEmail.collectAsState(initial = "")
+        val usernameFlow by settingsModel.userName.collectAsState(initial = "")
+        val passwordFlow by settingsModel.userPassword.collectAsState(initial = "")
+
+
+        LaunchedEffect(emailFlow, usernameFlow, passwordFlow) {
+            emailState = emailFlow
+            usernameState = usernameFlow
+            passwordState = passwordFlow
+        }
+
+        LaunchedEffect(emailState, passwordState) {
+            if (!autoLoginAttempted && emailState.isNotBlank() && passwordState.isNotBlank()) {
                 autoLoginAttempted = true
                 coroutineScope.launch {
-                    authModel.handleAuth(AuthType.LOGIN, email, password, username, settingsModel)
+                    authModel.handleAuth(
+                        AuthType.LOGIN,
+                        emailState,
+                        passwordState,
+                        usernameState,
+                        settingsModel
+                    )
                 }
             }
         }
@@ -133,12 +153,13 @@ class AuthView : ComponentActivity() {
 
                 if (authType == AuthType.SIGNUP) {
                     OutlinedTextField(
-                        value = username,
+                        value = usernameState,
                         label = { Text("Name") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
                         onValueChange = {
+                            usernameState = it
                             settingsModel.saveUserName(it)
                         }
                     )
@@ -146,23 +167,27 @@ class AuthView : ComponentActivity() {
 
                 if (authType != AuthType.NONE) {
                     OutlinedTextField(
-                        value = email,
+                        value = emailState,
                         label = { Text("Email") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
                         onValueChange = {
+                            emailState = it
                             settingsModel.saveUserEmail(it)
                         }
                     )
 
                     OutlinedTextField(
-                        value = password,
+                        value = passwordState,
                         label = { Text("Password") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
-                        onValueChange = { settingsModel.saveUserPassword(it) },
+                        onValueChange = {
+                            passwordState = it
+                            settingsModel.saveUserPassword(it)
+                        },
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         trailingIcon = {
@@ -182,7 +207,13 @@ class AuthView : ComponentActivity() {
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                authModel.handleAuth(authType, email, password, username, settingsModel)
+                                authModel.handleAuth(
+                                    authType,
+                                    emailState,
+                                    passwordState,
+                                    usernameState,
+                                    settingsModel
+                                )
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
