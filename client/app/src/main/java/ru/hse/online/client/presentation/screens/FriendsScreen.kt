@@ -60,7 +60,7 @@ fun FriendsScreen(userViewModel: UserViewModel, navController: NavController, gr
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text ("Your friends") },
+                title = { Text("Your friends") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -72,7 +72,7 @@ fun FriendsScreen(userViewModel: UserViewModel, navController: NavController, gr
                 }
             )
         }
-    ) {padding ->
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,9 +127,16 @@ fun FriendsScreen(userViewModel: UserViewModel, navController: NavController, gr
                         }
                     }
 
-                items(friends) { friend ->
-                    FriendCard(friend = friend, vm = userViewModel, navController = navController, groupViewModel = groupViewModel)
+                    items(friends) { friend ->
+                        FriendCard(
+                            friend = friend,
+                            vm = userViewModel,
+                            navController = navController,
+                            groupViewModel = groupViewModel
+                        )
+                    }
                 }
+            }
         }
     }
 }
