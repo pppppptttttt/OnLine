@@ -44,7 +44,6 @@ fun TestScreen() {
 fun Groups(viewModel: GroupViewModel = koinViewModel()) {
     val connectionStatus by viewModel.connectionStatus.collectAsState()
     val groupId by viewModel.groupId.collectAsState()
-    val logs by viewModel.logs.collectAsState()
 
     var inviteUser by remember { mutableStateOf("") }
     var joinUser by remember { mutableStateOf("") }
@@ -176,20 +175,6 @@ fun Groups(viewModel: GroupViewModel = koinViewModel()) {
             ) {
                 Text("Update Location")
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Logs
-            Text(
-                text = "Logs:",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = logs,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
         }
     }
 }
