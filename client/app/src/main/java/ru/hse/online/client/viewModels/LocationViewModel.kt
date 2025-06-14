@@ -108,4 +108,8 @@ class LocationViewModel(
             _centerCameraEvents.send(Unit)
         }
     }
+
+    fun updateFriendLocation(friendEmail: String, lat: Double, lng: Double) {
+        // TODO: anton
+    }
 }

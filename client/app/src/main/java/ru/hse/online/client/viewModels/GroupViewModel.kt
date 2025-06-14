@@ -26,7 +26,8 @@ import kotlin.collections.plus
 class GroupViewModel(
     private val dataStore: AppDataStore,
     private val stompClient: StompClient,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val locationViewModel: LocationViewModel
 ) : ViewModel() {
 
     companion object {
@@ -112,9 +113,8 @@ class GroupViewModel(
         stompClient.connect()
 
         viewModelScope.launch {
-            // TODO: larger delay
             while (true) {
-                delay(30000L)
+                delay(5000L)
                 sendLocation(location.value.latitude, location.value.longitude)
             }
         }
@@ -157,24 +157,24 @@ class GroupViewModel(
         }
     }
 
-    // TODO: actually handle message
     private fun handleMessage(message: StompMessage) {
         val text = message.payload
         if (text.contains("lat", ignoreCase = true)) {
-            handleUpdateLocation(text)
+            val nameAndLocation = gson.fromJson(text, UsernameAndLocationFromServer::class.java)
+            handleUpdateLocation(nameAndLocation.from, nameAndLocation.lat, nameAndLocation.lng)
         } else {
-            handleInvite(text)
+            val invite = gson.fromJson(text, Invite::class.java)
+            handleInvite(invite.fromWho)
         }
         addLog("Received message: ${message.payload}")
     }
 
-    private fun handleUpdateLocation(text: String) {
-        TODO("Not yet implemented")
+    private fun handleUpdateLocation(fromWho: String, lat: Double, lng: Double) {
+        // TODO: anton
     }
 
-    private fun handleInvite(text: String) {
-        val invite = gson.fromJson(text, Invite::class.java)
-        receivedInvites = receivedInvites.plus(invite.fromWho)
+    private fun handleInvite(fromWho: String) {
+        receivedInvites = receivedInvites.plus(fromWho)
     }
 
 
@@ -242,5 +242,6 @@ class GroupViewModel(
     data class Invite(val fromWho: String, val toWho: String)
     data class Location(val lat: Double, val lng: Double)
     data class FromUsernameAndLocation(val from: String, val location: Location)
+    data class UsernameAndLocationFromServer(val from: String, val lat: Double, val lng: Double) // i am dima iblan
 }
 
