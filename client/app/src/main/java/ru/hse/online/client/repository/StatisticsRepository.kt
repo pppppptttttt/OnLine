@@ -71,6 +71,7 @@ class StatisticsRepository(
             val value = statsMap[it]?.value ?: 0.0
             stats.add(UserStatistics(userId, it.name, date, value))
         }
+        Log.e("TAG", stats.toString())
         return try {
             val response = statisticsApiService.addStatistics("Bearer $token", stats)
             when (response.code()) {
