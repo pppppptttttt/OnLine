@@ -60,18 +60,19 @@ public class GroupController {
     }
 
     private record FromUsernameAndLocation(String from, Location location) {
+        public String toJson() {
+            return "{\"from\": " + "\"" + from + "\", \"lat\": " + location.lat + ", \"lng\": " + location.lng + "}";
+        }
     }
 
     @MessageMapping("/updateLocation")
     public void updateLocation(String data) throws JsonProcessingException {
         FromUsernameAndLocation usernameAndLocation = mapper.readValue(data, FromUsernameAndLocation.class);
-        String from = usernameAndLocation.from;
-        Location location = usernameAndLocation.location;
 
-        Set<String> group = groupManager.getGroup(groupManager.getGroupId(from));
+        Set<String> group = groupManager.getGroup(groupManager.getGroupId(usernameAndLocation.from));
         for (String to : group) {
-            if (!Objects.equals(from, to)) {
-                messagingTemplate.convertAndSendToUser(to, "/msg", location.toJson());
+            if (!Objects.equals(usernameAndLocation.from, to)) {
+                messagingTemplate.convertAndSendToUser(to, "/msg", usernameAndLocation.toJson());
             }
         }
     }
