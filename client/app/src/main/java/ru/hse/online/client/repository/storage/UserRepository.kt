@@ -1,6 +1,5 @@
 package ru.hse.online.client.repository.storage
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,8 +10,11 @@ import ru.hse.online.client.presentation.map.toGoogleMapsFormat
 import ru.hse.online.client.repository.FriendshipRepository
 import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.networking.api_data.Friend
+import ru.hse.online.client.repository.networking.api_data.FriendshipResult
 import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
+import ru.hse.online.client.repository.networking.api_data.PathResult
+import ru.hse.online.client.repository.networking.api_data.userToFriendMap
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
 import java.time.LocalDate
@@ -28,14 +30,8 @@ class UserRepository(
     private val _friends = MutableStateFlow<List<Friend>>(listOf())
     val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
 
-    private val _paths = MutableStateFlow<List<PathResponse>>(emptyList())
-    val paths: StateFlow<List<PathResponse>> = _paths.asStateFlow()
-
-    private val _isInGroup = MutableStateFlow(false)
-    val isInGroup: StateFlow<Boolean> = _isInGroup.asStateFlow()
-
-    private val _groupId = MutableStateFlow<UUID?>(null)
-    val groupId: StateFlow<UUID?> = _groupId.asStateFlow()
+    private val _paths = MutableStateFlow<List<PathRequest>>(emptyList())
+    val paths: StateFlow<List<PathRequest>> = _paths.asStateFlow()
 
     private val _friendPublicPaths = MutableStateFlow<List<PathResponse>>(emptyList())
     val friendPublicPaths: StateFlow<List<PathResponse>> = _friendPublicPaths.asStateFlow()
@@ -47,11 +43,20 @@ class UserRepository(
     val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
 
     suspend fun loadFriends() {
-        friendshipRepository.getFriends();
+        when (val result = friendshipRepository.getFriends()) {
+            is FriendshipResult.Failure -> {}
+            is FriendshipResult.SuccessAddFriend -> {}
+            is FriendshipResult.SuccessGetFriends -> {
+                result.friends.forEach {
+                    _friends.value += userToFriendMap(it)!!
+                }
+            }
+            is FriendshipResult.SuccessRemoveFriend -> {}
+        }
     }
 
     suspend fun addFriend(email: String) {
-        var result = friendshipRepository.addFriend(
+        val result = friendshipRepository.addFriend(
             email
         );
         if (result.second != null) {
@@ -60,22 +65,27 @@ class UserRepository(
     }
 
     suspend fun deleteFriend(uuid: UUID) {
+        _friends.value = _friends.value.dropWhile { it.userId == uuid }
         friendshipRepository.removeFriend(
             uuid
         );
     }
 
     suspend fun savePath(description: String, path: List<LatLng>) {
-        pathRepository.createPath(
-            PathRequest(
-                userId = appDataStore.getUserIdFlow().first(),
-                polyline = path.toGoogleMapsFormat(),
-                created = LocalDate.now(),
-                name = description,
-                distance = statsViewModel.onlineDistance.first(),
-                duration = statsViewModel.onlineTime.first().toDouble()
-            )
-        );
+        val pathValue = PathRequest(
+            userId = appDataStore.getUserIdFlow().first(),
+            polyline = path.toGoogleMapsFormat(),
+            created = LocalDate.now(),
+            name = description,
+            distance = statsViewModel.onlineDistance.first(),
+            duration = statsViewModel.onlineTime.first().toDouble()
+        )
+        when (pathRepository.createPath(pathValue)) {
+            is PathResult.Failure -> {}
+            is PathResult.Success -> {
+                _paths.value += pathValue
+            }
+        }
     }
 
     init {
@@ -99,7 +109,6 @@ class UserRepository(
     }
 
     fun createGroup() {
-        _isInGroup.value = true
         val fr = Friend(
             UUID.randomUUID(),
             "lol",

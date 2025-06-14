@@ -65,7 +65,7 @@ val appModule = module {
         FriendshipRepository(
             friendshipApiService = get(),
             appDataStore = get(),
-            user_getter = get()
+            userGetter = get()
         )
     }
 

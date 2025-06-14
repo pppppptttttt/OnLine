@@ -15,7 +15,6 @@ class UserViewModel(
     private val locationRepository: LocationRepository
 ): ViewModel() {
     val friends: StateFlow<List<Friend>> = repository.friends
-    val isInGroup: StateFlow<Boolean> = repository.isInGroup
     val friendPublicPaths: StateFlow<List<PathResponse>> = repository.friendPublicPaths
     val friendProfile: StateFlow<Friend?> = repository.friendProfile
     val group: StateFlow<Map<UUID, Friend>> = repository.group
@@ -42,8 +41,6 @@ class UserViewModel(
         repository.createGroup()
     }
 
-    fun joinGroup(uuid: String) {}
-    fun inviteToGroup(uuid: UUID) {}
     fun loadFriendProfile(userId: String) {}
     fun loadPublicPaths(userId: UUID) {}
     fun addPathToCollection(path: PathResponse) {}
