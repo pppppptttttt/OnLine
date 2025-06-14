@@ -50,7 +50,7 @@ class StatsViewModel(
             when (val res = statisticsRepository.getStatistics(Stats.STEPS, LocalDate.now().minusDays(6), LocalDate.now().minusDays(1))) {
                 is StatisticsResult.SuccessGet -> {
                     res.statistics.forEach {
-                        _prevSixDaysStats.value[it.date] = it.value.toInt()
+                        _prevSixDaysStats.value[it.timestamp] = it.value.toInt()
                     }
                 }
                 is StatisticsResult.SuccessPost -> {}

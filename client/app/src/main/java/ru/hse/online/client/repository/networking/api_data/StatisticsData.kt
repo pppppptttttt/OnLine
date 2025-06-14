@@ -9,7 +9,7 @@ data class UserStatistics(
     val userId: UUID,
     val name: String,
     @JsonAdapter(LocalDateAdapter::class)
-    val date: LocalDate,
+    val timestamp: LocalDate,
     val value: Double
 )
 

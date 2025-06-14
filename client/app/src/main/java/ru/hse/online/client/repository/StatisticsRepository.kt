@@ -1,5 +1,6 @@
 package ru.hse.online.client.repository
 
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import ru.hse.online.client.repository.networking.api_data.LeaderBoardResponse
