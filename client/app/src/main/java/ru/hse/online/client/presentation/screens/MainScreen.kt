@@ -1,5 +1,6 @@
 ﻿package ru.hse.online.client.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -118,10 +120,10 @@ fun MainScreen(
 
             StepsProgress(
                 statsViewModel,
-                dailyStepGoal = dailyStepGoal,
-                groupViewModel = groupViewModel
+                dailyStepGoal = dailyStepGoal
             )
 
+            InvitesList(groupViewModel = groupViewModel)
         }
     }
 }
@@ -325,7 +327,7 @@ fun DailyStepProgress(stepCount: Int, stepGoal: Int) {
 }
 
 @Composable
-fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int, groupViewModel: GroupViewModel) {
+fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
     val stepsMap by statsViewModel.prevSixDaysStats.collectAsStateWithLifecycle()
     val todaySteps by statsViewModel.totalSteps.collectAsStateWithLifecycle()
     val prevDays = remember {
@@ -360,8 +362,6 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int, groupViewM
         fontSize = 16.sp,
         modifier = Modifier.padding(16.dp)
     )
-
-    InvitesList(groupViewModel = groupViewModel)
 }
 
 @Composable
@@ -403,18 +403,15 @@ fun ProgressCircle(date: LocalDate, progress: Float, steps: Int) {
 @Composable
 private fun InvitesList(groupViewModel: GroupViewModel) {
     val invites by groupViewModel.receivedInvites.collectAsStateWithLifecycle()
-
+    Log.e("TAG", invites.size.toString())
     if (invites.isEmpty()) {
         return
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(invites.toList()) { it ->
+        items(invites.toList()) {
             InviteCard(from = it, groupViewModel = groupViewModel)
         }
-    }
-    for (from in invites) {
-        InviteCard(from = from, groupViewModel = groupViewModel)
     }
 }
 
@@ -423,6 +420,7 @@ private fun InviteCard(from: String, groupViewModel: GroupViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentHeight()
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
