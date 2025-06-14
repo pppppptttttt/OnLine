@@ -19,18 +19,18 @@ class StatisticsRepository(
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    suspend fun getTodayStats(): MutableMap<Stats, MutableStateFlow<Double>> {
-        val result: MutableMap<Stats, MutableStateFlow<Double>> = mutableMapOf()
+    suspend fun getTodayStats(): MutableMap<Stats, Double> {
+        val result: MutableMap<Stats, Double> = mutableMapOf()
         val date = LocalDate.now()
         Stats.entries.forEach {
-            result[it] = MutableStateFlow(0.0)
+            result[it] = 0.0
             when (val getRes = getStatistics(it, date, date)) {
                 is StatisticsResult.SuccessGet -> {
-                    result[it]!!.value = getRes.statistics[0].value
+                    result[it] = getRes.statistics[0].value
                 }
                 is StatisticsResult.SuccessPost -> {}
                 is StatisticsResult.Failure -> {
-                    result[it]!!.value = 0.0
+                    result[it] = 0.0
                 }
             }
         }

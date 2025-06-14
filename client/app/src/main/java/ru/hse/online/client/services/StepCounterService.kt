@@ -209,9 +209,11 @@ class StepCounterService : Service(), SensorEventListener {
                 }
             }
         }
-//        CoroutineScope(Dispatchers.IO).launch {
-//            _stats = statisticsRepository.getTodayStats()
-//        }
+        CoroutineScope(Dispatchers.IO).launch {
+            statisticsRepository.getTodayStats().forEach { entry ->
+                _stats[entry.key]?.value = entry.value
+            }
+        }
     }
 
     private fun startForeground() {
