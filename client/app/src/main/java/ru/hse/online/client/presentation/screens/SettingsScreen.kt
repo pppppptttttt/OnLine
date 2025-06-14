@@ -9,87 +9,86 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.viewModels.SettingsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(onBack: () -> Unit) {
     val viewModel: SettingsViewModel = koinViewModel<SettingsViewModel>()
     val userName by viewModel.userName.collectAsState(initial = "")
     val userEmail by viewModel.userEmail.collectAsState(initial = "")
     val userDailyGoal by viewModel.dailyStepGoal.collectAsState(initial = "")
 
-    var selectedUnitsIndex by remember { mutableIntStateOf(0) }
-    //val units = listOf("Metric system", "Burgers per eagle")
-
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxHeight(),
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        for (field in arrayOf(
-            Pair(userName, "Nickname") to viewModel::saveUserName,
-            Pair(userEmail, "Email") to viewModel::saveUserEmail,
-            Pair(userDailyGoal.toString(), "Daily goal") to viewModel::saveDailyStepGoal
-        )) {
-            OutlinedTextField(
-                value = field.first.first,
-                onValueChange = { field.second(it) },
-                label = { Text(field.first.second) },
-                modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text ("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
-
-
-//        SingleChoiceSegmentedButtonRow {
-//            units.forEachIndexed { index, label ->
-//                SegmentedButton(
-//                    shape = SegmentedButtonDefaults.itemShape(
-//                        index = index,
-//                        count = units.size
-//                    ),
-//                    onClick = { selectedUnitsIndex = index },
-//                    selected = index == selectedUnitsIndex,
-//                    label = { Text(label) }
-//                )
-//            }
-//        }
-//        Spacer(modifier = Modifier.height(16.dp))
-
-        Column(
+    ) { padding ->  Column(
             modifier = Modifier
-                .weight(1f, false)
+                .padding(padding)
+                .fillMaxHeight(),
         ) {
-            Row {
-                Button(onClick = {}) { Text("Share profile") }
+            Spacer(modifier = Modifier.height(16.dp))
+            for (field in arrayOf(
+                Pair(userName, "Nickname") to viewModel::saveUserName,
+                Pair(userEmail, "Email") to viewModel::saveUserEmail,
+                Pair(userDailyGoal.toString(), "Daily goal") to viewModel::saveDailyStepGoal
+            )) {
+                OutlinedTextField(
+                    value = field.first.first,
+                    onValueChange = { field.second(it) },
+                    label = { Text(field.first.second) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Button(
-                onClick = {},
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF900020),
-                    contentColor = Color.LightGray
-                )
+            Column(
+                modifier = Modifier
+                    .weight(1f, false)
             ) {
-                Text("Reset password")
+                Row {
+                    Button(onClick = {}) { Text("Share profile") }
+                }
+
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF900020),
+                        contentColor = Color.LightGray
+                    )
+                ) {
+                    Text("Reset password")
+                }
             }
         }
     }
