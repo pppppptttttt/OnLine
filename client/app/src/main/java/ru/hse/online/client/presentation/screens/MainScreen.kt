@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Pause
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import ru.hse.online.client.viewModels.GroupViewModel
 import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
 import java.time.LocalDate
@@ -55,14 +58,15 @@ import kotlin.math.min
 @Composable
 fun MainScreen(
     statsViewModel: StatsViewModel,
-    settingsViewModel: SettingsViewModel = koinViewModel()
+    settingsViewModel: SettingsViewModel = koinViewModel(),
+    groupViewModel: GroupViewModel = koinViewModel()
 ) {
     val stepCount by statsViewModel.totalSteps.collectAsStateWithLifecycle(0)
     val calories by statsViewModel.totalCalories.collectAsStateWithLifecycle(0.0)
     val distance by statsViewModel.totalDistance.collectAsStateWithLifecycle(0.0)
     val time by statsViewModel.totalTime.collectAsStateWithLifecycle(0L)
     val dailyStepGoal by settingsViewModel.dailyStepGoal.collectAsState(initial = 6000)
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -114,6 +118,8 @@ fun MainScreen(
                 statsViewModel,
                 dailyStepGoal = dailyStepGoal
             )
+
+            InvitesList(groupViewModel = groupViewModel)
         }
     }
 }
@@ -387,6 +393,60 @@ fun ProgressCircle(date: LocalDate, progress: Float, steps: Int) {
             fontSize = 10.sp,
             modifier = Modifier.padding(top = 4.dp)
         )
+    }
+}
+
+@Composable
+private fun InvitesList(groupViewModel: GroupViewModel) {
+    if (groupViewModel.receivedInvites.isEmpty()) {
+        return
+    }
+
+    for (from in groupViewModel.receivedInvites) {
+        InviteCard(from = from, groupViewModel = groupViewModel)
+    }
+}
+
+@Composable
+private fun InviteCard(from: String, groupViewModel: GroupViewModel) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = from,
+                style = MaterialTheme.typography.titleMedium
+            )
+            IconButton(
+                onClick = {
+                    groupViewModel.receivedInvites = groupViewModel.receivedInvites.minus(from)
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Reject invite"
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    groupViewModel.joinGroup(from)
+                },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Join group by invite"
+                )
+            }
+        }
     }
 }
 

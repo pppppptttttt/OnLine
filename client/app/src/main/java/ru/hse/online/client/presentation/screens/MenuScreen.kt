@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import ru.hse.online.client.viewModels.GroupViewModel
+import ru.hse.online.client.viewModels.UserViewModel
 
 sealed class AppPage(val title: String, val route: String, val icon: ImageVector) {
     data object Profile : AppPage("Profile", "menu/profile", Icons.Default.Person)

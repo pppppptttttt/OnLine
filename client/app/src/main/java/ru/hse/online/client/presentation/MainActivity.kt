@@ -91,6 +91,7 @@ fun NavigationComponent() {
     val locationViewModel: LocationViewModel = koinViewModel()
     val statsViewModel: StatsViewModel = koinViewModel()
     val userViewModel: UserViewModel = koinViewModel()
+    val groupViewModel: GroupViewModel = koinViewModel()
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -116,7 +117,7 @@ fun NavigationComponent() {
                 )
             }
             composable(AppPage.Profile.route) { ProfileScreen(onBack = { navController.popBackStack() }) }
-            composable(AppPage.Friends.route) { FriendsScreen(userViewModel, navController) }
+            composable(AppPage.Friends.route) { FriendsScreen(userViewModel, navController, groupViewModel) }
             composable(AppPage.Leaderboard.route) { LeaderBoardScreen(onBack = { navController.popBackStack() }) }
             composable(AppPage.Statistics.route) { StatisticsScreen(onBack = { navController.popBackStack() }) }
             composable(AppPage.Settings.route) { SettingsScreen(onBack = { navController.popBackStack() }) }

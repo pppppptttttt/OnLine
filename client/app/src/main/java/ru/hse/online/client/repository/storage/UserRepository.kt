@@ -1,5 +1,6 @@
 package ru.hse.online.client.repository.storage
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ class UserRepository(
     private val statisticsRepository: StatisticsRepository,
     private val statsViewModel: StatsViewModel
 ) {
-    private val _friends = MutableStateFlow<List<Friend>>(emptyList())
+    private val _friends = MutableStateFlow<List<Friend>>(listOf())
     val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
 
     private val _paths = MutableStateFlow<List<PathResponse>>(emptyList())
@@ -49,10 +50,13 @@ class UserRepository(
         friendshipRepository.getFriends();
     }
 
-    suspend fun addFriend(uuid: UUID) {
-        friendshipRepository.addFriend(
-            uuid
+    suspend fun addFriend(email: String) {
+        var result = friendshipRepository.addFriend(
+            email
         );
+        if (result.second != null) {
+            _friends.value += (result.second!!)
+        }
     }
 
     suspend fun deleteFriend(uuid: UUID) {

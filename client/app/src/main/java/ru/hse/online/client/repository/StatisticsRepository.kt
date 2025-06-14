@@ -26,7 +26,7 @@ class StatisticsRepository(
             result[it] = 0.0
             when (val getRes = getStatistics(it, date, date)) {
                 is StatisticsResult.SuccessGet -> {
-                    result[it] = getRes.statistics[0].value
+                    result[it] = if (getRes.statistics.isEmpty()) 0.0 else getRes.statistics[0].value
                 }
                 is StatisticsResult.SuccessPost -> {}
                 is StatisticsResult.Failure -> {
