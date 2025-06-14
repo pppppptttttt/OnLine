@@ -170,7 +170,7 @@ class GroupViewModel(
     }
 
     private fun handleUpdateLocation(fromWho: String, lat: Double, lng: Double) {
-        // TODO: anton
+        locationViewModel.updateFriendLocation(fromWho, lat, lng)
     }
 
     private fun handleInvite(fromWho: String) {
