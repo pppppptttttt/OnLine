@@ -23,20 +23,26 @@ class LocationViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
     private val TAG: String = "APP_LOCATION_VIEW_MODEL"
-    
-    private var _routePoints: MutableStateFlow<List<LatLng>> =
-        MutableStateFlow<List<LatLng>>(listOf())
+
+    private var _routePoints: MutableStateFlow<MutableList<LatLng>> =
+        MutableStateFlow(mutableListOf())
     val routePoints: StateFlow<List<LatLng>> = _routePoints.asStateFlow()
 
-    private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
+    private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0,0.0))
     val location: StateFlow<LatLng> = _locationState.asStateFlow()
 
     private val _centerCameraEvents = Channel<Unit>(Channel.BUFFERED)
     val centerCameraEvents = _centerCameraEvents.receiveAsFlow()
 
+    private val _savedPaths = MutableStateFlow<List<List<LatLng>>>(emptyList())
+    val savedPaths: StateFlow<List<List<LatLng>>> = _savedPaths.asStateFlow()
+
     private val _isOnline = MutableStateFlow(false)
     private val _isPaused = MutableStateFlow(false)
     val previewPath: StateFlow<List<LatLng>> = locationRepository.previewPath
+
+    private val _groupPaths = MutableStateFlow<MutableMap<String, MutableList<LatLng>>>(mutableMapOf())
+    val groupPaths: StateFlow<Map<String, List<LatLng>>> = _groupPaths.asStateFlow()
 
     init {
         locationRepository.locationState
@@ -49,7 +55,7 @@ class LocationViewModel(
                         }
                         _locationState.value = newPoint
                         if (_isOnline.value) {
-                            _routePoints.value += newPoint
+                            _routePoints.value.add(newPoint)
                         }
                         Log.i(TAG, "New location: $newPoint")
                     }
@@ -96,7 +102,7 @@ class LocationViewModel(
                 userRepository.savePath(description, _routePoints.value)
             }
         }
-        _routePoints.value = emptyList()
+        _routePoints.value.clear()
     }
 
     fun clearPreview() {
@@ -110,6 +116,10 @@ class LocationViewModel(
     }
 
     fun updateFriendLocation(friendEmail: String, lat: Double, lng: Double) {
-        // TODO: anton
+        val newLocation = LatLng(lat, lng)
+
+        val pathsMap = _groupPaths.value
+        val friendPath = pathsMap.getOrPut(friendEmail) { mutableListOf() }
+        friendPath.add(newLocation)
     }
 }
