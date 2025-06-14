@@ -11,13 +11,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,64 +34,81 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeaderBoardScreen(viewModel: LeaderBoardViewModel = koinViewModel()) {
+fun LeaderBoardScreen(viewModel: LeaderBoardViewModel = koinViewModel(), onBack: () -> Unit) {
     val selectedTimeFrame by viewModel.selectedTimeFrame.collectAsStateWithLifecycle()
     val leaderboardState by viewModel.leaderboardState.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            TimeFrameButton(
-                text = "Daily",
-                selected = selectedTimeFrame == LeaderBoardViewModel.TimeFrame.DAILY,
-                onClick = { viewModel.loadLeaderboard(LeaderBoardViewModel.TimeFrame.DAILY) }
-            )
-            TimeFrameButton(
-                text = "Weekly",
-                selected = selectedTimeFrame == LeaderBoardViewModel.TimeFrame.WEEKLY,
-                onClick = { viewModel.loadLeaderboard(LeaderBoardViewModel.TimeFrame.WEEKLY) }
-            )
-            TimeFrameButton(
-                text = "Monthly",
-                selected = selectedTimeFrame == LeaderBoardViewModel.TimeFrame.MONTHLY,
-                onClick = { viewModel.loadLeaderboard(LeaderBoardViewModel.TimeFrame.MONTHLY) }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Leaderboards") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             )
         }
-
-        when (val state = leaderboardState) {
-            is LeaderBoardViewModel.LeaderBoardState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-            is LeaderBoardViewModel.LeaderBoardState.Success -> {
-                LeaderBoardList(
-                    users = state.users,
-                    currentUser = currentUser,
-                    modifier = Modifier.weight(1f)
+    ) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                TimeFrameButton(
+                    text = "Daily",
+                    selected = selectedTimeFrame == LeaderBoardViewModel.TimeFrame.DAILY,
+                    onClick = { viewModel.loadLeaderboard(LeaderBoardViewModel.TimeFrame.DAILY) }
+                )
+                TimeFrameButton(
+                    text = "Weekly",
+                    selected = selectedTimeFrame == LeaderBoardViewModel.TimeFrame.WEEKLY,
+                    onClick = { viewModel.loadLeaderboard(LeaderBoardViewModel.TimeFrame.WEEKLY) }
+                )
+                TimeFrameButton(
+                    text = "Monthly",
+                    selected = selectedTimeFrame == LeaderBoardViewModel.TimeFrame.MONTHLY,
+                    onClick = { viewModel.loadLeaderboard(LeaderBoardViewModel.TimeFrame.MONTHLY) }
                 )
             }
 
-            is LeaderBoardViewModel.LeaderBoardState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("Error loading leaderboard: ${state.message}")
+            when (val state = leaderboardState) {
+                is LeaderBoardViewModel.LeaderBoardState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is LeaderBoardViewModel.LeaderBoardState.Success -> {
+                    LeaderBoardList(
+                        users = state.users,
+                        currentUser = currentUser,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                is LeaderBoardViewModel.LeaderBoardState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Error loading leaderboard: ${state.message}")
+                    }
                 }
             }
         }

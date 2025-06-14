@@ -28,11 +28,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinContext
+import ru.hse.online.client.presentation.screens.AppPage
 import ru.hse.online.client.presentation.screens.FriendProfileScreen
+import ru.hse.online.client.presentation.screens.FriendsScreen
+import ru.hse.online.client.presentation.screens.LeaderBoardScreen
 import ru.hse.online.client.presentation.screens.MapScreen
 import ru.hse.online.client.presentation.screens.MainScreen
 import ru.hse.online.client.presentation.screens.MenuScreen
 import ru.hse.online.client.presentation.screens.PermissionScreen
+import ru.hse.online.client.presentation.screens.ProfileScreen
+import ru.hse.online.client.presentation.screens.SettingsScreen
+import ru.hse.online.client.presentation.screens.StatisticsScreen
 import ru.hse.online.client.viewModels.StatsViewModel
 import ru.hse.online.client.ui.theme.ClientTheme
 import ru.hse.online.client.viewModels.GroupViewModel
@@ -46,7 +52,7 @@ sealed class Screen(
 ) {
     data object Main : Screen("main", "Main", Icons.Default.Home)
     data object Map : Screen("map", "Map", Icons.Default.Map)
-    data object Settings : Screen("settings", "Settings", Icons.Default.Settings)
+    data object Menu : Screen("menu", "More", Icons.Default.Settings)
     data object Test : Screen("test", "Test", Icons.Outlined.Science)
 }
 
@@ -56,7 +62,7 @@ fun BottomNavigationBar(navController: NavController) {
         Screen.Main,
         Screen.Map,
         Screen.Test,
-        Screen.Settings
+        Screen.Menu
     )
 
     NavigationBar {
@@ -96,7 +102,7 @@ fun NavigationComponent() {
         ) {
             composable(Screen.Main.route) { MainScreen(statsViewModel) }
             composable(Screen.Map.route) { MapScreen(statsViewModel, locationViewModel, userViewModel) }
-            composable(Screen.Settings.route) { MenuScreen(userViewModel, navController) }
+            composable(Screen.Menu.route) { MenuScreen(navController) }
             composable(Screen.Test.route) { TestScreen() }
             composable(
                 route = "friendProfile/{userId}",
@@ -109,6 +115,11 @@ fun NavigationComponent() {
                     navController = navController
                 )
             }
+            composable(AppPage.Profile.route) { ProfileScreen(onBack = { navController.popBackStack() }) }
+            composable(AppPage.Friends.route) { FriendsScreen(userViewModel, navController) }
+            composable(AppPage.Leaderboard.route) { LeaderBoardScreen(onBack = { navController.popBackStack() }) }
+            composable(AppPage.Statistics.route) { StatisticsScreen(onBack = { navController.popBackStack() }) }
+            composable(AppPage.Settings.route) { SettingsScreen(onBack = { navController.popBackStack() }) }
         }
     }
 }

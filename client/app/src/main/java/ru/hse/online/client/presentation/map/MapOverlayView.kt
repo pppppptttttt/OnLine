@@ -354,7 +354,7 @@ fun PathSavingDialog(
     onConfirmation: (String) -> Unit,
     statsViewModel: StatsViewModel
 ) {
-    val distance by statsViewModel.onlineDistance.collectAsStateWithLifecycle(0)
+    val distance by statsViewModel.onlineDistance.collectAsStateWithLifecycle(0.0)
     val time by statsViewModel.onlineTime.collectAsStateWithLifecycle(0)
     var pathDescription by remember { mutableStateOf("") }
     Dialog(onDismissRequest = { onDismissRequest() }) {

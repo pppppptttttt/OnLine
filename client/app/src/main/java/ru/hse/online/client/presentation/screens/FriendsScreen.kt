@@ -49,69 +49,87 @@ import ru.hse.online.client.presentation.Screen
 import ru.hse.online.client.repository.networking.api_data.*
 import ru.hse.online.client.viewModels.UserViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsScreen(viewModel: UserViewModel, navController: NavController) {
 
     val friends by viewModel.friends.collectAsStateWithLifecycle()
     var newFriendName by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text ("Your friends") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            )
+        }
+    ) {padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
         ) {
-            TextField(
-                value = newFriendName,
-                onValueChange = { newFriendName = it },
-                label = { Text("Friend's name") },
-                modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = newFriendName,
+                    onValueChange = { newFriendName = it },
+                    label = { Text("Friend's name") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            viewModel.addFriend(newFriendName)
+                            newFriendName = ""
+                        }
+                    )
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = {
                         viewModel.addFriend(newFriendName)
                         newFriendName = ""
-                    }
-                )
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(
-                onClick = {
-                    viewModel.addFriend(newFriendName)
-                    newFriendName = ""
-                },
-                enabled = newFriendName.isNotBlank()
-            ) {
-                Text("Add")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (friends.isEmpty()) {
-                item {
-                    Text(
-                        text = "You don't have any friends, sad",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
+                    },
+                    enabled = newFriendName.isNotBlank()
+                ) {
+                    Text("Add")
                 }
             }
 
-            items(friends) { friend ->
-                FriendCard(friend = friend, vm = viewModel, navController = navController)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (friends.isEmpty()) {
+                    item {
+                        Text(
+                            text = "You don't have any friends, sad",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+
+                items(friends) { friend ->
+                    FriendCard(friend = friend, vm = viewModel, navController = navController)
+                }
             }
         }
     }
