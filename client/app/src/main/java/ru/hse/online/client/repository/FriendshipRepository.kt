@@ -13,7 +13,7 @@ import java.util.UUID
 class FriendshipRepository(
     private val friendshipApiService: FriendshipApiService,
     private val appDataStore: AppDataStore,
-    private val user_getter: GetUserUseCase
+    private val userGetter: GetUserUseCase
 ) {
 
     suspend fun getFriends(): FriendshipResult {
@@ -35,7 +35,7 @@ class FriendshipRepository(
         val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
         val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
-            when (val friendResponse = user_getter.execute(token, friendMail, null)) {
+            when (val friendResponse = userGetter.execute(token, friendMail, null)) {
                 is UserResult.Success -> {
                     val response = friendshipApiService.addFriend("Bearer $token", userId, friendResponse.user?.userId)
                     when (response.code()) {

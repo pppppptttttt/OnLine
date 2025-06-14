@@ -37,7 +37,8 @@ val networkModule = module {
         GroupViewModel(
             dataStore = get(),
             stompClient = get(),
-            locationRepository = get()
+            locationRepository = get(),
+            locationViewModel = get()
         )
     }
 
