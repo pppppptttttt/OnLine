@@ -41,7 +41,7 @@ public class GroupController {
 
     @MessageMapping("/invite")
     public void invite(Invite invite) {
-        messagingTemplate.convertAndSendToUser(invite.toWho, "/msg", "{\"from\": \"" + invite.fromWho + "\"}");
+        messagingTemplate.convertAndSendToUser(invite.toWho, "/msg", invite.toJson());
     }
 
     @MessageMapping("/joinGroup")
@@ -59,10 +59,7 @@ public class GroupController {
         return groupManager;
     }
 
-    private record FromUsernameAndLocation(String from, Location location) {
-        public String toJson() {
-            return "{\"from\": " + "\"" + from + "\", \"lat\": " + location.lat + ", \"lng\": " + location.lng + "}";
-        }
+    private record FromUsernameAndLocation(String from, Double lat, Double lng) {
     }
 
     @MessageMapping("/updateLocation")
@@ -72,7 +69,7 @@ public class GroupController {
         Set<String> group = groupManager.getGroup(groupManager.getGroupId(usernameAndLocation.from));
         for (String to : group) {
             if (!Objects.equals(usernameAndLocation.from, to)) {
-                messagingTemplate.convertAndSendToUser(to, "/msg", usernameAndLocation.toJson());
+                messagingTemplate.convertAndSendToUser(to, "/msg", data);
             }
         }
     }

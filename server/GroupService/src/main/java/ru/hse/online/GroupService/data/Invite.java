@@ -8,4 +8,8 @@ public class Invite {
         this.fromWho = fromWho;
         this.toWho = toWho;
     }
+
+    public String toJson() {
+        return "{\"fromWho\": \"" + fromWho + "\", \"toWho\": \"" + toWho + "\"}";
+    }
 }
