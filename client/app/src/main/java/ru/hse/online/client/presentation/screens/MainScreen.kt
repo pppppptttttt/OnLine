@@ -1,26 +1,23 @@
 ﻿package ru.hse.online.client.presentation.screens
 
-import android.icu.text.SimpleDateFormat
-import android.icu.util.Calendar
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Route
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,13 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 import ru.hse.online.client.viewModels.SettingsViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
 import java.time.LocalDate
-import java.util.Locale
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,10 +68,13 @@ fun MainScreen(
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(30.dp),
+                        modifier = Modifier.fillMaxWidth().height(20.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("OnLine")
+                        Text(
+                            text = "OnLine",
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
                 },
                 colors = topAppBarColors(
@@ -134,9 +131,12 @@ fun AdditionalMetricCard(
         modifier = Modifier
             .padding(8.dp)
             .wrapContentSize()
+            .defaultMinSize(minWidth = 100.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 imageVector = icon,
@@ -214,7 +214,6 @@ fun StepsMetricCard(
                 Card(
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(16.dp)
                         .align(Alignment.CenterHorizontally),
                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White, contentColor = Color.Black)
@@ -256,20 +255,20 @@ fun MetricsGrid(
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             AdditionalMetricCard(
-                icon = Icons.Default.Add,
+                icon = Icons.Default.Route,
                 title = "km",
                 value = "%.1f".format(distance),
             )
             AdditionalMetricCard(
-                icon = Icons.Default.Info,
+                icon = Icons.Default.LocalFireDepartment,
                 title = "kcal",
                 value = "%.1f".format(calories),
             )
             AdditionalMetricCard(
-                icon = Icons.Default.Call,
+                icon = Icons.Default.AccessTime,
                 title = "time",
                 value = formatTime(time),
             )
@@ -319,12 +318,19 @@ fun DailyStepProgress(stepCount: Int, stepGoal: Int) {
 
 @Composable
 fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
-    val stepsMap by statsViewModel.prevSevenDaysStats.collectAsStateWithLifecycle()
+    val stepsMap by statsViewModel.prevSixDaysStats.collectAsStateWithLifecycle()
+    val todaySteps by statsViewModel.totalSteps.collectAsStateWithLifecycle()
     val prevDays = remember {
-        List(7) { index ->
-           LocalDate.now().minusDays(index.toLong())
+        List(6) { index ->
+           LocalDate.now().minusDays(index.toLong() + 1)
         }.reversed()
     }
+
+    var avg = todaySteps;
+    prevDays.forEach { date ->
+        avg += stepsMap[date] ?: 0
+    }
+    avg /= 7;
 
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -334,42 +340,53 @@ fun StepsProgress(statsViewModel: StatsViewModel, dailyStepGoal: Int) {
             .padding(16.dp)
     ) {
         prevDays.forEach { date ->
-            val steps = stepsMap[date] ?: 9999
+            val steps = stepsMap[date] ?: 0
             val progress = if (dailyStepGoal > 0) min(steps.toFloat() / dailyStepGoal, 1f) else 0f
-            Log.e("TAG", progress.toString())
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Text(
-                    text = date.dayOfWeek.toString().take(3),
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                Box(contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        progress = { 1f },
-                        modifier = Modifier.size(36.dp),
-                        color = Color.LightGray,
-                        strokeWidth = 3.dp,
-                        trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
-                    )
-                    CircularProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier.size(36.dp),
-                        color = Color.Green,
-                        strokeWidth = 3.dp,
-                        trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
-                    )
-                }
-
-                Text(
-                    text = steps.toString(),
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
+            ProgressCircle(date, progress, steps)
         }
+        ProgressCircle(LocalDate.now(), if (dailyStepGoal > 0) min(todaySteps.toFloat() / dailyStepGoal, 1f) else 0f , todaySteps)
+    }
+
+    Text(
+        text = "You walked $avg steps on average!",
+        fontSize = 16.sp,
+        modifier = Modifier.padding(16.dp)
+    )
+}
+
+@Composable
+fun ProgressCircle(date: LocalDate, progress: Float, steps: Int) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 4.dp)
+    ) {
+        Text(
+            text = date.dayOfWeek.toString().take(3),
+            fontSize = 12.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Box(contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(
+                progress = { 1f },
+                modifier = Modifier.size(36.dp),
+                color = Color.LightGray,
+                strokeWidth = 3.dp,
+                trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+            )
+            CircularProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.size(36.dp),
+                color = Color.Green,
+                strokeWidth = 3.dp,
+                trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
+            )
+        }
+
+        Text(
+            text = steps.toString(),
+            fontSize = 10.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
 

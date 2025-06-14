@@ -1,17 +1,18 @@
 package ru.hse.online.client.viewModels
 
-import android.icu.util.Calendar
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.StatisticsRepository
+import ru.hse.online.client.repository.networking.api_data.StatisticsResult
 import ru.hse.online.client.services.ContextProvider
 import ru.hse.online.client.services.StepCounterService
+import ru.hse.online.client.services.StepCounterService.Stats
 import ru.hse.online.client.services.StepServiceConnector
 import java.time.LocalDate
-import java.util.Date
 
 class StatsViewModel(
     private val connector: StepServiceConnector,
@@ -38,21 +39,23 @@ class StatsViewModel(
     private val _isInGroup = MutableStateFlow(false)
     val isInGroup: StateFlow<Boolean> = _isInGroup.asStateFlow()
 
-    private val _prevSevenDaysStats = MutableStateFlow<MutableMap<LocalDate, Int>>(mutableMapOf())
-    val prevSevenDaysStats: StateFlow<MutableMap<LocalDate, Int>> = _prevSevenDaysStats.asStateFlow()
+    private val _prevSixDaysStats = MutableStateFlow<MutableMap<LocalDate, Int>>(mutableMapOf())
+    val prevSixDaysStats: StateFlow<MutableMap<LocalDate, Int>> = _prevSixDaysStats.asStateFlow()
 
     init {
         connector.bind()
         StepCounterService.startService(contextProvider.getContext())
 
-        val prevDays = List(7) { index ->
-            LocalDate.now().minusDays(index.toLong())
-        }.reversed()
-
-        var value = 1;
-        for (prev in prevDays) {
-            _prevSevenDaysStats.value[prev] = 1234*value
-            value++;
+        viewModelScope.launch {
+            when (val res = statisticsRepository.getStatistics(Stats.STEPS, LocalDate.now().minusDays(6), LocalDate.now().minusDays(1))) {
+                is StatisticsResult.SuccessGet -> {
+                    res.statistics.forEach {
+                        _prevSixDaysStats.value[it.date] = it.value.toInt()
+                    }
+                }
+                is StatisticsResult.SuccessPost -> {}
+                is StatisticsResult.Failure -> {}
+            }
         }
     }
 
