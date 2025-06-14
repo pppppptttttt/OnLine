@@ -107,34 +107,33 @@ fun FriendsScreen(userViewModel: UserViewModel, navController: NavController, gr
                 ) {
                     Text("Add")
                 }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    if (friends.isEmpty()) {
-                        item {
-                            Text(
-                                text = "You don't have any friends, sad",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
-                        }
-                    }
-
-                    items(friends) { friend ->
-                        FriendCard(
-                            friend = friend,
-                            vm = userViewModel,
-                            navController = navController,
-                            groupViewModel = groupViewModel
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (friends.isEmpty()) {
+                    item {
+                        Text(
+                            text = "You don't have any friends, sad",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     }
+                }
+
+                items(friends) { friend ->
+                    FriendCard(
+                        friend = friend,
+                        vm = userViewModel,
+                        navController = navController,
+                        groupViewModel = groupViewModel
+                    )
                 }
             }
         }
