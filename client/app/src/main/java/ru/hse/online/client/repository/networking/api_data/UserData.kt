@@ -16,8 +16,14 @@ data class User(
     val username: String,
     val email: String,
     val friends: List<String> = emptyList()
-
 )
+
+fun userToFriendMap(user: User?): Friend? {
+    if (user == null) {
+        return null;
+    }
+    return Friend(userId = user.userId, username = user.username, email = user.email)
+}
 
 sealed class UserResult {
     data class Success(val user: User? = null, val code: Int) : UserResult()

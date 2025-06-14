@@ -64,7 +64,8 @@ val appModule = module {
     factory<FriendshipRepository> {
         FriendshipRepository(
             friendshipApiService = get(),
-            appDataStore = get()
+            appDataStore = get(),
+            user_getter = get()
         )
     }
 

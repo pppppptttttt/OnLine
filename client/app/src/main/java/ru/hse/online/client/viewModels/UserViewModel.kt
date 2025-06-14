@@ -26,9 +26,9 @@ class UserViewModel(
         }
     }
 
-    fun addFriend(uuid: String) {
+    fun addFriend(email: String) {
         viewModelScope.launch {
-            repository.addFriend(UUID.fromString(uuid))
+            repository.addFriend(email)
         }
     }
 

@@ -1,7 +1,6 @@
 package ru.hse.online.client.repository.networking.api_service
 
 import retrofit2.Response
-import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -22,7 +21,7 @@ interface FriendshipApiService {
     suspend fun addFriend(
         @Header("Authorization") token: String,
         @Query("userId") userId: UUID,
-        @Query("friendId") friendId: UUID
+        @Query("friendId") friendId: UUID?
     ): Response<Void>
 
     @DELETE("/data/api/v1/remove/friend/")
