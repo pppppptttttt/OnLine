@@ -88,6 +88,8 @@ class StepCounterService : Service(), SensorEventListener {
 
     private var _prevDate: LocalDate = LocalDate.now()
 
+    private var _pauseAll = MutableStateFlow(false);
+
     private fun getStatFlow(stat: Stats): MutableStateFlow<Double> {
         return _stats.getOrPut(stat) {
             MutableStateFlow(0.0)
@@ -97,6 +99,10 @@ class StepCounterService : Service(), SensorEventListener {
     private fun increaseStat(value: Double, stat: Stats) {
         val flow = _stats.getOrPut(stat) { MutableStateFlow(0.0) }
         flow.value += value
+    }
+
+    fun pauseAll() {
+        _pauseAll.value = !_pauseAll.value
     }
 
     fun goOnline() {
@@ -204,7 +210,9 @@ class StepCounterService : Service(), SensorEventListener {
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
-            _stats = statisticsRepository.getTodayStats()
+            statisticsRepository.getTodayStats().forEach { entry ->
+                _stats[entry.key]?.value = entry.value
+            }
         }
     }
 
@@ -259,7 +267,7 @@ class StepCounterService : Service(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
-            if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR) {
+            if (it.sensor.type == Sensor.TYPE_STEP_DETECTOR && !_pauseAll.value) {
                 Log.e(TAG, "Step detected, ${_stats[Stats.STEPS]?.value}")
                 increaseStat(1.0, Stats.STEPS)
                 if (isOnline) {
