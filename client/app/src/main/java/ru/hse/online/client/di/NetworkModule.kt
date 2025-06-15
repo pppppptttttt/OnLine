@@ -8,15 +8,12 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.hse.online.client.repository.FriendshipRepository
 import ru.hse.online.client.repository.networking.api_service.AuthApiService
 import ru.hse.online.client.repository.networking.api_service.PathApiService
 import ru.hse.online.client.repository.networking.api_service.StatisticsApiService
 import ru.hse.online.client.repository.networking.api_service.FriendshipApiService
-import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.networking.adapter.LocalDateAdapter
 import ru.hse.online.client.repository.networking.api_service.UserDataApiService
-import ru.hse.online.client.repository.storage.PathRepository
 import ru.hse.online.client.usecase.AuthUseCase
 import ru.hse.online.client.usecase.CreateUserUseCase
 import ru.hse.online.client.usecase.GetUserUseCase

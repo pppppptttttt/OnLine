@@ -119,7 +119,7 @@ fun NavigationComponent() {
             composable(AppPage.Profile.route) { ProfileScreen(onBack = { navController.popBackStack() }) }
             composable(AppPage.Friends.route) { FriendsScreen(userViewModel, navController, groupViewModel) }
             composable(AppPage.Leaderboard.route) { LeaderBoardScreen(onBack = { navController.popBackStack() }) }
-            composable(AppPage.Statistics.route) { StatisticsScreen(onBack = { navController.popBackStack() }) }
+            composable(AppPage.Statistics.route) { StatisticsScreen(onBack = { navController.popBackStack() }, statsViewModel) }
             composable(AppPage.Settings.route) { SettingsScreen(onBack = { navController.popBackStack() }) }
         }
     }

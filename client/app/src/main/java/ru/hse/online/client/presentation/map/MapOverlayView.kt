@@ -73,7 +73,11 @@ import ru.hse.online.client.viewModels.UserViewModel
 import java.util.UUID
 
 @Composable
-fun MapOverlayView(statsViewModel: StatsViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
+fun MapOverlayView(
+    statsViewModel: StatsViewModel,
+    locationViewModel: LocationViewModel,
+    userViewModel: UserViewModel
+) {
     var showGroupDialog by remember { mutableStateOf(false) }
     var showPathSaveDialog by remember { mutableStateOf(false) }
     val isOnline by statsViewModel.isOnline.collectAsStateWithLifecycle(false)
