@@ -3,8 +3,8 @@ package ru.hse.online.client.repository
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import ru.hse.online.client.repository.networking.api_data.LeaderBoardResponse
 import ru.hse.online.client.repository.networking.api_data.StatisticsResult
+import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserStatistics
 import ru.hse.online.client.repository.networking.api_service.StatisticsApiService
 import ru.hse.online.client.repository.storage.AppDataStore
@@ -87,7 +87,7 @@ class StatisticsRepository(
         userId: UUID,
         start: LocalDate,
         end: LocalDate
-    ): List<LeaderBoardResponse> {
+    ): List<Pair<User, Double>> {
         val token = "Bearer " + appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
         val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val response = statisticsApiService.getLeaderBoard(

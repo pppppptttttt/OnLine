@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
-import ru.hse.online.client.repository.networking.api_data.LeaderBoardResponse
+import ru.hse.online.client.repository.networking.api_data.User
 import ru.hse.online.client.repository.networking.api_data.UserStatistics
 import java.util.UUID
 
@@ -26,7 +26,7 @@ interface StatisticsApiService {
         @Query("userId") userId: UUID,
         @Query("start") start: String,
         @Query("end") end: String
-    ): Response<List<LeaderBoardResponse>>
+    ): Response<List<Pair<User, Double>>>
 
     @POST("/data/api/v1/create/statistics/")
     suspend fun addStatistics(
