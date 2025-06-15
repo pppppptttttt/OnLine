@@ -22,10 +22,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import ru.hse.online.client.repository.StatisticsRepository
 import ru.hse.online.client.repository.storage.AppDataStore
+import ru.hse.online.client.repository.storage.LocationRepository
 import java.time.LocalDateTime
 import java.time.Duration
 import java.time.LocalDate
@@ -45,6 +47,7 @@ class StepCounterService : Service(), SensorEventListener {
     private var stepSensor: Sensor? = null
     private val dataStore: AppDataStore by inject()
     private val statisticsRepository: StatisticsRepository by inject()
+    private val locationRepository: LocationRepository by inject()
 
     private var testJob: Job? = null
     private var autoSaveJob: Job? = null
@@ -89,6 +92,9 @@ class StepCounterService : Service(), SensorEventListener {
     private var _prevDate: LocalDate = LocalDate.now()
 
     private var _pauseAll = MutableStateFlow(false);
+
+    private var userWeight: Int = 0
+    private var userHeight: Int = 0
 
     private fun getStatFlow(stat: Stats): MutableStateFlow<Double> {
         return _stats.getOrPut(stat) {
@@ -138,6 +144,7 @@ class StepCounterService : Service(), SensorEventListener {
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
+        loadUserData()
         loadSavedData()
         startForeground()
         registerSensor()
@@ -165,7 +172,14 @@ class StepCounterService : Service(), SensorEventListener {
         }
     }
 
-     private suspend fun onDateUpdate() {
+    private fun loadUserData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            userWeight = dataStore.getValueFlow(AppDataStore.USER_WEIGHT, 0).first()
+            userHeight = dataStore.getValueFlow(AppDataStore.USER_HEIGHT, 0).first()
+        }
+    }
+
+    private suspend fun onDateUpdate() {
         statisticsRepository.sendStats(_stats.toMutableMap(), _prevDate)
         Stats.entries.forEach {
             _stats[it]?.value = 0.0
@@ -290,14 +304,28 @@ class StepCounterService : Service(), SensorEventListener {
 
     private fun updateDerivedMetrics() {
         val now = LocalDateTime.now()
-        increaseStat(_KKAL_PER_STEP, Stats.KCALS)
+
+        val calories = if (userWeight > 0 && userHeight > 0) {
+            // Формула: 0.035 * вес + (скорость^2 / рост) * 0.029 * вес
+            val heightMeters = userHeight / 100.0
+            val currentSpeed = locationRepository.currentSpeed.value
+            val kkalToMin = ((0.035 * userWeight) + ((currentSpeed * currentSpeed) / heightMeters) * 0.029 * userWeight)
+            val mins = Duration.between(prevActionTime, now).toMillis()/60000f
+            kkalToMin * mins
+        } else {
+            _KKAL_PER_STEP
+        }
+
+        increaseStat(calories, Stats.KCALS)
         increaseStat(_KM_PER_STEP, Stats.DISTANCE)
+
         val dur = Duration.between(prevActionTime, now).toMillis()
         if (dur in 1.._INACTIVE_INTERVAL_MILIS) {
             increaseStat(dur.toDouble(), Stats.TIME)
         }
+
         if (isOnline) {
-            _caloriesBurnedOnline.value += _KKAL_PER_STEP
+            _caloriesBurnedOnline.value += calories
             _distanceTraveledOnline.value += _KM_PER_STEP
             if (dur in 1.._INACTIVE_INTERVAL_MILIS) {
                 _timeElapsedOnline.value += dur

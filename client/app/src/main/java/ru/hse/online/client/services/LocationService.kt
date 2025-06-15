@@ -36,7 +36,7 @@ class LocationService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             locationResult.lastLocation?.let { location ->
-                repository.updateLocation(location)
+                repository.updateLocation(location, location.speed)
                 updateNotification(location)
             }
         }
@@ -60,7 +60,7 @@ class LocationService : Service() {
     private fun startLocationUpdates() {
         if (!hasPermissions()) {
             Log.i(TAG, "No permissions")
-            repository.updateLocation("Location permissions not granted")
+            repository.updateLocation("Location permissions not granted", 0f)
             stopSelf()
             return
         }
@@ -76,7 +76,7 @@ class LocationService : Service() {
                 Log.i(TAG, "Location update succeed")
                 repository.setActive()
             } catch (e: Exception) {
-                repository.updateLocation("Location updates failed: ${e.message}")
+                repository.updateLocation("Location updates failed: ${e.message}", 0f)
                 stopSelf()
             }
         }

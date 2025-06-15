@@ -22,7 +22,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "us
 class AppDataStore(
     private val context: Context
 ) {
-     companion object {
+    companion object {
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PASSWORD = stringPreferencesKey("user_password")
@@ -36,6 +36,10 @@ class AppDataStore(
         val USER_PREVIOUS_DATE = stringPreferencesKey("user_previous_date")
 
         val USER_DAILY_GOAL = intPreferencesKey("daily_step_goal")
+
+        val USER_WEIGHT = intPreferencesKey("user_weight")
+        val USER_HEIGHT = intPreferencesKey("user_height")
+        val USER_GENDER = stringPreferencesKey("user_gender")
     }
 
     suspend fun <T> saveValue(key: Preferences.Key<T>, value: T) {
