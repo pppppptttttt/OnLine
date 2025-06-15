@@ -61,4 +61,3 @@ fun calculateDynamicZoom(bounds: LatLngBounds): Float {
 
     return min(latZoom, lngZoom).toFloat()
 }
-
