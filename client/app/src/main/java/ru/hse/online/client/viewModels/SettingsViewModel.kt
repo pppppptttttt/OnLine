@@ -1,6 +1,5 @@
 package ru.hse.online.client.viewModels
 
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -24,7 +23,22 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
         AppDataStore.USER_TOKEN,
         defaultValue = ""
     )
+
     val userId = dataStore.getUserIdFlow()
+
+    val userWeight = dataStore.getValueFlow(
+        AppDataStore.USER_WEIGHT,
+        defaultValue = 0
+    )
+    val userHeight = dataStore.getValueFlow(
+        AppDataStore.USER_HEIGHT,
+        defaultValue = 0
+    )
+    val userGender = dataStore.getValueFlow(
+        AppDataStore.USER_GENDER,
+        defaultValue = ""
+    )
+
     val dailyStepGoal = dataStore.getValueFlow(
         AppDataStore.USER_DAILY_GOAL,
         defaultValue = 6000
@@ -35,7 +49,6 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
             dataStore.saveValue(AppDataStore.USER_NAME, name)
         }
     }
-
 
     fun saveUserEmail(email: String) {
         viewModelScope.launch {
@@ -62,10 +75,29 @@ class SettingsViewModel(private val dataStore: AppDataStore) : ViewModel() {
     }
 
     fun saveDailyStepGoal(steps: String) {
-        if (steps.isNotBlank() && steps.isDigitsOnly()) {
-            viewModelScope.launch {
-                dataStore.saveValue(AppDataStore.USER_DAILY_GOAL, steps.toInt())
-            }
+        viewModelScope.launch {
+            val value = steps.toIntOrNull() ?: 0
+            dataStore.saveValue(AppDataStore.USER_DAILY_GOAL, value)
+        }
+    }
+
+    fun saveUserWeight(weight: String) {
+        viewModelScope.launch {
+            val value = weight.toIntOrNull() ?: 0
+            dataStore.saveValue(AppDataStore.USER_WEIGHT, value)
+        }
+    }
+
+    fun saveUserHeight(height: String) {
+        viewModelScope.launch {
+            val value = height.toIntOrNull() ?: 0
+            dataStore.saveValue(AppDataStore.USER_HEIGHT, value)
+        }
+    }
+
+    fun saveUserGender(gender: String) {
+        viewModelScope.launch {
+            dataStore.saveValue(AppDataStore.USER_GENDER, gender)
         }
     }
 }

@@ -19,16 +19,22 @@ class LocationRepository {
         MutableStateFlow<List<LatLng>>(listOf())
     val previewPath: StateFlow<List<LatLng>> = _previewPath.asStateFlow()
 
-    fun updateLocation(newLocation: Location) {
+    private val _currentSpeed = MutableStateFlow(0f)
+    val currentSpeed: StateFlow<Float> = _currentSpeed.asStateFlow()
+
+    fun updateLocation(newLocation: Location, speed: Float) {
         if (_location != null && _location?.distanceTo(newLocation)!! <= MIN_DISTANCE_CHANGE_METERS) {
             return;
         }
         _locationState.value = LocationState.Available(newLocation)
         _location = newLocation
+        _currentSpeed.value = speed
     }
 
-    fun updateLocation(error: String) {
+
+    fun updateLocation(error: String, speed: Float) {
         _locationState.value = LocationState.Error(error)
+        _currentSpeed.value = speed
     }
 
     fun setActive() {
