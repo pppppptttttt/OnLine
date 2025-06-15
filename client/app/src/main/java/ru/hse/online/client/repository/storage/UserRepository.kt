@@ -143,10 +143,10 @@ class UserRepository(
 
         return res.map { userStat ->
             LeaderBoardViewModel.LeaderBoardUser(
-                id = userStat.user.userId.toString(),
-                email = userStat.user.email,
-                username = userStat.user.username,
-                steps = userStat.steps.toInt()
+                id = userStat.first.userId.toString(),
+                email = userStat.first.email,
+                username = userStat.first.username,
+                steps = userStat.second.toInt()
             )
         }
     }
