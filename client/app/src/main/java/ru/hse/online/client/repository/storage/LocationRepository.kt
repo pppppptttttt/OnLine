@@ -31,7 +31,6 @@ class LocationRepository {
         _currentSpeed.value = speed
     }
 
-
     fun updateLocation(error: String, speed: Float) {
         _locationState.value = LocationState.Error(error)
         _currentSpeed.value = speed

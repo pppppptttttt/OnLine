@@ -35,7 +35,8 @@ val networkModule = module {
             dataStore = get(),
             stompClient = get(),
             locationRepository = get(),
-            locationViewModel = get()
+            locationViewModel = get(),
+            userViewModel = get()
         )
     }
 

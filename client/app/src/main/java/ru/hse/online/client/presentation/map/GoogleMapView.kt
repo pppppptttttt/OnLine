@@ -32,15 +32,15 @@ fun GoogleMapView(viewModel: LocationViewModel) {
     val centerCameraEvents = viewModel.centerCameraEvents
     val cameraPositionState = rememberCameraPositionState()
     var isFirstAppearance by remember { mutableStateOf(true) }
+    val groupPaths by viewModel.groupPaths.collectAsState()
 
-    val savedPaths by viewModel.savedPaths.collectAsState()
     val markers = remember { mutableStateListOf<LatLng>() }
 
     val currentMarkerState = rememberMarkerState()
 
     LaunchedEffect(currentLocation) {
         if (isFirstAppearance) {
-            if (previewPath.isEmpty() && routePoints.isEmpty() && savedPaths.isEmpty()) {
+            if (previewPath.isEmpty()) {
                 currentLocation.let { location ->
                     cameraPositionState.animate(
                         CameraUpdateFactory.newLatLngZoom(
@@ -52,7 +52,7 @@ fun GoogleMapView(viewModel: LocationViewModel) {
             } else {
                 cameraPositionState.animate(
                     calculateCameraUpdate(
-                        previewPath + routePoints + savedPaths.flatten()
+                        previewPath
                     )
                 )
             }
@@ -100,12 +100,14 @@ fun GoogleMapView(viewModel: LocationViewModel) {
             width = 15f
         )
 
-        savedPaths.forEach { path ->
-            Polyline(
-                points = path,
-                color = Color(0xFF4CAF50), // Зеленый цвет
-                width = 12f
-            )
+        groupPaths.forEach { (friend, path) ->
+            if (path.isNotEmpty()) {
+                Polyline(
+                    points = path,
+                    color = friend.color,
+                    width = 12f
+                )
+            }
         }
 
         Marker(
