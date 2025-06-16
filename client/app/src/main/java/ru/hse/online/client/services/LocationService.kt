@@ -36,8 +36,10 @@ class LocationService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             locationResult.lastLocation?.let { location ->
-                repository.updateLocation(location, location.speed)
-                updateNotification(location)
+                if (location.accuracy < 23) {
+                    repository.updateLocation(location, location.speed)
+                    updateNotification(location)
+                }
             }
         }
     }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.LocationRepository
 import ua.naiksoftware.stomp.dto.LifecycleEvent
@@ -27,7 +28,8 @@ class GroupViewModel(
     private val dataStore: AppDataStore,
     private val stompClient: StompClient,
     private val locationRepository: LocationRepository,
-    private val locationViewModel: LocationViewModel
+    private val locationViewModel: LocationViewModel,
+    private val userViewModel: UserViewModel
 ) : ViewModel() {
 
     companion object {
@@ -171,7 +173,12 @@ class GroupViewModel(
     }
 
     private fun handleUpdateLocation(fromWho: String, lat: Double, lng: Double) {
-        locationViewModel.updateFriendLocation(fromWho, lat, lng)
+        val friend = userViewModel.friends.value.find({ friend ->
+            friend.email == fromWho
+        })
+        if (friend != null) {
+            locationViewModel.updateFriendLocation(friend, lat, lng)
+        }
     }
 
     fun receiveInvite(fromWho: String) {

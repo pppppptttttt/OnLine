@@ -17,7 +17,6 @@ class UserViewModel(
     val friends: StateFlow<List<Friend>> = repository.friends
     val friendPublicPaths: StateFlow<List<PathResponse>> = repository.friendPublicPaths
     val friendProfile: StateFlow<Friend?> = repository.friendProfile
-    val group: StateFlow<Map<UUID, Friend>> = repository.group
 
     init {
         viewModelScope.launch {
