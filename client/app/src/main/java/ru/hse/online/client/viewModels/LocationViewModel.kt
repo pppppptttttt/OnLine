@@ -39,8 +39,6 @@ class LocationViewModel(
     private val _isOnline = MutableStateFlow(false)
     private val _isPaused = MutableStateFlow(false)
     val previewPath: StateFlow<List<LatLng>> = locationRepository.previewPath
-    private val _groupPaths = MutableStateFlow<Map<Friend, List<LatLng>>>(mutableMapOf())
-    val groupPaths: StateFlow<Map<Friend, List<LatLng>>> = _groupPaths.asStateFlow()
 
     private class KalmanFilter(
         private val processNoise: Double = 1e-5,
@@ -155,14 +153,5 @@ class LocationViewModel(
         viewModelScope.launch {
             _centerCameraEvents.send(Unit)
         }
-    }
-
-    fun updateFriendLocation(friend: Friend, lat: Double, lng: Double) {
-        val newLocation = LatLng(lat, lng)
-        val currentPaths = _groupPaths.value.toMutableMap()
-
-        val currentFriendPath = currentPaths.getOrDefault(friend, emptyList()) + newLocation
-        currentPaths[friend] = currentFriendPath
-        _groupPaths.value = currentPaths
     }
 }

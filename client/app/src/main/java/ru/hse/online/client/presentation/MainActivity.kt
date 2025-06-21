@@ -104,7 +104,7 @@ fun NavigationComponent() {
             modifier = Modifier.padding(padding)
         ) {
             composable(Screen.Main.route) { MainScreen(statsViewModel, settingsViewModel, groupViewModel) }
-            composable(Screen.Map.route) { MapScreen(statsViewModel, locationViewModel, userViewModel) }
+            composable(Screen.Map.route) { MapScreen(statsViewModel, locationViewModel, groupViewModel) }
             composable(Screen.Menu.route) { MenuScreen(navController) }
             composable(Screen.Test.route) { TestScreen(groupViewModel) }
             composable(
