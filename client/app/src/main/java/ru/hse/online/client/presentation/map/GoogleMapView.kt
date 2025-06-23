@@ -1,5 +1,6 @@
 package ru.hse.online.client.presentation.map
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,20 +20,22 @@ import com.google.android.gms.maps.model.MapColorScheme
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import ru.hse.online.client.viewModels.GroupViewModel
 import ru.hse.online.client.viewModels.LocationViewModel
 
 @Composable
-fun GoogleMapView(viewModel: LocationViewModel) {
+fun GoogleMapView(viewModel: LocationViewModel, groupViewModel: GroupViewModel) {
     val routePoints by viewModel.routePoints.collectAsState()
     val previewPath by viewModel.previewPath.collectAsState()
     val currentLocation by viewModel.location.collectAsState()
     val centerCameraEvents = viewModel.centerCameraEvents
     val cameraPositionState = rememberCameraPositionState()
     var isFirstAppearance by remember { mutableStateOf(true) }
-    val groupPaths by viewModel.groupPaths.collectAsState()
+    val groupPaths by groupViewModel.groupPaths.collectAsState()
 
     val markers = remember { mutableStateListOf<LatLng>() }
 
@@ -100,12 +103,19 @@ fun GoogleMapView(viewModel: LocationViewModel) {
             width = 15f
         )
 
+        Log.i("TAGA", "GoogleMapView $groupPaths")
         groupPaths.forEach { (friend, path) ->
             if (path.isNotEmpty()) {
                 Polyline(
                     points = path,
-                    color = friend.color,
-                    width = 12f
+                    color = Color.Green,
+                    width = 20f
+                )
+                Marker(
+                    state = MarkerState(path.last()),
+                    icon = BitmapDescriptorFactory.defaultMarker(
+                        BitmapDescriptorFactory.HUE_AZURE
+                    )
                 )
             }
         }

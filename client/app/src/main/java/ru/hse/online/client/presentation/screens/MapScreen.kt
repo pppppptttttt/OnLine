@@ -8,12 +8,12 @@ import ru.hse.online.client.presentation.map.GoogleMapView
 import ru.hse.online.client.presentation.map.MapOverlayView
 import ru.hse.online.client.viewModels.LocationViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
-import ru.hse.online.client.viewModels.UserViewModel
+import ru.hse.online.client.viewModels.GroupViewModel
 
 @Composable
-fun MapScreen(statsViewModel: StatsViewModel, locationViewModel: LocationViewModel, userViewModel: UserViewModel) {
+fun MapScreen(statsViewModel: StatsViewModel, locationViewModel: LocationViewModel, groupViewModel: GroupViewModel) {
     Surface(modifier = Modifier.fillMaxSize()) {
-        GoogleMapView(locationViewModel)
-        MapOverlayView(statsViewModel, locationViewModel, userViewModel)
+        GoogleMapView(locationViewModel, groupViewModel)
+        MapOverlayView(statsViewModel, locationViewModel, groupViewModel)
     }
 }

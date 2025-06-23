@@ -109,4 +109,13 @@ val appModule = module {
             authView = activity
         )
     }
+
+    viewModel<GroupViewModel> {
+        GroupViewModel(
+            dataStore = get(),
+            stompClient = get(),
+            locationRepository = get(),
+            userViewModel = get()
+        )
+    }
 }

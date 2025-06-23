@@ -30,16 +30,6 @@ val networkModule = module {
 
     single { provideStompClient() }
 
-    viewModel<GroupViewModel> {
-        GroupViewModel(
-            dataStore = get(),
-            stompClient = get(),
-            locationRepository = get(),
-            locationViewModel = get(),
-            userViewModel = get()
-        )
-    }
-
     single<AuthApiService> { provideAuthService(get()) }
     single<UserDataApiService> { provideUserDataService(get()) }
     single<PathApiService> { providePathApiService(get()) }
