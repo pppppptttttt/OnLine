@@ -62,7 +62,7 @@ fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         Screen.Main,
         Screen.Map,
-        Screen.Test,
+//        Screen.Test,
         Screen.Menu
     )
 
