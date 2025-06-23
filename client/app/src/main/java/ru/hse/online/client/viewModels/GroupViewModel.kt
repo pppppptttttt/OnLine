@@ -47,8 +47,14 @@ class GroupViewModel(
     private var _receivedInvites: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet());
     var receivedInvites: StateFlow<Set<String>> = _receivedInvites.asStateFlow()
 
+    private val _groupId = MutableStateFlow(-1L)
+    val groupId: StateFlow<Long> = _groupId.asStateFlow()
+
+    private val compositeDisposable = CompositeDisposable()
+
     private val _groupPaths = MutableStateFlow<Map<Friend, List<LatLng>>>(mutableMapOf())
     val groupPaths: StateFlow<Map<Friend, List<LatLng>>> = _groupPaths.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -73,12 +79,10 @@ class GroupViewModel(
                     else -> {}
                 }
             }.launchIn(viewModelScope)
+
+        Log.e(TAG, "trying to connect")
+        connect()
     }
-
-    private val _groupId = MutableStateFlow(-1L)
-    val groupId: StateFlow<Long> = _groupId.asStateFlow()
-
-    private val compositeDisposable = CompositeDisposable()
 
     fun connect() {
         if (stompClient.isConnected) {
@@ -118,7 +122,7 @@ class GroupViewModel(
 
         viewModelScope.launch {
             while (true) {
-                delay(5000L)
+                delay(30000L)
                 sendLocation(location.value.latitude, location.value.longitude)
             }
         }
