@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.storage.AppDataStore
 import ru.hse.online.client.repository.storage.LocationRepository
 import ua.naiksoftware.stomp.dto.LifecycleEvent
@@ -33,10 +32,11 @@ class GroupViewModel(
 
     companion object {
         private val gson = Gson()
-        private const val TAG = "APP_GROUP_VIEWMODEL";
+        private const val TAG = "APP_GROUP_VIEWMODEL"
+        private const val DELAY_BETWEEN_LOCATION_UPDATES = 30000L
     }
 
-    private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0));
+    private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0))
     var location: StateFlow<LatLng> = _locationState.asStateFlow()
 
     private val _connectionStatus = MutableStateFlow(false)
@@ -44,7 +44,7 @@ class GroupViewModel(
 
     private lateinit var email: String
 
-    private var _receivedInvites: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet());
+    private var _receivedInvites: MutableStateFlow<Set<String>> = MutableStateFlow(emptySet())
     var receivedInvites: StateFlow<Set<String>> = _receivedInvites.asStateFlow()
 
     private val _groupId = MutableStateFlow(-1L)
@@ -122,7 +122,7 @@ class GroupViewModel(
 
         viewModelScope.launch {
             while (true) {
-                delay(30000L)
+                delay(DELAY_BETWEEN_LOCATION_UPDATES)
                 sendLocation(location.value.latitude, location.value.longitude)
             }
         }
