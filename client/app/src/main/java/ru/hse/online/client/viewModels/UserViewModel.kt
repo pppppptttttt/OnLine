@@ -17,10 +17,24 @@ class UserViewModel(
     val friends: StateFlow<List<Friend>> = repository.friends
     val friendPublicPaths: StateFlow<List<PathResponse>> = repository.friendPublicPaths
     val friendProfile: StateFlow<Friend?> = repository.friendProfile
+    val userPaths: StateFlow<List<PathResponse>> = repository.userPaths
+
+    val lifetimeSteps: StateFlow<Int> = repository.lifetimeSteps
+    val lifetimeCalories: StateFlow<Double> = repository.lifetimeCalories
+    val lifetimeDistance: StateFlow<Double> = repository.lifetimeDitance
+
+    private val _achivements: MutableStateFlow<List<Int>>(emptyList())
+    val achievements: StateFlow<List<Int>> = _achivements.asStateFlow()
 
     init {
         viewModelScope.launch {
             repository.loadFriends()
+        }
+        viewModelScope.launch {
+            repository.loadPaths()
+        }
+        viewModelScope.launch {
+            repository.loadLifeTimeStats()
         }
     }
 
@@ -36,15 +50,16 @@ class UserViewModel(
         }
     }
 
-    fun createGroup() {
-        repository.createGroup()
+    fun loadFriendProfile(userId: String) {
+
     }
 
-    fun loadFriendProfile(userId: String) {}
-    fun loadPublicPaths(userId: UUID) {}
-    fun addPathToCollection(path: PathResponse) {}
+    fun addPathToCollection(path: PathResponse) {
+        viewModelScope.launch {
+            repository.savePath(path)
+        }
+    }
     fun previewPath(path: PathResponse) {
         locationRepository.loadPreviewPath(path.polyline)
     }
-
 }
