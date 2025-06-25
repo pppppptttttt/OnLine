@@ -228,6 +228,7 @@ class GroupViewModel(
     }
 
     fun joinGroup(inviter: String) {
+        _receivedInvites.value -= inviter
         val invite = Invite(inviter, email) // inviter -> fromWho, current user -> toWho
         stompClient.send("/app/joinGroup", gson.toJson(invite))
             .subscribe()
