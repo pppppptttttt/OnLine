@@ -37,6 +37,7 @@ class LocationViewModel(
     val centerCameraEvents = _centerCameraEvents.receiveAsFlow()
 
     private val _isOnline = MutableStateFlow(false)
+    val isOnline = _isOnline.asStateFlow()
     private val _isPaused = MutableStateFlow(false)
     val previewPath: StateFlow<List<LatLng>> = locationRepository.previewPath
 
