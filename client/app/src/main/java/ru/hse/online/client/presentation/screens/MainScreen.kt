@@ -92,38 +92,44 @@ fun MainScreen(
             )
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                MetricsGrid(
-                    stepCount = stepCount,
-                    stepGoal = dailyStepGoal,
-                    calories = calories,
-                    distance = distance,
-                    time = time,
-                    onStop = {
-                        statsViewModel.pauseAll()
-                    }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    MetricsGrid(
+                        stepCount = stepCount,
+                        stepGoal = dailyStepGoal,
+                        calories = calories,
+                        distance = distance,
+                        time = time,
+                        onStop = {
+                            statsViewModel.pauseAll()
+                        }
+                    )
+                }
+
+                Spacer(
+                    modifier = Modifier.height(20.dp)
                 )
             }
 
-            Spacer(
-                modifier = Modifier.height(20.dp)
-            )
+            item {
+                StepsProgress(
+                    statsViewModel,
+                    dailyStepGoal = dailyStepGoal
+                )
+            }
 
-            StepsProgress(
-                statsViewModel,
-                dailyStepGoal = dailyStepGoal
-            )
-
-            InvitesList(groupViewModel = groupViewModel)
+            item {
+                InvitesList(groupViewModel = groupViewModel)
+            }
         }
     }
 }

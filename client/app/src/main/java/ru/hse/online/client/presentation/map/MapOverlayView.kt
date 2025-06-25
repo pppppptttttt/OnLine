@@ -247,7 +247,7 @@ fun GroupPanel(group: List<Friend>, onClose: () -> Unit) {
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .background(Color.Green, shape = CircleShape)
+                                    .background(friend.color, shape = CircleShape)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(friend.username)

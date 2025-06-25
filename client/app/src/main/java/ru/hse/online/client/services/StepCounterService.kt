@@ -159,9 +159,9 @@ class StepCounterService : Service(), SensorEventListener {
             var prev = 0.0
             while (true) {
                 delay(_SERVER_SEND_INTERVAL)
-                if (prev != _stats[Stats.STEPS].value) {
+                if (prev != _stats[Stats.STEPS]?.value) {
                     statisticsRepository.sendStats(_stats)
-                    prev = _stats[Stats.STEPS].value
+                    prev = _stats[Stats.STEPS]!!.value
                 }
             }
         }

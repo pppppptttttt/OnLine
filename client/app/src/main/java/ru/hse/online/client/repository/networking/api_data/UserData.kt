@@ -1,14 +1,23 @@
 package ru.hse.online.client.repository.networking.api_data
 import androidx.compose.ui.graphics.Color
 import java.util.UUID
+import kotlin.random.Random
 
+fun getRandomColor(): Color {
+    return Color(
+        Random.nextFloat(),
+        Random.nextFloat(),
+        Random.nextFloat(),
+        1f
+    )
+}
 
 data class Friend(
     val userId: UUID,
     val username: String,
     val email: String,
     val stats: Map<String, Double> = emptyMap(),
-    var color: Color = Color(0)
+    var color: Color = getRandomColor()
 )
 
 data class User(

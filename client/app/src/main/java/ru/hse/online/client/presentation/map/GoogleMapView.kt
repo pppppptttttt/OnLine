@@ -108,13 +108,13 @@ fun GoogleMapView(viewModel: LocationViewModel, groupViewModel: GroupViewModel) 
             if (path.isNotEmpty()) {
                 Polyline(
                     points = path,
-                    color = Color.Green,
+                    color = friend.color,
                     width = 20f
                 )
                 Marker(
                     state = MarkerState(path.last()),
                     icon = BitmapDescriptorFactory.defaultMarker(
-                        BitmapDescriptorFactory.HUE_AZURE
+                        BitmapDescriptorFactory.HUE_GREEN
                     )
                 )
             }
