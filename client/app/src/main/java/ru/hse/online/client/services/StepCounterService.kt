@@ -156,9 +156,13 @@ class StepCounterService : Service(), SensorEventListener {
             }
         }
         autoSendJob = CoroutineScope(Dispatchers.IO).launch {
+            var prev = 0.0
             while (true) {
                 delay(_SERVER_SEND_INTERVAL)
-                statisticsRepository.sendStats(_stats)
+                if (prev != _stats[Stats.STEPS].value) {
+                    statisticsRepository.sendStats(_stats)
+                    prev = _stats[Stats.STEPS].value
+                }
             }
         }
         dateUpdateJob = CoroutineScope(Dispatchers.IO).launch {
