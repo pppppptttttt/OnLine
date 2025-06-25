@@ -27,7 +27,6 @@ class GroupViewModel(
     private val dataStore: AppDataStore,
     private val stompClient: StompClient,
     private val locationRepository: LocationRepository,
-    private val locationViewModel: LocationViewModel,
     private val userViewModel: UserViewModel
 ) : ViewModel() {
 
@@ -52,6 +51,10 @@ class GroupViewModel(
     val groupId: StateFlow<Long> = _groupId.asStateFlow()
 
     private val compositeDisposable = CompositeDisposable()
+
+    private val _groupPaths = MutableStateFlow<Map<Friend, List<LatLng>>>(mutableMapOf())
+    val groupPaths: StateFlow<Map<Friend, List<LatLng>>> = _groupPaths.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -176,11 +179,18 @@ class GroupViewModel(
     }
 
     private fun handleUpdateLocation(fromWho: String, lat: Double, lng: Double) {
-        val friend = userViewModel.friends.value.find({ friend ->
+        val friend = userViewModel.friends.value.find { friend ->
             friend.email == fromWho
-        })
+        }
         if (friend != null) {
-            locationViewModel.updateFriendLocation(friend, lat, lng)
+            val newLocation = LatLng(lat, lng)
+            val currentPaths = _groupPaths.value.toMutableMap()
+
+            val currentFriendPath = currentPaths.getOrDefault(friend, emptyList()) + newLocation
+            currentPaths[friend] = currentFriendPath
+            _groupPaths.value = currentPaths
+
+            Log.i("TAGA ", "updateFriendLocation: ${_groupPaths.value}")
         }
     }
 

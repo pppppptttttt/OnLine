@@ -1,5 +1,6 @@
 package ru.hse.online.client.presentation.map
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -72,7 +73,6 @@ import ru.hse.online.client.viewModels.UserViewModel
 fun MapOverlayView(
     statsViewModel: StatsViewModel,
     locationViewModel: LocationViewModel,
-    userViewModel: UserViewModel,
     groupViewModel: GroupViewModel
 ) {
     var showPathSaveDialog by remember { mutableStateOf(false) }
@@ -80,7 +80,8 @@ fun MapOverlayView(
     val isPaused by statsViewModel.isPaused.collectAsStateWithLifecycle(false)
     val previewPath by locationViewModel.previewPath.collectAsStateWithLifecycle()
     var showGroupPanel by remember { mutableStateOf(false) }
-    val group by locationViewModel.groupPaths.collectAsState()
+    val group by groupViewModel.groupPaths.collectAsStateWithLifecycle()
+    Log.i("TAGA ", "check $group")
 
     Box(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -261,7 +262,7 @@ fun GroupPanel(group: List<Friend>, onClose: () -> Unit) {
                     }
 
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
-
+                    Log.i("TAGA ", "check foreach $group")
                     group.forEach { friend ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -270,7 +271,7 @@ fun GroupPanel(group: List<Friend>, onClose: () -> Unit) {
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .background(friend.color, shape = CircleShape)
+                                    .background(Color.Green, shape = CircleShape)
                             )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(friend.username)
