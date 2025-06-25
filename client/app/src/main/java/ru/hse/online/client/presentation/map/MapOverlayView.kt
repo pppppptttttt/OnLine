@@ -172,6 +172,7 @@ fun MapOverlayView(
                     } else {
                         statsViewModel.goOnLine()
                         locationViewModel.goOnLine()
+                        groupViewModel.isOnline = true
                     }
                 },
                 modifier = Modifier.size(56.dp),

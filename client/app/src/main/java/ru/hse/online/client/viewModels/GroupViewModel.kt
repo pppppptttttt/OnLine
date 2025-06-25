@@ -52,7 +52,7 @@ class GroupViewModel(
     private val _groupId = MutableStateFlow(-1L)
     val groupId: StateFlow<Long> = _groupId.asStateFlow()
 
-    private var isOnline = locationViewModel.isOnline
+    var isOnline = false
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -128,7 +128,9 @@ class GroupViewModel(
             while (true) {
                 delay(DELAY_BETWEEN_LOCATION_UPDATES)
                 if (shouldSendLocation(location.value)) {
+                    Log.i(TAG, "1")
                     sendLocation(location.value.latitude, location.value.longitude)
+                    Log.i(TAG, "2")
                 }
             }
         }
@@ -137,8 +139,8 @@ class GroupViewModel(
     private var prevLocation: LatLng? = null
 
     private fun shouldSendLocation(location: LatLng): Boolean {
-        Log.i(TAG, "${isOnline.value}")
-        if (!isOnline.value) {
+        Log.i(TAG, "bebra ${isOnline}")
+        if (!isOnline) {
             return false
         }
 
