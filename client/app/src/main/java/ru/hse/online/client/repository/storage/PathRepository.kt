@@ -11,9 +11,8 @@ class PathRepository(
     private val appDataStore: AppDataStore
 ) {
 
-    suspend fun getPaths(): PathResult {
+    suspend fun getPaths(userId: UUID = appDataStore.getUserIdFlow().first()): PathResult {
         val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
-        val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
             val response = pathApiService.getPaths(token, userId)
             when (response.code()) {

@@ -53,7 +53,9 @@ class UserViewModel(
     }
 
     fun loadFriendProfile(userId: String) {
-
+        viewModelScope.launch {
+            repository.loadFriendProfile(userId)
+        }
     }
 
     fun addPathToCollection(path: PathResponse) {
