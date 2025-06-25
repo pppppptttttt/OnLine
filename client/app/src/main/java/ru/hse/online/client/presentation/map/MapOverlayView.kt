@@ -126,55 +126,27 @@ fun MapOverlayView(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top = 8.dp, end = 8.dp)
-        ) {
-            Button(
-                onClick = { locationViewModel.clearPreview() },
-                modifier = Modifier.size(36.dp),
-                enabled = previewPath.isNotEmpty()
-            ) {
-                Icon(Icons.Filled.Clear, contentDescription = "Remove preview")
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 8.dp, start = 8.dp)
-        ) {
-            Button(
-                onClick = {
-                    if (group.isNotEmpty()) {
-                        showGroupPanel = true
-                    }
-                },
-                modifier = Modifier.size(36.dp),
-                enabled = group.isNotEmpty()
-            ) {
-                Icon(Icons.Filled.People, contentDescription = "Show group")
-            }
-        }
-
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.weight(1f))
+            MapControlButton(
+                icon = Icons.Filled.Clear,
+                onClick = { locationViewModel.clearPreview() },
+                modifier = Modifier.size(56.dp),
+                enabled = previewPath.isNotEmpty()
+            )
 
             MapControlButton(
                 icon = Icons.Filled.NearMe,
                 onClick = { locationViewModel.centerCamera() },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.size(56.dp),
+                enabled = true
             )
-
-            Spacer(modifier = Modifier.width(4.dp))
 
             MapControlButton(
                 icon = if (isPaused) Icons.Filled.DoubleArrow else Icons.Filled.Pause,
@@ -187,11 +159,9 @@ fun MapOverlayView(
                         locationViewModel.pauseOnline()
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.size(56.dp),
                 enabled = isOnline
             )
-
-            Spacer(modifier = Modifier.width(4.dp))
 
             MapControlButton(
                 icon = if (!isOnline) Icons.Filled.PlayArrow else Icons.Filled.Stop,
@@ -204,10 +174,16 @@ fun MapOverlayView(
                         locationViewModel.goOnLine()
                     }
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.size(56.dp),
+                enabled = true
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            MapControlButton(
+                icon = Icons.Filled.People,
+                onClick = { if (group.isNotEmpty()) showGroupPanel = true },
+                modifier = Modifier.size(56.dp),
+                enabled = group.isNotEmpty()
+            )
         }
     }
 
@@ -293,12 +269,15 @@ fun MapControlButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
-            .aspectRatio(1f)
-            .padding(4.dp),
-        enabled = enabled
+        modifier = modifier,
+        enabled = enabled,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
     ) {
-        Icon(icon, contentDescription = null)
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
 
