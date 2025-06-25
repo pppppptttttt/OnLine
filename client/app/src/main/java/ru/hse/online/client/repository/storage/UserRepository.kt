@@ -49,6 +49,20 @@ class UserRepository(
     private val _lifetimeDistance = MutableStateFlow<Double>(0.0)
     val lifetimeDistance: StateFlow<Double> = _lifetimeDistance.asStateFlow()
 
+    suspend fun loadFriendProfile(userId: String) {
+        _friends.forEach {
+            if (it.userId.toString() == userId) {
+                _friendProfile = it
+                when (val result = pathRepository.getPaths(it.userId)) {
+                    is PathResult.Success -> {
+                         _friendPublicPaths.value = result.paths!!
+                    }
+                    is PathResult.Failure -> {}
+                }
+            }
+        }
+    }
+
     suspend fun loadLifeTimeStats() {
         val result = statisticsRepository.getLifeTime()
         _lifetimeSteps.value = result[StepCounterService.Stats.STEPS]!!.toInt()
