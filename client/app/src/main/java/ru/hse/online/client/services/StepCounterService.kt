@@ -302,8 +302,17 @@ class StepCounterService : Service(), SensorEventListener {
         sensorManager.unregisterListener(this)
     }
 
+    private var _prev = LocalDateTime.now()
+    private val _DERIVED_METRICS_PENALTY = 5000
+
     private fun updateDerivedMetrics() {
         val now = LocalDateTime.now()
+        if (Duration.between(now, _prev).toMillis() > _DERIVED_METRICS_PENALTY) {
+            _prev = LocalDateTime.now()
+            return
+        }
+
+        _prev = LocalDateTime.now()
 
         val calories = if (userWeight > 0 && userHeight > 0) {
             // Формула: 0.035 * вес + (скорость^2 / рост) * 0.029 * вес

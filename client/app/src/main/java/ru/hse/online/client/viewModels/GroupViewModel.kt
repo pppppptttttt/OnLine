@@ -1,5 +1,6 @@
 package ru.hse.online.client.viewModels
 
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,7 +35,7 @@ class GroupViewModel(
     companion object {
         private val gson = Gson()
         private const val TAG = "APP_GROUP_VIEWMODEL"
-        private const val DELAY_BETWEEN_LOCATION_UPDATES = 30000L
+        private const val DELAY_BETWEEN_LOCATION_UPDATES = 15000L
     }
 
     private var _locationState: MutableStateFlow<LatLng> = MutableStateFlow<LatLng>(LatLng(0.0,0.0))
@@ -50,6 +51,8 @@ class GroupViewModel(
 
     private val _groupId = MutableStateFlow(-1L)
     val groupId: StateFlow<Long> = _groupId.asStateFlow()
+
+    private var isOnline = locationViewModel.isOnline
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -120,9 +123,41 @@ class GroupViewModel(
         viewModelScope.launch {
             while (true) {
                 delay(DELAY_BETWEEN_LOCATION_UPDATES)
-                sendLocation(location.value.latitude, location.value.longitude)
+                if (shouldSendLocation(location.value)) {
+                    sendLocation(location.value.latitude, location.value.longitude)
+                }
             }
         }
+    }
+
+    private var prevLocation: LatLng? = null
+
+    private fun shouldSendLocation(location: LatLng): Boolean {
+        Log.i(TAG, "${isOnline.value}")
+        if (!isOnline.value) {
+            return false
+        }
+
+        if (location.latitude == 0.0 && location.longitude == 0.0) {
+            return false
+        }
+
+        if (prevLocation != null) {
+            // somehow, this is necessary
+            val result = FloatArray(1)
+            val la1 = prevLocation!!.latitude
+            val lo1 = prevLocation!!.longitude
+            val la2 = location.latitude
+            val lo2 = location.longitude
+            Location.distanceBetween(la1, lo1, la2, lo2, result)
+            if (result[0] < 5) {
+                Log.i(TAG, "${result[0]}")
+                return false
+            }
+        }
+
+        prevLocation = location
+        return true
     }
 
     private fun subscribeToTopics() {
