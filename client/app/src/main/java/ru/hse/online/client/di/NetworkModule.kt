@@ -51,7 +51,7 @@ val networkModule = module {
     factory<AuthUseCase> { AuthUseCase(get()) }
 }
 
-private fun provideBaseUrl(): String = "http://51.250.111.207:80"
+private fun provideBaseUrl(): String = "http://84.201.153.135:80"
 
 private fun provideOkHttpClient(): OkHttpClient {
     val loggingInterceptor = HttpLoggingInterceptor().apply {

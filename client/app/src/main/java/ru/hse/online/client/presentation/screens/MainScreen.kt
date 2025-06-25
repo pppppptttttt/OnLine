@@ -76,7 +76,7 @@ fun MainScreen(
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(20.dp),
+                        modifier = Modifier.fillMaxWidth().height(25.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
