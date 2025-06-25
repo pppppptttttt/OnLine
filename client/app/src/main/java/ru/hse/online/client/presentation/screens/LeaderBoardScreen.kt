@@ -40,6 +40,8 @@ fun LeaderBoardScreen(viewModel: LeaderBoardViewModel = koinViewModel(), onBack:
     val selectedTimeFrame by viewModel.selectedTimeFrame.collectAsStateWithLifecycle()
     val leaderboardState by viewModel.leaderboardState.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
+
+    viewModel.loadLeaderboard(selectedTimeFrame)
     Scaffold(
         topBar = {
             TopAppBar(

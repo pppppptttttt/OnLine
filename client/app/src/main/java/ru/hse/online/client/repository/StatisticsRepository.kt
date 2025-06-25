@@ -39,16 +39,19 @@ class StatisticsRepository(
     }
 
     suspend fun getLifeTime(): Map<Stats, Double> {
-        val res = mutableMapOf()
+        val res:MutableMap<Stats, Double> = mutableMapOf()
         Stats.entries.forEach {
             if (it != Stats.TIME) {
-                when (val result = getStatistics(it, LocalDate.ofEpochDay(0), LocalDate.ofEpochDay(0)) {
+                when (val result = getStatistics(it, LocalDate.ofEpochDay(0), LocalDate.ofEpochDay(0))) {
                     is StatisticsResult.SuccessGet -> {
-                        res[it] = result.statistics.first().value
+                        if (result.statistics.isNotEmpty()) {
+                            res[it] = result.statistics.first().value
+                        }
+                        else res[it] = 0.0
                     }
                     is StatisticsResult.Failure -> {}
                     is StatisticsResult.SuccessPost -> {}
-                })
+                }
             }
         }
         return res;

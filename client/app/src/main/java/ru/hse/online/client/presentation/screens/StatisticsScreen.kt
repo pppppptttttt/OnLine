@@ -193,8 +193,8 @@ fun WeekBarChart(data: Map<LocalDate, Double>, stat: Stats, dailyStepsGoal: Int)
                     )
 
                     Text(
-                        text = date.dayOfMonth.toString() + " " + date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                        fontSize = 14.sp,
+                        text = date.dayOfMonth.toString() + "/" + date.monthValue.toString(),
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }

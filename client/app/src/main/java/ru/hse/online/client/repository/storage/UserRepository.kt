@@ -15,6 +15,7 @@ import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
 import ru.hse.online.client.repository.networking.api_data.PathResult
 import ru.hse.online.client.repository.networking.api_data.userToFriendMap
+import ru.hse.online.client.services.StepCounterService
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
 import java.time.LocalDate
@@ -39,20 +40,20 @@ class UserRepository(
     private val _friendProfile = MutableStateFlow<Friend?>(null)
     val friendProfile: StateFlow<Friend?> = _friendProfile.asStateFlow()
 
-    private val _lifetimeSteps = MutableStateFlow<Int>()
+    private val _lifetimeSteps = MutableStateFlow<Int>(0)
     val lifetimeSteps: StateFlow<Int> = _lifetimeSteps.asStateFlow()
 
-    private val _lifetimeCalories = MutableStateFlow<Double>()
+    private val _lifetimeCalories = MutableStateFlow<Double>(0.0)
     val lifetimeCalories: StateFlow<Double> = _lifetimeCalories.asStateFlow()
 
-    private val _lifetimeDistance = MutableStateFlow<Double>()
+    private val _lifetimeDistance = MutableStateFlow<Double>(0.0)
     val lifetimeDistance: StateFlow<Double> = _lifetimeDistance.asStateFlow()
 
     suspend fun loadLifeTimeStats() {
         val result = statisticsRepository.getLifeTime()
-        _lifetimeSteps = result[Stats.STEPS].toInt()
-        _lifetimeDistance = result[Stats.DISTANCE]
-        _lifetimeCalories = result[Stats.KCALS]
+        _lifetimeSteps.value = result[StepCounterService.Stats.STEPS]!!.toInt()
+        _lifetimeDistance.value = result[StepCounterService.Stats.DISTANCE]!!
+        _lifetimeCalories.value = result[StepCounterService.Stats.KCALS]!!
     }
 
     suspend fun loadFriends() {
@@ -71,7 +72,7 @@ class UserRepository(
     suspend fun loadPaths() {
         when (val result = pathRepository.getPaths()) {
             is PathResult.Success -> {
-                _paths.value = result.paths
+                _paths.value = result.paths!!
             }
             is PathResult.Failure -> {}
         }
@@ -98,7 +99,7 @@ class UserRepository(
             userId = appDataStore.getUserIdFlow().first(),
             polyline = path.polyline,
             created = path.created,
-            name = path.description,
+            name = path.name,
             distance = path.distance,
             duration = path.duration
         )
