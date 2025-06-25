@@ -2,7 +2,9 @@ package ru.hse.online.client.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.hse.online.client.repository.networking.api_data.Friend
 import ru.hse.online.client.repository.networking.api_data.PathResponse
@@ -17,10 +19,24 @@ class UserViewModel(
     val friends: StateFlow<List<Friend>> = repository.friends
     val friendPublicPaths: StateFlow<List<PathResponse>> = repository.friendPublicPaths
     val friendProfile: StateFlow<Friend?> = repository.friendProfile
+    val userPaths: StateFlow<List<PathResponse>> = repository.paths
+
+    val lifetimeSteps: StateFlow<Int> = repository.lifetimeSteps
+    val lifetimeCalories: StateFlow<Double> = repository.lifetimeCalories
+    val lifetimeDistance: StateFlow<Double> = repository.lifetimeDistance
+
+    private val _achievements = MutableStateFlow<List<Int>>(emptyList())
+    val achievements: StateFlow<List<Int>> = _achievements.asStateFlow()
 
     init {
         viewModelScope.launch {
             repository.loadFriends()
+        }
+        viewModelScope.launch {
+            repository.loadPaths()
+        }
+        viewModelScope.launch {
+            repository.loadLifeTimeStats()
         }
     }
 
@@ -36,15 +52,16 @@ class UserViewModel(
         }
     }
 
-    fun createGroup() {
-        repository.createGroup()
+    fun loadFriendProfile(userId: String) {
+
     }
 
-    fun loadFriendProfile(userId: String) {}
-    fun loadPublicPaths(userId: UUID) {}
-    fun addPathToCollection(path: PathResponse) {}
+    fun addPathToCollection(path: PathResponse) {
+        viewModelScope.launch {
+            repository.savePath(path)
+        }
+    }
     fun previewPath(path: PathResponse) {
         locationRepository.loadPreviewPath(path.polyline)
     }
-
 }

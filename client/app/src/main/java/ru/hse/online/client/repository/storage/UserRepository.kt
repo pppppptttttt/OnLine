@@ -15,6 +15,7 @@ import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResponse
 import ru.hse.online.client.repository.networking.api_data.PathResult
 import ru.hse.online.client.repository.networking.api_data.userToFriendMap
+import ru.hse.online.client.services.StepCounterService
 import ru.hse.online.client.viewModels.LeaderBoardViewModel
 import ru.hse.online.client.viewModels.StatsViewModel
 import java.time.LocalDate
@@ -30,8 +31,8 @@ class UserRepository(
     private val _friends = MutableStateFlow<List<Friend>>(listOf())
     val friends: StateFlow<List<Friend>> = _friends.asStateFlow()
 
-    private val _paths = MutableStateFlow<List<PathRequest>>(emptyList())
-    val paths: StateFlow<List<PathRequest>> = _paths.asStateFlow()
+    private val _paths = MutableStateFlow<List<PathResponse>>(emptyList())
+    val paths: StateFlow<List<PathResponse>> = _paths.asStateFlow()
 
     private val _friendPublicPaths = MutableStateFlow<List<PathResponse>>(emptyList())
     val friendPublicPaths: StateFlow<List<PathResponse>> = _friendPublicPaths.asStateFlow()
@@ -39,8 +40,21 @@ class UserRepository(
     private val _friendProfile = MutableStateFlow<Friend?>(null)
     val friendProfile: StateFlow<Friend?> = _friendProfile.asStateFlow()
 
-    private val _group = MutableStateFlow<Map<UUID, Friend>>(emptyMap())
-    val group: StateFlow<Map<UUID, Friend>> = _group.asStateFlow()
+    private val _lifetimeSteps = MutableStateFlow<Int>(0)
+    val lifetimeSteps: StateFlow<Int> = _lifetimeSteps.asStateFlow()
+
+    private val _lifetimeCalories = MutableStateFlow<Double>(0.0)
+    val lifetimeCalories: StateFlow<Double> = _lifetimeCalories.asStateFlow()
+
+    private val _lifetimeDistance = MutableStateFlow<Double>(0.0)
+    val lifetimeDistance: StateFlow<Double> = _lifetimeDistance.asStateFlow()
+
+    suspend fun loadLifeTimeStats() {
+        val result = statisticsRepository.getLifeTime()
+        _lifetimeSteps.value = result[StepCounterService.Stats.STEPS]!!.toInt()
+        _lifetimeDistance.value = result[StepCounterService.Stats.DISTANCE]!!
+        _lifetimeCalories.value = result[StepCounterService.Stats.KCALS]!!
+    }
 
     suspend fun loadFriends() {
         when (val result = friendshipRepository.getFriends()) {
@@ -55,10 +69,19 @@ class UserRepository(
         }
     }
 
+    suspend fun loadPaths() {
+        when (val result = pathRepository.getPaths()) {
+            is PathResult.Success -> {
+                _paths.value = result.paths!!
+            }
+            is PathResult.Failure -> {}
+        }
+    }
+
     suspend fun addFriend(email: String) {
         val result = friendshipRepository.addFriend(
             email
-        );
+        )
         if (result.second != null) {
             _friends.value += (result.second!!)
         }
@@ -68,7 +91,24 @@ class UserRepository(
         _friends.value = _friends.value.dropWhile { it.userId == uuid }
         friendshipRepository.removeFriend(
             uuid
-        );
+        )
+    }
+
+    suspend fun savePath(path: PathResponse) {
+        val pathValue = PathRequest(
+            userId = appDataStore.getUserIdFlow().first(),
+            polyline = path.polyline,
+            created = path.created,
+            name = path.name,
+            distance = path.distance,
+            duration = path.duration
+        )
+        when (pathRepository.createPath(pathValue)) {
+            is PathResult.Failure -> {}
+            is PathResult.Success -> {
+                _paths.value += path
+            }            
+        }
     }
 
     suspend fun savePath(description: String, path: List<LatLng>) {
@@ -80,51 +120,21 @@ class UserRepository(
             distance = statsViewModel.onlineDistance.first(),
             duration = statsViewModel.onlineTime.first().toDouble()
         )
+        val path = PathResponse(
+            userId = appDataStore.getUserIdFlow().first(),
+            pathId = UUID(0,0),
+            polyline = path.toGoogleMapsFormat(),
+            created = LocalDate.now(),
+            name = description,
+            distance = statsViewModel.onlineDistance.first(),
+            duration = statsViewModel.onlineTime.first().toDouble()
+        )
         when (pathRepository.createPath(pathValue)) {
             is PathResult.Failure -> {}
             is PathResult.Success -> {
-                _paths.value += pathValue
+                _paths.value += path
             }
         }
-    }
-
-    init {
-        val fr = Friend(
-            UUID.randomUUID(),
-            "lol",
-            "kek",
-            hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0)
-        )
-        _friends.value += fr
-        _friendProfile.value = fr
-        _friendPublicPaths.value += PathResponse(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            "}__uHwg_uDslDoneEji_CxmvD?oohD",
-            LocalDate.of(1, 1, 1),
-            "aboba",
-            1.0,
-            1.0
-        )
-    }
-
-    fun createGroup() {
-        val fr = Friend(
-            UUID.randomUUID(),
-            "lol",
-            "kek",
-            hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0),
-            Color.Red
-        )
-        val fr2 = Friend(
-            UUID.randomUUID(),
-            "lol",
-            "kek",
-            hashMapOf("steps" to 123.0, "distance" to 1.0, "kcals" to 2.0),
-            Color.Blue
-        )
-        _group.value += Pair(fr.userId, fr)
-        _group.value += Pair(fr2.userId, fr2)
     }
 
     suspend fun getLeaderboard(timeFrame: LeaderBoardViewModel.TimeFrame): List<LeaderBoardViewModel.LeaderBoardUser> {
