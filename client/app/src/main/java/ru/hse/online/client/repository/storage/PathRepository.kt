@@ -11,10 +11,11 @@ class PathRepository(
     private val appDataStore: AppDataStore
 ) {
 
-    suspend fun getPaths(userId: UUID = appDataStore.getUserIdFlow().first()): PathResult {
+    suspend fun getPaths(friendId: UUID? = null): PathResult {
         val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
-            val response = pathApiService.getPaths(token, userId)
+            val response = pathApiService.getPaths(token, friendId ?: userId)
             when (response.code()) {
                 200 -> PathResult.Success(
                     paths = response.body(),

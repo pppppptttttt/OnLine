@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.forEach
 import ru.hse.online.client.presentation.map.toGoogleMapsFormat
 import ru.hse.online.client.repository.FriendshipRepository
 import ru.hse.online.client.repository.StatisticsRepository
@@ -50,9 +51,9 @@ class UserRepository(
     val lifetimeDistance: StateFlow<Double> = _lifetimeDistance.asStateFlow()
 
     suspend fun loadFriendProfile(userId: String) {
-        _friends.forEach {
+        _friends.value.forEach {
             if (it.userId.toString() == userId) {
-                _friendProfile = it
+                _friendProfile.value = it
                 when (val result = pathRepository.getPaths(it.userId)) {
                     is PathResult.Success -> {
                          _friendPublicPaths.value = result.paths!!
@@ -93,6 +94,9 @@ class UserRepository(
     }
 
     suspend fun addFriend(email: String) {
+        if (_friends.value.any { it.email == email }) {
+            return
+        }
         val result = friendshipRepository.addFriend(
             email
         )

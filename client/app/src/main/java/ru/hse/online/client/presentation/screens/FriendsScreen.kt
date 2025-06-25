@@ -85,7 +85,7 @@ fun FriendsScreen(userViewModel: UserViewModel, navController: NavController, gr
                 TextField(
                     value = newFriendName,
                     onValueChange = { newFriendName = it },
-                    label = { Text("Friend's name") },
+                    label = { Text("Friend's email") },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(

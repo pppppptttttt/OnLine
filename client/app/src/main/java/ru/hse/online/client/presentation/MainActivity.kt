@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material3.Icon
@@ -53,7 +54,7 @@ sealed class Screen(
 ) {
     data object Main : Screen("main", "Main", Icons.Default.Home)
     data object Map : Screen("map", "Map", Icons.Default.Map)
-    data object Menu : Screen("menu", "More", Icons.Default.Settings)
+    data object Menu : Screen("menu", "More", Icons.Default.Menu)
     data object Test : Screen("test", "Test", Icons.Outlined.Science)
 }
 
