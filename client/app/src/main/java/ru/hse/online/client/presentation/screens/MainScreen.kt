@@ -414,7 +414,7 @@ private fun InvitesList(groupViewModel: GroupViewModel) {
         return
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.height(100.dp)) {
         items(invites.toList()) {
             InviteCard(from = it, groupViewModel = groupViewModel)
         }
