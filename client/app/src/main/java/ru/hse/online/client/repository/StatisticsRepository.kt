@@ -39,6 +39,8 @@ class StatisticsRepository(
     }
 
     suspend fun getLifeTime(): Map<Stats, Double> {
+        val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
+        val userId: UUID = appDataStore.getUserIdFlow().first()
         val res:MutableMap<Stats, Double> = mutableMapOf()
         Stats.entries.forEach {
             if (it != Stats.TIME) {
@@ -47,7 +49,11 @@ class StatisticsRepository(
                         if (result.statistics.isNotEmpty()) {
                             res[it] = result.statistics.first().value
                         }
-                        else res[it] = 0.0
+                        else {
+                            res[it] = 0.0
+                            val stats = mutableListOf(UserStatistics(userId, it.name, LocalDate.ofEpochDay(0), 0.0))
+                            statisticsApiService.addStatistics("Bearer $token", stats)
+                        }
                     }
                     is StatisticsResult.Failure -> {}
                     is StatisticsResult.SuccessPost -> {}

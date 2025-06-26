@@ -122,7 +122,7 @@ fun MapOverlayView(
                 icon = Icons.Default.AccessTime,
                 title = "time",
                 value = formatTime(onLineTime),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(2f)
             )
         }
 
@@ -296,7 +296,6 @@ fun PathSavingDialog(
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.6f)
                 .wrapContentSize()
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
@@ -322,7 +321,7 @@ fun PathSavingDialog(
                     onValueChange = { pathDescription = it },
                     label = { Text("Enter description") },
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .width(240.dp)
                         .padding(horizontal = 16.dp)
                 )
 
