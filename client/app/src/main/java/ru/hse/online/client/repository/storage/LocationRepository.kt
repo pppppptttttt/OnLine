@@ -42,11 +42,6 @@ class LocationRepository {
 
     fun loadPreviewPath(pathLine: String) {
         _previewPath.value = pathLine.googleMapsFormatToLatLngList()
-        
-        _previewPath.value += LatLng(50.79055,29.82028)
-        _previewPath.value += LatLng(50.81833,30.83652)
-        _previewPath.value += LatLng(50.16131,29.89719)
-        _previewPath.value += LatLng(50.16131,30.76511)
     }
 
     fun clearPreview() {
