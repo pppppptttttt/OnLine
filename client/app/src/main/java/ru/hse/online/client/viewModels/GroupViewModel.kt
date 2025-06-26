@@ -59,6 +59,11 @@ class GroupViewModel(
     private val _groupPaths = MutableStateFlow<Map<Friend, List<LatLng>>>(mutableMapOf())
     val groupPaths: StateFlow<Map<Friend, List<LatLng>>> = _groupPaths.asStateFlow()
 
+    fun close() {
+        isOnline = false
+        _groupId.value =  -1L
+        _groupPaths.value = mutableMapOf()
+    }
 
     init {
         viewModelScope.launch {
@@ -271,6 +276,7 @@ class GroupViewModel(
         stompClient.send("/app/joinGroup", gson.toJson(invite))
             .subscribe()
         addLog("Joining group of: $inviter")
+        sendLocation(location.value.latitude, location.value.longitude)
     }
 
     fun quitGroup() {

@@ -36,7 +36,7 @@ import ru.hse.online.client.viewModels.LeaderBoardViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeaderBoardScreen(viewModel: LeaderBoardViewModel = koinViewModel(), onBack: () -> Unit) {
+fun LeaderBoardScreen(viewModel: LeaderBobardViewModel = koinViewModel(), onBack: () -> Unit) {
     val selectedTimeFrame by viewModel.selectedTimeFrame.collectAsStateWithLifecycle()
     val leaderboardState by viewModel.leaderboardState.collectAsStateWithLifecycle()
     val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
