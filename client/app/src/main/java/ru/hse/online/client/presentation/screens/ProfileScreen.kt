@@ -86,17 +86,6 @@ fun ProfileScreen(userViewModel: UserViewModel, statsViewModel: StatsViewModel, 
                 LifetimeStatsRow(stepCount + stepLife, calories + caloriesLife, distance + distanceLife)
                 Spacer(modifier = Modifier.height(24.dp))
             }
-
-            item {
-                SectionTitle("Achievements")
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            
-            item {
-                AchievementsList(achievements = achievements)
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
             item {
                 SectionTitle("Saved Paths")
                 Spacer(modifier = Modifier.height(12.dp))
