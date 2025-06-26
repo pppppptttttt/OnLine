@@ -112,10 +112,6 @@ class StepCounterService : Service(), SensorEventListener {
     }
 
     fun goOnline() {
-        _stepsOnline.value = 0
-        _caloriesBurnedOnline.value = 0.0
-        _distanceTraveledOnline.value = 0.0
-        _timeElapsedOnline.value = 0
         isOnline = true
     }
 
@@ -129,6 +125,10 @@ class StepCounterService : Service(), SensorEventListener {
 
     fun goOffline() {
         isOnline = false
+        _stepsOnline.value = 0
+        _caloriesBurnedOnline.value = 0.0
+        _distanceTraveledOnline.value = 0.0
+        _timeElapsedOnline.value = 0
     }
 
     private val binder = LocalBinder()
@@ -338,6 +338,7 @@ class StepCounterService : Service(), SensorEventListener {
         }
 
         if (isOnline) {
+            log.e("BOBRD", "${_caloriesBurnedOnline.value}")
             _caloriesBurnedOnline.value += calories
             _distanceTraveledOnline.value += _KM_PER_STEP
             if (dur in 1.._INACTIVE_INTERVAL_MILIS) {
