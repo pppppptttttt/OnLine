@@ -81,11 +81,7 @@ class LocationViewModel(
                 when (state) {
                     is LocationRepository.LocationState.Available -> {
                         val newPoint = state.location.let {
-                            val (filteredLat, filteredLng) = kalmanFilter.update(
-                                it.latitude,
-                                it.longitude
-                            )
-                            LatLng(filteredLat, filteredLng)
+                            LatLng(it.latitude, it.longitude)
                         }
 
                         _locationState.value = newPoint
@@ -94,7 +90,6 @@ class LocationViewModel(
                                 currentPoints + newPoint
                             }
                         }
-                        Log.i(TAG, "Filtered location: $newPoint")
                     }
                     is LocationRepository.LocationState.Error -> {
                         Log.i(TAG, state.message)
