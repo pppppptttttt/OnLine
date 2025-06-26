@@ -1,5 +1,6 @@
 package ru.hse.online.client.repository.storage
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -138,7 +139,7 @@ class UserRepository(
             distance = statsViewModel.onlineDistance.first(),
             duration = statsViewModel.onlineTime.first().toDouble()
         )
-        val path = PathResponse(
+        val pathResponse = PathResponse(
             userId = appDataStore.getUserIdFlow().first(),
             pathId = UUID(0,0),
             polyline = path.toGoogleMapsFormat(),
@@ -147,10 +148,11 @@ class UserRepository(
             distance = statsViewModel.onlineDistance.first(),
             duration = statsViewModel.onlineTime.first().toDouble()
         )
-        when (pathRepository.createPath(pathValue)) {
-            is PathResult.Failure -> {}
+        when (val res = pathRepository.createPath(pathValue)) {
+            is PathResult.Failure -> {
+            }
             is PathResult.Success -> {
-                _paths.value += path
+                _paths.value += pathResponse
             }
         }
     }

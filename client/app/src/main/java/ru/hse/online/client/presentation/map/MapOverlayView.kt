@@ -201,13 +201,13 @@ fun MapOverlayView(
                 showPathSaveDialog = false
                 statsViewModel.goOffLine()
                 locationViewModel.goOffLine(savePath = false)
-                groupViewModel.clear()
+                groupViewModel.close()
             },
             onConfirmation = { value: String ->
                 showPathSaveDialog = false
                 statsViewModel.goOffLine()
                 locationViewModel.goOffLine(savePath = true, value)
-                groupViewModel.clear()
+                groupViewModel.close()
             },
             statsViewModel = statsViewModel
         )

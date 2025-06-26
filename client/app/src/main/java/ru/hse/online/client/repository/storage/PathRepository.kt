@@ -1,5 +1,6 @@
 package ru.hse.online.client.repository.storage
 
+import android.util.Log
 import kotlinx.coroutines.flow.first
 import ru.hse.online.client.repository.networking.api_data.PathRequest
 import ru.hse.online.client.repository.networking.api_data.PathResult
@@ -15,7 +16,7 @@ class PathRepository(
         val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
         val userId: UUID = appDataStore.getUserIdFlow().first()
         return try {
-            val response = pathApiService.getPaths(token, friendId ?: userId)
+            val response = pathApiService.getPaths("Bearer $token", friendId ?: userId)
             when (response.code()) {
                 200 -> PathResult.Success(
                     paths = response.body(),
@@ -34,7 +35,7 @@ class PathRepository(
     suspend fun createPath(path: PathRequest): PathResult {
         val token: String = appDataStore.getValueFlow(AppDataStore.USER_TOKEN, "").first()
         return try {
-            val response = pathApiService.createPath(token, path)
+            val response = pathApiService.createPath("Bearer $token", path)
             when (response.code()) {
                 204 -> PathResult.Success(code = response.code())
                 else -> PathResult.Failure(
@@ -49,7 +50,7 @@ class PathRepository(
 
     suspend fun deletePath(token: String, userId: UUID, pathId: UUID): PathResult {
         return try {
-            val response = pathApiService.deletePath(token, userId, pathId)
+            val response = pathApiService.deletePath("Bearer $token", userId, pathId)
             when (response.code()) {
                 204 -> PathResult.Success(code = response.code())
                 else -> PathResult.Failure(

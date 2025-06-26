@@ -129,6 +129,13 @@ class StepCounterService : Service(), SensorEventListener {
         _caloriesBurnedOnline.value = 0.0
         _distanceTraveledOnline.value = 0.0
         _timeElapsedOnline.value = 0
+
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.saveValue(AppDataStore.USER_ONLINE_STEPS, 0)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_CALORIES, 0.0)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_DISTANCE, 0.0)
+            dataStore.saveValue(AppDataStore.USER_ONLINE_TIME, 0)
+        }
     }
 
     private val binder = LocalBinder()
@@ -197,34 +204,25 @@ class StepCounterService : Service(), SensorEventListener {
 
         CoroutineScope(Dispatchers.IO).launch {
             launch {
-                dataStore.getValueFlow(AppDataStore.USER_ONLINE_STEPS, 0).collect { value ->
-                    _stepsOnline.value = value
-                }
+                _stepsOnline.value = dataStore.getValueFlow(AppDataStore.USER_ONLINE_STEPS, 0).first()
             }
 
             launch {
-                dataStore.getValueFlow(AppDataStore.USER_ONLINE_CALORIES, 0.0).collect { value ->
-                    _caloriesBurnedOnline.value = value
-                }
+                _caloriesBurnedOnline.value = dataStore.getValueFlow(AppDataStore.USER_ONLINE_CALORIES, 0.0).first()
             }
 
             launch {
-                dataStore.getValueFlow(AppDataStore.USER_ONLINE_DISTANCE, 0.0).collect { value ->
-                    _distanceTraveledOnline.value = value
-                }
+                _distanceTraveledOnline.value = dataStore.getValueFlow(AppDataStore.USER_ONLINE_DISTANCE, 0.0).first()
             }
 
             launch {
-                dataStore.getValueFlow(AppDataStore.USER_ONLINE_TIME, 0).collect { value ->
-                    _timeElapsedOnline.value = value
-                }
+                _timeElapsedOnline.value = dataStore.getValueFlow(AppDataStore.USER_ONLINE_TIME, 0).first()
             }
 
             launch {
-                dataStore.getValueFlow(AppDataStore.USER_PREVIOUS_DATE, "").collect { value ->
-                    _prevDate =
-                        if (value == "") LocalDate.now() else LocalDate.parse(value, dateFormatter)
-                }
+                val value = dataStore.getValueFlow(AppDataStore.USER_PREVIOUS_DATE, "").first()
+                _prevDate =
+                    if (value == "") LocalDate.now() else LocalDate.parse(value, dateFormatter)
             }
         }
         CoroutineScope(Dispatchers.IO).launch {
@@ -318,6 +316,8 @@ class StepCounterService : Service(), SensorEventListener {
 
         _prev = LocalDateTime.now()
 
+        val calories = _KKAL_PER_STEP
+        /*
         val calories = if (userWeight > 0 && userHeight > 0) {
             // Формула: 0.035 * вес + (скорость^2 / рост) * 0.029 * вес
             val heightMeters = userHeight / 100.0
@@ -327,7 +327,7 @@ class StepCounterService : Service(), SensorEventListener {
             kkalToMin * mins
         } else {
             _KKAL_PER_STEP
-        }
+        }*/
 
         increaseStat(calories, Stats.KCALS)
         increaseStat(_KM_PER_STEP, Stats.DISTANCE)
@@ -338,7 +338,6 @@ class StepCounterService : Service(), SensorEventListener {
         }
 
         if (isOnline) {
-            log.e("BOBRD", "${_caloriesBurnedOnline.value}")
             _caloriesBurnedOnline.value += calories
             _distanceTraveledOnline.value += _KM_PER_STEP
             if (dur in 1.._INACTIVE_INTERVAL_MILIS) {
